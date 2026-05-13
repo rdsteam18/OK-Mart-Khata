@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>बल्क रिमाइंडर - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card,
+        body.dark-mode .customer-item,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .bottom-sheet .sheet-content,
+        body.dark-mode .header,
+        body.dark-mode .filter-section,
+        body.dark-mode .message-preview {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .header h1 {
+            font-size: 18px;
+            flex: 1;
+        }
+        .dark-mode-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin: 12px;
+        }
+        .stat-card {
+            flex: 1;
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .stat-card .value.danger {
+            color: var(--danger);
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: var(--light);
+            margin: 12px;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+        .filter-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .filter-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            background: var(--light);
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            padding: 8px 16px;
+            background: var(--light-gray);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .filter-chip.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Customer Selection */
+        .selection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px;
+            padding: 8px 0;
+        }
+        .select-all-btn {
+            background: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        .selected-count {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Customer List */
+        .customer-list {
+            margin: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .customer-item {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+        }
+        .customer-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+        .customer-info {
+            flex: 1;
+        }
+        .customer-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .customer-phone {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .customer-due {
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--danger);
+        }
+
+        /* Message Preview */
+        .message-preview {
+            background: var(--light);
+            margin: 12px;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+        .message-preview h4 {
+            margin-bottom: 12px;
+        }
+        .message-box {
+            background: var(--light-gray);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .message-type-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .msg-type-btn {
+            flex: 1;
+            padding: 10px;
+            background: var(--light-gray);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+        .msg-type-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .send-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        /* Toast */
+        .toast-message {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast-message.show {
+            opacity: 1;
+        }
+
+        /* Progress */
+        .progress-container {
+            margin: 12px;
+            display: none;
+        }
+        .progress-bar {
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 8px;
+            color: var(--gray);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item active" data-page="bulk">
+        <span>📲</span>
+        <span class="nav-label">बल्क</span>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1>📲 बल्क रिमाइंडर</h1>
+    <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="label">कुल ग्राहक</div>
+        <div class="value" id="totalCustomers">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">बकाया ग्राहक</div>
+        <div class="value danger" id="dueCustomers">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">कुल बकाया</div>
+        <div class="value danger" id="totalDue">₹0</div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <div class="filter-title">🎯 फ़िल्टर करें</div>
+    <div class="filter-row">
+        <input type="number" id="minDue" class="filter-input" placeholder="न्यूनतम बकाया" value="0">
+        <input type="number" id="maxDue" class="filter-input" placeholder="अधिकतम बकाया">
+    </div>
+    <div class="filter-buttons">
+        <div class="filter-chip" data-filter="all">सभी बकाया</div>
+        <div class="filter-chip" data-filter="500">₹500+</div>
+        <div class="filter-chip" data-filter="1000">₹1000+</div>
+        <div class="filter-chip" data-filter="5000">₹5000+</div>
+        <div class="filter-chip" data-filter="10000">₹10000+</div>
+    </div>
+</div>
+
+<!-- Selection Header -->
+<div class="selection-header">
+    <button class="select-all-btn" id="selectAllBtn">सभी का चयन करें</button>
+    <span class="selected-count" id="selectedCount">0 ग्राहक चुने</span>
+</div>
+
+<!-- Customer List -->
+<div class="customer-list" id="customerList">
+    <div class="loading">लोड हो रहा है...</div>
+</div>
+
+<!-- Progress Bar -->
+<div class="progress-container" id="progressContainer">
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-text" id="progressText">भेजा जा रहा है...</div>
+</div>
+
+<!-- Message Preview -->
+<div class="message-preview">
+    <h4>✏️ मैसेज प्रीव्यू</h4>
+    <div class="message-type-buttons">
+        <button class="msg-type-btn active" data-type="friendly">😊 फ्रेंडली</button>
+        <button class="msg-type-btn" data-type="due">⚠️ बकाया</button>
+        <button class="msg-type-btn" data-type="urgent">🚨 अर्जेंट</button>
+    </div>
+    <div class="message-box" id="messagePreview"></div>
+    <button class="send-btn" id="sendBtn">📲 WhatsApp पर भेजें</button>
+</div>
+
+<div id="toastMessage" class="toast-message"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    let allCustomers = [];
+    let selectedCustomers = new Set();
+    let currentMessageType = 'friendly';
+    let storeName = 'OK Mart';
+    
+    const toastMessage = document.getElementById('toastMessage');
+    
+    function showToast(msg) {
+        toastMessage.innerText = msg;
+        toastMessage.classList.add('show');
+        setTimeout(() => toastMessage.classList.remove('show'), 3000);
+    }
+    
+    // Check Login
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        await loadStoreSettings();
+        await loadCustomers();
+    });
+    
+    // Load Store Settings
+    async function loadStoreSettings() {
+        try {
+            const settingsRef = doc(db, 'settings', 'store_settings');
+            const settingsSnap = await getDoc(settingsRef);
+            if (settingsSnap.exists()) {
+                const data = settingsSnap.data();
+                storeName = data.storeName || 'OK Mart';
+                if (data.primaryColor) {
+                    document.documentElement.style.setProperty('--primary', data.primaryColor);
+                }
+            }
+        } catch (e) { console.log(e); }
+    }
+    
+    // Load Customers
+    async function loadCustomers() {
+        try {
+            const snapshot = await getDocs(collection(db, 'customers'));
+            allCustomers = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const due = data.totalDue || 0;
+                if (due > 0) {  // Only due customers
+                    allCustomers.push({
+                        id: doc.id,
+                        name: data.name || 'N/A',
+                        phone: data.phone || '',
+                        due: due,
+                        totalAdded: data.totalAdded || 0,
+                        totalPaid: data.totalPaid || 0
+                    });
+                }
+            });
+            
+            // Sort by due amount (highest first)
+            allCustomers.sort((a, b) => b.due - a.due);
+            
+            updateStats();
+            applyFilter();
+            
+        } catch (error) {
+            console.error("Error loading customers:", error);
+            document.getElementById('customerList').innerHTML = '<div class="empty-state">❌ लोड करने में एरर</div>';
+        }
+    }
+    
+    // Update Statistics
+    function updateStats() {
+        let totalDue = 0;
+        allCustomers.forEach(c => totalDue += c.due);
+        
+        document.getElementById('totalCustomers').innerText = allCustomers.length;
+        document.getElementById('dueCustomers').innerText = allCustomers.length;
+        document.getElementById('totalDue').innerHTML = '₹' + totalDue.toLocaleString();
+    }
+    
+    // Apply Filter
+    let currentFilteredCustomers = [];
+    
+    function applyFilter() {
+        let minDue = parseInt(document.getElementById('minDue').value) || 0;
+        let maxDue = parseInt(document.getElementById('maxDue').value) || Infinity;
+        
+        currentFilteredCustomers = allCustomers.filter(c => 
+            c.due >= minDue && c.due <= maxDue
+        );
+        
+        renderCustomerList();
+        updateMessagePreview();
+    }
+    
+    // Render Customer List with checkboxes
+    function renderCustomerList() {
+        const container = document.getElementById('customerList');
+        
+        if (currentFilteredCustomers.length === 0) {
+            container.innerHTML = '<div class="empty-state">📭 कोई बकाया ग्राहक नहीं</div>';
+            return;
+        }
+        
+        container.innerHTML = currentFilteredCustomers.map(customer => `
+            <div class="customer-item" data-id="${customer.id}">
+                <input type="checkbox" class="customer-checkbox" data-id="${customer.id}" ${selectedCustomers.has(customer.id) ? 'checked' : ''}>
+                <div class="customer-info">
+                    <div class="customer-name">${escapeHtml(customer.name)}</div>
+                    <div class="customer-phone">📞 ${customer.phone}</div>
+                </div>
+                <div class="customer-due">₹${customer.due.toLocaleString()}</div>
+            </div>
+        `).join('');
+        
+        // Add checkbox listeners
+        document.querySelectorAll('.customer-checkbox').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                e.stopPropagation();
+                const id = cb.dataset.id;
+                if (cb.checked) {
+                    selectedCustomers.add(id);
+                } else {
+                    selectedCustomers.delete(id);
+                }
+                updateSelectedCount();
+            });
+        });
+        
+        // Add click on card to toggle checkbox
+        document.querySelectorAll('.customer-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('customer-checkbox')) {
+                    const cb = item.querySelector('.customer-checkbox');
+                    if (cb) {
+                        cb.checked = !cb.checked;
+                        const event = new Event('change');
+                        cb.dispatchEvent(event);
+                    }
+                }
+            });
+        });
+        
+        updateSelectedCount();
+    }
+    
+    // Update selected count
+    function updateSelectedCount() {
+        document.getElementById('selectedCount').innerText = `${selectedCustomers.size} ग्राहक चुने`;
+    }
+    
+    // Select all
+    function selectAll() {
+        if (selectedCustomers.size === currentFilteredCustomers.length) {
+            // Deselect all
+            selectedCustomers.clear();
+        } else {
+            // Select all filtered customers
+            currentFilteredCustomers.forEach(c => {
+                selectedCustomers.add(c.id);
+            });
+        }
+        renderCustomerList();
+    }
+    
+    // Get message based on type
+    function getMessage(customer, type) {
+        const name = customer.name.split(' ')[0]; // First name only
+        const dueAmount = customer.due.toLocaleString();
+        
+        switch(type) {
+            case 'friendly':
+                return `नमस्ते ${name}, 🙏\n\nआपका बकाया रुपये ${dueAmount} है। कृपया जल्दी से जल्दी भुगतान करें।\n\nधन्यवाद!\n${storeName}`;
+            case 'due':
+                return `⚠️ सूचना: ${name} जी,\n\nआपका बकाया रुपये ${dueAmount} हो गया है। कृपया जल्द से जल्द भुगतान करें।\n\n${storeName}`;
+            case 'urgent':
+                return `🚨 अर्जेंट सूचना 🚨\n\n${name} जी,\nआपका बकाया रुपये ${dueAmount} लंबित है। कृपया आज या कल तक भुगतान करें।\n\nधन्यवाद\n${storeName}`;
+            default:
+                return `नमस्ते ${name}, आपका बकाया ₹${dueAmount} है। कृपया भुगतान करें।`;
+        }
+    }
+    
+    // Update message preview
+    function updateMessagePreview() {
+        if (currentFilteredCustomers.length === 0) {
+            document.getElementById('messagePreview').innerHTML = 'कोई ग्राहक नहीं';
+            return;
+        }
+        
+        const sampleCustomer = currentFilteredCustomers[0];
+        const message = getMessage(sampleCustomer, currentMessageType);
+        document.getElementById('messagePreview').innerHTML = message.replace(/\n/g, '<br>');
+    }
+    
+    // Send bulk WhatsApp messages
+    async function sendBulkMessages() {
+        if (selectedCustomers.size === 0) {
+            showToast('कृपया कम से कम एक ग्राहक चुनें');
+            return;
+        }
+        
+        const selectedCustomerData = allCustomers.filter(c => selectedCustomers.has(c.id));
+        
+        const confirmMsg = `📲 ${selectedCustomers.size} ग्राहकों को WhatsApp पर मैसेज भेजना है।\n\nक्या आप जारी रखना चाहते हैं?`;
+        if (!confirm(confirmMsg)) return;
+        
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        progressContainer.style.display = 'block';
+        sendBtn.disabled = true;
+        
+        let sent = 0;
+        let failed = 0;
+        
+        for (let i = 0; i < selectedCustomerData.length; i++) {
+            const customer = selectedCustomerData[i];
+            const phone = customer.phone.replace(/[^0-9]/g, '').replace(/^91/, '').replace(/^0/, '');
+            
+            if (phone && phone.length >= 10) {
+                const message = getMessage(customer, currentMessageType);
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+                
+                // Log reminder to Firestore
+                try {
+                    await addDoc(collection(db, 'reminders'), {
+                        customerId: customer.id,
+                        customerName: customer.name,
+                        phone: phone,
+                        message: message,
+                        type: currentMessageType,
+                        sentAt: new Date(),
+                        status: 'sent'
+                    });
+                } catch(e) { console.log(e); }
+                
+                // Open WhatsApp in new tab (will open multiple tabs)
+                window.open(whatsappUrl, '_blank');
+                sent++;
+            } else {
+                failed++;
+                console.log("Invalid phone:", customer.phone);
+            }
+            
+            // Update progress
+            const percent = ((i + 1) / selectedCustomerData.length) * 100;
+            progressFill.style.width = percent + '%';
+            progressText.innerText = `भेजा जा रहा है... ${i + 1}/${selectedCustomerData.length}`;
+            
+            // Delay to avoid overwhelming browser
+            await new Promise(r => setTimeout(r, 500));
+        }
+        
+        progressText.innerText = `✅ पूरा हुआ! ${sent} भेजे, ${failed} असफल`;
+        sendBtn.disabled = false;
+        
+        showToast(`✅ ${sent} ग्राहकों को मैसेज भेजा गया`);
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+            progressContainer.style.display = 'none';
+        }, 3000);
+    }
+    
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Filter chips
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            
+            const filterValue = chip.dataset.filter;
+            if (filterValue === 'all') {
+                document.getElementById('minDue').value = 0;
+                document.getElementById('maxDue').value = '';
+            } else {
+                document.getElementById('minDue').value = parseInt(filterValue);
+                document.getElementById('maxDue').value = '';
+            }
+            applyFilter();
+        });
+    });
+    
+    // Message type buttons
+    document.querySelectorAll('.msg-type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.msg-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMessageType = btn.dataset.type;
+            updateMessagePreview();
+        });
+    });
+    
+    // Input filters
+    document.getElementById('minDue')?.addEventListener('input', applyFilter);
+    document.getElementById('maxDue')?.addEventListener('input', applyFilter);
+    document.getElementById('selectAllBtn')?.addEventListener('click', selectAll);
+    document.getElementById('sendBtn')?.addEventListener('click', sendBulkMessages);
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => {
+            const page = nav.dataset.page;
+            if (page === 'dashboard') location.href = 'index.html';
+            if (page === 'customers') location.href = 'customers.html';
+            if (page === 'add') location.href = 'index.html';
+            if (page === 'reports') location.href = 'reports.html';
+        });
+    });
+    
+    // Back button
+    document.getElementById('backBtn')?.addEventListener('click', () => {
+        window.location.href = 'index.html';
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    });
+    
+    // Dark Mode
+    const darkBtn = document.getElementById('darkModeBtn');
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        darkBtn.innerText = '☀️';
+    }
+    darkBtn?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkBtn.innerText = isDark ? '☀️' : '🌙';
+    });
+</script>
+</body>
+</html>
