@@ -1,0 +1,542 @@
+/* Mobile First CSS - OK Mart Khata System */
+
+:root {
+    --primary: #FF5722;
+    --primary-dark: #E64A19;
+    --success: #4CAF50;
+    --danger: #F44336;
+    --warning: #FFC107;
+    --info: #2196F3;
+    --dark: #1a1a1a;
+    --light: #ffffff;
+    --gray: #757575;
+    --light-gray: #f5f5f5;
+    --border: #e0e0e0;
+    
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: var(--light-gray);
+    color: var(--dark);
+    padding-bottom: 70px;
+    line-height: 1.5;
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background: #121212;
+    color: #ffffff;
+}
+
+body.dark-mode .card,
+body.dark-mode .stat-card,
+body.dark-mode .customer-item,
+body.dark-mode .transaction-item {
+    background: #1e1e1e;
+    color: #ffffff;
+}
+
+/* Container */
+.container {
+    max-width: 100%;
+    padding: var(--space-md);
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    padding: var(--space-sm) 0;
+}
+
+.menu-btn, .notification-btn, .dark-mode-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    min-width: 44px;
+    min-height: 44px;
+    cursor: pointer;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+}
+
+/* Welcome Section */
+.welcome-section h2 {
+    font-size: 24px;
+    margin-bottom: var(--space-xs);
+}
+
+.welcome-section p {
+    color: var(--gray);
+    font-size: 14px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.stat-card {
+    background: var(--light);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s;
+}
+
+.stat-card:active {
+    transform: scale(0.98);
+}
+
+.stat-icon {
+    font-size: 32px;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--gray);
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Sections */
+.section {
+    margin-bottom: var(--space-lg);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.view-all {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Customer List */
+.customer-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.customer-item {
+    background: var(--light);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.customer-item:active {
+    transform: scale(0.98);
+    background: var(--light-gray);
+}
+
+.customer-rank {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.customer-info {
+    flex: 1;
+}
+
+.customer-name {
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.customer-phone {
+    font-size: 12px;
+    color: var(--gray);
+}
+
+.customer-due {
+    text-align: right;
+}
+
+.due-amount {
+    font-weight: bold;
+    color: var(--danger);
+}
+
+.due-percent {
+    font-size: 12px;
+    color: var(--gray);
+}
+
+/* Transaction List */
+.transaction-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.transaction-item {
+    background: var(--light);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.transaction-customer {
+    font-weight: 500;
+    margin-bottom: var(--space-xs);
+}
+
+.transaction-date {
+    font-size: 11px;
+    color: var(--gray);
+}
+
+.credit-amount {
+    color: var(--danger);
+    font-weight: bold;
+}
+
+.payment-amount {
+    color: var(--success);
+    font-weight: bold;
+}
+
+/* Bottom Navigation */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--light);
+    display: flex;
+    justify-content: space-around;
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    z-index: 100;
+}
+
+body.dark-mode .mobile-bottom-nav {
+    background: #1e1e1e;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: var(--gray);
+    min-width: 44px;
+    min-height: 44px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.nav-item.active {
+    color: var(--primary);
+}
+
+.nav-label {
+    font-size: 10px;
+}
+
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: 80px;
+    right: var(--space-md);
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background: var(--primary);
+    border: none;
+    color: white;
+    font-size: 24px;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    z-index: 90;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.fab:active {
+    transform: scale(0.95);
+    background: var(--primary-dark);
+}
+
+/* Bottom Sheet */
+.bottom-sheet {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.bottom-sheet.open {
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.sheet-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.bottom-sheet.open .sheet-overlay {
+    opacity: 1;
+}
+
+.sheet-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--light);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    transform: translateY(100%);
+    transition: transform 0.3s;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.bottom-sheet.open .sheet-content {
+    transform: translateY(0);
+}
+
+.sheet-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: var(--space-md) auto;
+}
+
+.sheet-body {
+    padding: var(--space-md);
+}
+
+body.dark-mode .sheet-content {
+    background: #1e1e1e;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: var(--space-md);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--space-sm);
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    background: var(--light);
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+body.dark-mode .form-control {
+    background: #2d2d2d;
+    border-color: #404040;
+    color: white;
+}
+
+/* Quick Amount Buttons */
+.quick-amounts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.quick-amount {
+    background: var(--light-gray);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-amount:active {
+    background: var(--primary);
+    color: white;
+}
+
+body.dark-mode .quick-amount {
+    background: #2d2d2d;
+    color: white;
+}
+
+/* Segmented Control */
+.segmented-control {
+    display: flex;
+    background: var(--light-gray);
+    border-radius: var(--radius-md);
+    padding: 4px;
+}
+
+.segment {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.segment.active {
+    background: var(--primary);
+    color: white;
+}
+
+/* Primary Button */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:active {
+    background: var(--primary-dark);
+}
+
+/* Amount Input Wrapper */
+.amount-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.currency {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Skeleton Loader */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: var(--radius-sm);
+    height: 60px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Desktop Styles */
+@media (min-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .container {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+}
+
+@media (min-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .container {
+        max-width: 1200px;
+    }
+}
