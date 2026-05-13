@@ -95,11 +95,6 @@
             to { opacity: 1; }
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
         /* Header */
         .header {
             text-align: center;
@@ -113,7 +108,6 @@
             border-radius: 50%;
             object-fit: cover;
             box-shadow: var(--shadow-md);
-            animation: fadeIn 0.5s;
         }
         .title {
             font-size: 24px;
@@ -528,6 +522,7 @@
         let currentCustomer = null;
         let currentCustomerId = null;
         let allTransactions = [];
+        let storeSettings = { storeName: 'OK Mart', logoUrl: null, primaryColor: '#FF5722', qrUrl: null, whatsappNumber: '' };
         
         const appContainer = document.getElementById('appContainer');
         const toastMessage = document.getElementById('toastMessage');
@@ -557,7 +552,6 @@
         function getSession() {
             const sessionStr = localStorage.getItem(SESSION_KEY);
             if (!sessionStr) return null;
-            
             try {
                 const session = JSON.parse(sessionStr);
                 if (new Date(session.expiresAt) > new Date()) {
@@ -576,17 +570,26 @@
             localStorage.removeItem(SESSION_KEY);
         }
         
+        // Load Store Settings from Firebase
         async function loadStoreSettings() {
             try {
                 const settingsRef = doc(db, 'settings', 'store_settings');
                 const settingsSnap = await getDoc(settingsRef);
                 if (settingsSnap.exists()) {
                     const data = settingsSnap.data();
-                    if (data.primaryColor) {
-                        document.documentElement.style.setProperty('--primary', data.primaryColor);
-                    }
+                    storeSettings.storeName = data.storeName || 'OK Mart';
+                    storeSettings.logoUrl = data.logoUrl || null;
+                    storeSettings.primaryColor = data.primaryColor || '#FF5722';
+                    storeSettings.qrUrl = data.qrUrl || null;
+                    storeSettings.whatsappNumber = data.whatsappNumber || '';
+                    
+                    // Apply primary color
+                    document.documentElement.style.setProperty('--primary', storeSettings.primaryColor);
+                    document.documentElement.style.setProperty('--primary-dark', storeSettings.primaryColor);
                 }
-            } catch (e) { console.log(e); }
+            } catch (e) { 
+                console.log("Settings load error:", e);
+            }
         }
         
         function normalizePhone(phone) {
@@ -717,21 +720,26 @@
         async function loadFullDashboard(customer) {
             const transactions = await loadCustomerTransactions(customer.id);
             allTransactions = transactions;
-            
-            const settingsRef = doc(db, 'settings', 'store_settings');
-            const settingsSnap = await getDoc(settingsRef);
-            const settings = settingsSnap.exists() ? settingsSnap.data() : {};
-            
-            renderDashboard(customer, transactions, settings);
+            renderDashboard(customer, transactions);
         }
         
         function showLoginScreen() {
+            // Get logo URL and store name from settings
+            const logoUrl = storeSettings.logoUrl;
+            const storeName = storeSettings.storeName;
+            
+            let logoHtml = '';
+            if (logoUrl && logoUrl.trim() !== '') {
+                logoHtml = `<img src="${logoUrl}" alt="Logo" class="logo" onerror="this.src='https://via.placeholder.com/80?text=OK'">`;
+            } else {
+                logoHtml = `<div class="logo" style="background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 40px;">🏪</div>`;
+            }
+            
             let html = `
                 <div class="login-card">
                     <div class="header">
-                        <img src="assets/images/logo-placeholder.png" alt="Logo" class="logo" id="storeLogo"
-                             onerror="this.src='https://via.placeholder.com/80?text=OK'">
-                        <div class="title" id="storeName">OK Mart</div>
+                        ${logoHtml}
+                        <div class="title" id="storeName">${escapeHtml(storeName)}</div>
                         <div class="subtitle">ग्राहक लॉगिन</div>
                     </div>
                     <div class="error-message" id="errorMessage">⚠️ <span id="errorText"></span></div>
@@ -963,7 +971,7 @@
             });
         }
         
-        function renderDashboard(customer, transactions, settings) {
+        function renderDashboard(customer, transactions) {
             const dueAmount = (customer.totalDue || 0);
             const totalAdded = (customer.totalAdded || 0);
             const totalPaid = (customer.totalPaid || 0);
@@ -986,8 +994,8 @@
                     </div>
             `;
             
-            if (settings && settings.qrUrl) {
-                html += `<div class="qr-section"><div>📱 स्कैन करें और भुगतान करें</div><div class="qr-image"><img src="${settings.qrUrl}" alt="Payment QR" onerror="this.style.display='none'"></div></div>`;
+            if (storeSettings.qrUrl && storeSettings.qrUrl.trim() !== '') {
+                html += `<div class="qr-section"><div>📱 स्कैन करें और भुगतान करें</div><div class="qr-image"><img src="${storeSettings.qrUrl}" alt="Payment QR" onerror="this.style.display='none'"></div></div>`;
             }
             
             html += `<div class="ledger-section"><div class="section-title">📋 लेनदेन इतिहास (${transactions.length})</div><div class="transaction-list">`;
@@ -1006,41 +1014,39 @@
             appContainer.innerHTML = html;
             
             document.getElementById('logoutBtn')?.addEventListener('click', () => { clearSession(); showLoginScreen(); });
-            document.getElementById('pdfBtn')?.addEventListener('click', () => generatePDF(customer, transactions, settings));
+            document.getElementById('pdfBtn')?.addEventListener('click', () => generatePDF(customer, transactions));
             document.getElementById('whatsappBtn')?.addEventListener('click', () => {
-                const whatsappNumber = settings?.whatsappNumber || '';
+                const whatsappNumber = storeSettings.whatsappNumber;
                 whatsappNumber ? window.open(`https://wa.me/${whatsappNumber}?text=नमस्ते, मुझे सहायता चाहिए`, '_blank') : showToast('सपोर्ट नंबर उपलब्ध नहीं है');
             });
         }
         
-        function generatePDF(customer, transactions, settings) {
+        function generatePDF(customer, transactions) {
             if (transactions.length === 0) { showToast('कोई लेनदेन नहीं है'); return; }
             const printWindow = window.open('', '_blank');
             const today = new Date().toLocaleDateString('hi-IN');
             let totalCredit = 0, totalPayment = 0;
             transactions.forEach(t => { if (t.type === 'credit') totalCredit += t.amount; else totalPayment += t.amount; });
-            let html = `<!DOCTYPE html><html><head><title>Statement - ${customer.name}</title><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;padding:20px}.header{text-align:center;margin-bottom:30px}.store-name{font-size:22px;font-weight:bold;color:#FF5722}.customer-details{margin:20px 0;padding:10px;background:#f5f5f5;border-radius:8px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#FF5722;color:white}.total-row{font-weight:bold;background:#f5f5f5}.due{color:red;font-weight:bold}.footer{margin-top:30px;text-align:center;font-size:11px;color:gray}@media print{body{padding:0}.no-print{display:none}}</style></head><body><div class="header"><div class="store-name">${settings?.storeName || 'OK Mart'}</div><div class="title">खाता स्टेटमेंट</div><div>दिनांक: ${today}</div></div><div class="customer-details"><strong>ग्राहक नाम:</strong> ${customer.name}<br><strong>मोबाइल:</strong> ${customer.phone}<br><strong>पता:</strong> ${customer.address || 'N/A'}</div><table><thead><tr><th>दिनांक</th><th>टाइप</th><th>रकम</th><th>नोट</th></tr></thead><tbody>`;
+            let html = `<!DOCTYPE html><html><head><title>Statement - ${customer.name}</title><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;padding:20px}.header{text-align:center;margin-bottom:30px}.store-name{font-size:22px;font-weight:bold;color:#FF5722}.customer-details{margin:20px 0;padding:10px;background:#f5f5f5;border-radius:8px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#FF5722;color:white}.total-row{font-weight:bold;background:#f5f5f5}.due{color:red;font-weight:bold}.footer{margin-top:30px;text-align:center;font-size:11px;color:gray}@media print{body{padding:0}.no-print{display:none}}</style></head><body><div class="header"><div class="store-name">${storeSettings.storeName}</div><div class="title">खाता स्टेटमेंट</div><div>दिनांक: ${today}</div></div><div class="customer-details"><strong>ग्राहक नाम:</strong> ${customer.name}<br><strong>मोबाइल:</strong> ${customer.phone}<br><strong>पता:</strong> ${customer.address || 'N/A'}</div><table><thead><tr><th>दिनांक</th><th>टाइप</th><th>रकम</th><th>नोट</th></tr></thead><tbody>`;
             transactions.slice(0, 50).forEach(t => { html += `<tr><td>${t.date.toLocaleDateString('hi-IN')}</td><td>${t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट'}</td><td>${t.type === 'credit' ? '+' : '-'} ₹${t.amount.toLocaleString()}</td><td>${escapeHtml(t.note) || '-'}</td></tr>`; });
             const balance = totalCredit - totalPayment;
-            html += `<tr class="total-row"><td colspan="3"><strong>कुल क्रेडिट</strong></td><td><strong>₹${totalCredit.toLocaleString()}</strong></td></tr><tr class="total-row"><td colspan="3"><strong>कुल भुगतान</strong></td><td><strong>₹${totalPayment.toLocaleString()}</strong></td></tr><tr class="total-row"><td colspan="3"><strong>शेष बकाया</strong></td><td class="due"><strong>₹${balance.toLocaleString()}</strong></td></tr></tbody></table><div class="footer"><p>यह एक कंप्यूटर जनरेटेड स्टेटमेंट है।</p><p>${settings?.storeName || 'OK Mart'} - धन्यवाद!</p></div><div class="no-print" style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:10px 20px;background:#FF5722;color:white;border:none;border-radius:8px;">🖨️ प्रिंट करें</button></div></body></html>`;
+            html += `<tr class="total-row"><td colspan="3"><strong>कुल क्रेडिट</strong></td><td><strong>₹${totalCredit.toLocaleString()}</strong></td></tr><tr class="total-row"><td colspan="3"><strong>कुल भुगतान</strong></td><td><strong>₹${totalPayment.toLocaleString()}</strong></td></tr><tr class="total-row"><td colspan="3"><strong>शेष बकाया</strong></td><td class="due"><strong>₹${balance.toLocaleString()}</strong></td></tr></tbody></table><div class="footer"><p>यह एक कंप्यूटर जनरेटेड स्टेटमेंट है।</p><p>${storeSettings.storeName} - धन्यवाद!</p></div><div class="no-print" style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:10px 20px;background:#FF5722;color:white;border:none;border-radius:8px;">🖨️ प्रिंट करें</button></div></body></html>`;
             printWindow.document.write(html);
             printWindow.document.close();
         }
         
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
         
-        // Initialize - Check for existing session
+        // Initialize - Load settings first, then check session
         async function init() {
             await loadStoreSettings();
+            
             const session = getSession();
             if (session) {
                 try {
                     const customer = session.customerData;
                     const transactions = await loadCustomerTransactions(session.customerId);
-                    const settingsRef = doc(db, 'settings', 'store_settings');
-                    const settingsSnap = await getDoc(settingsRef);
-                    const settings = settingsSnap.exists() ? settingsSnap.data() : {};
-                    renderDashboard(customer, transactions, settings);
+                    renderDashboard(customer, transactions);
                 } catch (e) {
                     showLoginScreen();
                 }
@@ -1054,14 +1060,16 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const installDiv = document.createElement('div');
-            installDiv.className = 'install-prompt';
-            installDiv.innerHTML = '<span>📲 ऐप इंस्टॉल करें</span><button id="installBtn">इंस्टॉल करें</button>';
-            document.body.appendChild(installDiv);
-            document.getElementById('installBtn')?.addEventListener('click', () => {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => { installDiv.remove(); });
-            });
+            setTimeout(() => {
+                const installDiv = document.createElement('div');
+                installDiv.className = 'install-prompt';
+                installDiv.innerHTML = '<span>📲 ऐप इंस्टॉल करें</span><button id="installBtn">इंस्टॉल करें</button>';
+                document.body.appendChild(installDiv);
+                document.getElementById('installBtn')?.addEventListener('click', () => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => { installDiv.remove(); });
+                });
+            }, 2000);
         });
         
         // Dark Mode
