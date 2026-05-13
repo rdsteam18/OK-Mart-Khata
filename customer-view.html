@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ग्राहक लॉगिन - OK Mart Khata</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <meta name="theme-color" content="#FF5722">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OK Khata">
     <style>
         * {
             margin: 0;
@@ -15,6 +21,7 @@
         :root {
             --primary: #FF5722;
             --primary-dark: #E64A19;
+            --primary-light: #FF8A65;
             --success: #4CAF50;
             --danger: #F44336;
             --warning: #FFC107;
@@ -42,7 +49,7 @@
         }
 
         body.dark-mode {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
         }
 
         .container {
@@ -53,14 +60,15 @@
             padding: 20px;
         }
 
+        /* Login Card */
         .login-card, .pin-card {
             background: var(--light);
-            border-radius: var(--radius-lg);
-            padding: 24px;
+            border-radius: var(--radius-xl);
+            padding: 32px 24px;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             box-shadow: var(--shadow-lg);
-            animation: slideUp 0.4s ease-out;
+            animation: slideUp 0.5s ease-out;
         }
 
         body.dark-mode .login-card,
@@ -74,7 +82,7 @@
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(40px);
             }
             to {
                 opacity: 1;
@@ -82,28 +90,46 @@
             }
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Header */
         .header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
         .logo {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             margin: 0 auto 12px;
             display: block;
             border-radius: 50%;
             object-fit: cover;
+            box-shadow: var(--shadow-md);
+            animation: fadeIn 0.5s;
         }
         .title {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
             margin-bottom: 4px;
+            color: var(--dark);
+        }
+        body.dark-mode .title {
+            color: #fff;
         }
         .subtitle {
             font-size: 13px;
             color: var(--gray);
         }
 
+        /* Form */
         .form-group {
             margin-bottom: 20px;
         }
@@ -115,13 +141,12 @@
         }
         .form-control {
             width: 100%;
-            padding: 14px;
-            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border: 2px solid var(--border);
             border-radius: var(--radius-md);
             font-size: 16px;
             background: var(--light);
-            text-align: center;
-            letter-spacing: 1px;
+            transition: all 0.3s;
         }
         body.dark-mode .form-control {
             background: #2d2d2d;
@@ -131,8 +156,10 @@
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.1);
         }
 
+        /* PIN Inputs */
         .pin-inputs {
             display: flex;
             gap: 12px;
@@ -148,6 +175,7 @@
             border: 2px solid var(--border);
             border-radius: var(--radius-md);
             background: var(--light);
+            transition: all 0.2s;
         }
         body.dark-mode .pin-input {
             background: #2d2d2d;
@@ -157,8 +185,10 @@
         .pin-input:focus {
             border-color: var(--primary);
             outline: none;
+            transform: scale(1.05);
         }
 
+        /* Buttons */
         .btn-primary {
             width: 100%;
             padding: 14px;
@@ -169,15 +199,17 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
         .btn-primary:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
         }
-        .btn-secondary {
-            background: var(--gray);
+        .btn-primary:disabled {
+            opacity: 0.6;
+            transform: none;
         }
 
+        /* Messages */
         .error-message {
             background: #FFEBEE;
             color: var(--danger);
@@ -187,11 +219,11 @@
             font-size: 13px;
             display: none;
             border-left: 3px solid var(--danger);
+            animation: fadeIn 0.3s;
         }
         body.dark-mode .error-message {
             background: #2d2d2d;
         }
-
         .success-message {
             background: #E8F5E9;
             color: var(--success);
@@ -201,11 +233,13 @@
             font-size: 13px;
             display: none;
             border-left: 3px solid var(--success);
+            animation: fadeIn 0.3s;
         }
 
+        /* Customer Dashboard */
         .customer-dashboard {
             background: var(--light);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-xl);
             width: 100%;
             max-width: 550px;
             box-shadow: var(--shadow-lg);
@@ -214,8 +248,8 @@
         }
 
         .dash-header {
-            background: var(--primary);
-            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 24px 20px;
             color: white;
             text-align: center;
             position: relative;
@@ -223,16 +257,16 @@
         .dash-header .name {
             font-size: 22px;
             font-weight: bold;
+            margin-bottom: 4px;
         }
         .dash-header .phone {
             font-size: 13px;
             opacity: 0.9;
-            margin-top: 4px;
         }
         .logout-icon {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 16px;
+            right: 16px;
             background: rgba(255,255,255,0.2);
             border: none;
             font-size: 20px;
@@ -240,8 +274,14 @@
             border-radius: 30px;
             cursor: pointer;
             color: white;
+            transition: all 0.2s;
+        }
+        .logout-icon:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.3);
         }
 
+        /* Stats */
         .stats-row {
             display: flex;
             padding: 20px;
@@ -255,6 +295,10 @@
             padding: 12px;
             background: var(--light-gray);
             border-radius: var(--radius-md);
+            transition: transform 0.2s;
+        }
+        .stat-card:active {
+            transform: scale(0.98);
         }
         body.dark-mode .stat-card {
             background: #2d2d2d;
@@ -274,6 +318,7 @@
             color: var(--success);
         }
 
+        /* Quick Actions */
         .quick-actions {
             display: flex;
             gap: 12px;
@@ -287,6 +332,12 @@
             padding: 12px;
             text-align: center;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:active {
+            transform: scale(0.97);
+            background: var(--primary);
+            color: white;
         }
         body.dark-mode .action-btn {
             background: #2d2d2d;
@@ -300,6 +351,7 @@
             color: var(--gray);
         }
 
+        /* QR Section */
         .qr-section {
             text-align: center;
             padding: 16px;
@@ -316,12 +368,14 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            background: white;
         }
         .qr-image img {
             max-width: 100%;
             max-height: 100%;
         }
 
+        /* Ledger Section */
         .ledger-section {
             padding: 16px;
             max-height: 400px;
@@ -331,6 +385,9 @@
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .transaction-list {
             display: flex;
@@ -344,6 +401,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.2s;
+        }
+        .transaction-item:active {
+            transform: scale(0.99);
         }
         .transaction-info {
             flex: 1;
@@ -378,6 +439,7 @@
             color: var(--gray);
         }
 
+        /* Toast Message */
         .toast-message {
             position: fixed;
             bottom: 30px;
@@ -385,18 +447,20 @@
             transform: translateX(-50%);
             background: var(--dark);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 30px;
             font-size: 13px;
             z-index: 300;
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
+            white-space: nowrap;
         }
         .toast-message.show {
             opacity: 1;
         }
 
+        /* Links */
         .forgot-link {
             text-align: center;
             margin-top: 16px;
@@ -406,43 +470,43 @@
             text-decoration: none;
             font-size: 13px;
         }
-
         .warning-text {
             font-size: 12px;
             color: var(--warning);
             text-align: center;
             margin-top: 10px;
         }
+
+        /* Install Prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 200;
+            animation: slideUp 0.3s;
+            box-shadow: var(--shadow-lg);
+        }
+        .install-prompt button {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <div class="container" id="appContainer">
-        <!-- Login View (Phone Number) -->
-        <div id="loginView" class="login-card">
-            <div class="header">
-                <img src="assets/images/logo-placeholder.png" alt="Logo" class="logo" id="storeLogo"
-                     onerror="this.src='https://via.placeholder.com/70?text=OK'">
-                <div class="title" id="storeName">OK Mart</div>
-                <div class="subtitle">ग्राहक लॉगिन</div>
-            </div>
-
-            <div class="error-message" id="errorMessage">
-                ⚠️ <span id="errorText"></span>
-            </div>
-
-            <div class="form-group">
-                <label>📞 मोबाइल नंबर</label>
-                <input type="tel" id="phoneInput" class="form-control" placeholder="9876543210" maxlength="10" inputmode="numeric">
-            </div>
-
-            <button class="btn-primary" id="loginBtn">🔓 जारी रखें</button>
-
-            <div style="text-align: center; margin-top: 16px;">
-                <a href="login.html" style="color: var(--primary); text-decoration: none;">← एडमिन लॉगिन</a>
-            </div>
-        </div>
-    </div>
-
+    <div class="container" id="appContainer"></div>
     <div id="toastMessage" class="toast-message"></div>
 
     <script type="module">
@@ -464,15 +528,52 @@
         let currentCustomer = null;
         let currentCustomerId = null;
         let allTransactions = [];
-        let pinAttempts = 0;
         
         const appContainer = document.getElementById('appContainer');
         const toastMessage = document.getElementById('toastMessage');
+        
+        // Session Keys
+        const SESSION_KEY = 'okmart_customer_session';
+        const SESSION_EXPIRY = 7 * 24 * 60 * 60 * 1000; // 7 days
         
         function showToast(msg) {
             toastMessage.innerText = msg;
             toastMessage.classList.add('show');
             setTimeout(() => toastMessage.classList.remove('show'), 3000);
+        }
+        
+        // Save session to localStorage
+        function saveSession(customerId, customerData) {
+            const session = {
+                customerId: customerId,
+                customerData: customerData,
+                savedAt: new Date().toISOString(),
+                expiresAt: new Date(Date.now() + SESSION_EXPIRY).toISOString()
+            };
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        }
+        
+        // Get session from localStorage
+        function getSession() {
+            const sessionStr = localStorage.getItem(SESSION_KEY);
+            if (!sessionStr) return null;
+            
+            try {
+                const session = JSON.parse(sessionStr);
+                if (new Date(session.expiresAt) > new Date()) {
+                    return session;
+                } else {
+                    localStorage.removeItem(SESSION_KEY);
+                    return null;
+                }
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        // Clear session
+        function clearSession() {
+            localStorage.removeItem(SESSION_KEY);
         }
         
         async function loadStoreSettings() {
@@ -481,8 +582,6 @@
                 const settingsSnap = await getDoc(settingsRef);
                 if (settingsSnap.exists()) {
                     const data = settingsSnap.data();
-                    if (data.logoUrl) document.getElementById('storeLogo').src = data.logoUrl;
-                    if (data.storeName) document.getElementById('storeName').innerText = data.storeName;
                     if (data.primaryColor) {
                         document.documentElement.style.setProperty('--primary', data.primaryColor);
                     }
@@ -490,7 +589,6 @@
             } catch (e) { console.log(e); }
         }
         
-        // Normalize phone number
         function normalizePhone(phone) {
             let cleaned = phone.toString().trim().replace(/[^0-9]/g, '');
             if (cleaned.startsWith('91')) cleaned = cleaned.substring(2);
@@ -498,7 +596,6 @@
             return cleaned;
         }
         
-        // Find customer by phone
         async function findCustomerByPhone(inputPhone) {
             const cleanInput = normalizePhone(inputPhone);
             const customersRef = collection(db, 'customers');
@@ -515,72 +612,77 @@
             return matchedCustomer;
         }
         
-        // Get or create customer PIN
         async function getCustomerPin(customerId) {
-            const pinRef = doc(db, 'customer_pins', customerId);
-            const pinSnap = await getDoc(pinRef);
-            
-            if (pinSnap.exists()) {
-                return pinSnap.data();
+            try {
+                const pinRef = doc(db, 'customer_pins', customerId);
+                const pinSnap = await getDoc(pinRef);
+                return pinSnap.exists() ? pinSnap.data() : null;
+            } catch (error) {
+                return null;
             }
-            return null;
         }
         
-        // Create new PIN for customer
         async function createCustomerPin(customerId, pin) {
-            const pinRef = doc(db, 'customer_pins', customerId);
-            await setDoc(pinRef, {
-                customerId: customerId,
-                pin: pin,
-                pinCreatedAt: new Date(),
-                pinAttempts: 0,
-                pinLockedUntil: null,
-                createdAt: new Date()
-            });
-            return true;
+            try {
+                const pinRef = doc(db, 'customer_pins', customerId);
+                await setDoc(pinRef, {
+                    customerId: customerId,
+                    pin: pin,
+                    pinCreatedAt: new Date(),
+                    pinAttempts: 0,
+                    pinLockedUntil: null,
+                    createdAt: new Date()
+                });
+                return true;
+            } catch (error) {
+                console.error("Create PIN error:", error);
+                return false;
+            }
         }
         
-        // Verify PIN
         async function verifyCustomerPin(customerId, enteredPin) {
-            const pinRef = doc(db, 'customer_pins', customerId);
-            const pinSnap = await getDoc(pinRef);
-            
-            if (!pinSnap.exists()) {
-                return { success: false, needCreate: true };
-            }
-            
-            const pinData = pinSnap.data();
-            
-            // Check if locked
-            if (pinData.pinLockedUntil && pinData.pinLockedUntil.toDate() > new Date()) {
-                return { success: false, locked: true, lockedUntil: pinData.pinLockedUntil.toDate() };
-            }
-            
-            // Verify PIN
-            if (pinData.pin === enteredPin) {
-                // Reset attempts on success
-                await updateDoc(pinRef, { pinAttempts: 0 });
-                return { success: true };
-            } else {
-                // Increment attempts
-                const newAttempts = (pinData.pinAttempts || 0) + 1;
-                let lockedUntil = null;
+            try {
+                const pinRef = doc(db, 'customer_pins', customerId);
+                const pinSnap = await getDoc(pinRef);
                 
-                if (newAttempts >= 3) {
-                    lockedUntil = new Date();
-                    lockedUntil.setMinutes(lockedUntil.getMinutes() + 15);
+                if (!pinSnap.exists()) {
+                    return { success: false, needCreate: true };
                 }
                 
-                await updateDoc(pinRef, {
-                    pinAttempts: newAttempts,
-                    pinLockedUntil: lockedUntil
-                });
+                const pinData = pinSnap.data();
                 
-                return { success: false, attemptsLeft: 3 - newAttempts, locked: lockedUntil !== null, lockedUntil: lockedUntil };
+                if (pinData.pinLockedUntil && pinData.pinLockedUntil.toDate) {
+                    const lockedUntil = pinData.pinLockedUntil.toDate();
+                    if (lockedUntil > new Date()) {
+                        return { success: false, locked: true, lockedUntil: lockedUntil };
+                    }
+                }
+                
+                if (pinData.pin === enteredPin) {
+                    await updateDoc(pinRef, { pinAttempts: 0 });
+                    return { success: true };
+                } else {
+                    const newAttempts = (pinData.pinAttempts || 0) + 1;
+                    let lockedUntil = null;
+                    
+                    if (newAttempts >= 3) {
+                        lockedUntil = new Date();
+                        lockedUntil.setMinutes(lockedUntil.getMinutes() + 15);
+                    }
+                    
+                    await updateDoc(pinRef, {
+                        pinAttempts: newAttempts,
+                        pinLockedUntil: lockedUntil
+                    });
+                    
+                    return { success: false, attemptsLeft: 3 - newAttempts, locked: lockedUntil !== null };
+                }
+            } catch (error) {
+                console.error("Verify PIN error:", error);
+                return { success: false, error: true };
             }
         }
         
-        // Load customer transactions
         async function loadCustomerTransactions(customerId) {
             const ledgerRef = collection(db, 'ledger');
             const snapshot = await getDocs(ledgerRef);
@@ -612,7 +714,81 @@
             return transactions;
         }
         
-        // Show PIN creation screen
+        async function loadFullDashboard(customer) {
+            const transactions = await loadCustomerTransactions(customer.id);
+            allTransactions = transactions;
+            
+            const settingsRef = doc(db, 'settings', 'store_settings');
+            const settingsSnap = await getDoc(settingsRef);
+            const settings = settingsSnap.exists() ? settingsSnap.data() : {};
+            
+            renderDashboard(customer, transactions, settings);
+        }
+        
+        function showLoginScreen() {
+            let html = `
+                <div class="login-card">
+                    <div class="header">
+                        <img src="assets/images/logo-placeholder.png" alt="Logo" class="logo" id="storeLogo"
+                             onerror="this.src='https://via.placeholder.com/80?text=OK'">
+                        <div class="title" id="storeName">OK Mart</div>
+                        <div class="subtitle">ग्राहक लॉगिन</div>
+                    </div>
+                    <div class="error-message" id="errorMessage">⚠️ <span id="errorText"></span></div>
+                    <div class="form-group">
+                        <label>📞 मोबाइल नंबर</label>
+                        <input type="tel" id="phoneInput" class="form-control" placeholder="9876543210" maxlength="10" inputmode="numeric">
+                    </div>
+                    <button class="btn-primary" id="loginBtn">🔓 जारी रखें</button>
+                    <div style="text-align: center; margin-top: 16px;">
+                        <a href="login.html" style="color: var(--primary); text-decoration: none;">← एडमिन लॉगिन</a>
+                    </div>
+                </div>
+            `;
+            appContainer.innerHTML = html;
+            
+            document.getElementById('loginBtn')?.addEventListener('click', async () => {
+                const phone = document.getElementById('phoneInput').value.trim();
+                const errorDiv = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                
+                if (!phone || phone.length < 10) {
+                    errorText.innerText = 'सही मोबाइल नंबर डालें (10 अंक)';
+                    errorDiv.style.display = 'block';
+                    setTimeout(() => errorDiv.style.display = 'none', 3000);
+                    return;
+                }
+                
+                errorDiv.style.display = 'none';
+                
+                try {
+                    const customer = await findCustomerByPhone(phone);
+                    if (!customer) {
+                        errorText.innerText = 'यह नंबर रजिस्टर्ड नहीं है। कृपया दुकान से संपर्क करें।';
+                        errorDiv.style.display = 'block';
+                        return;
+                    }
+                    
+                    currentCustomer = customer;
+                    currentCustomerId = customer.id;
+                    
+                    const pinData = await getCustomerPin(customer.id);
+                    if (pinData) {
+                        showPinLoginScreen(customer);
+                    } else {
+                        showPinCreateScreen(customer);
+                    }
+                } catch (error) {
+                    errorText.innerText = 'कुछ गलत हो गया। कृपया बाद में प्रयास करें।';
+                    errorDiv.style.display = 'block';
+                }
+            });
+            
+            document.getElementById('phoneInput')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') document.getElementById('loginBtn')?.click();
+            });
+        }
+        
         function showPinCreateScreen(customer) {
             currentCustomer = customer;
             currentCustomerId = customer.id;
@@ -621,16 +797,10 @@
                 <div class="pin-card">
                     <div class="header">
                         <div class="title">🔐 सुरक्षा PIN सेट करें</div>
-                        <div class="subtitle">${customer.name}</div>
+                        <div class="subtitle">${escapeHtml(customer.name)}</div>
                     </div>
-                    
-                    <div class="success-message" id="successMessage" style="display: none;">
-                        ✅ <span id="successText"></span>
-                    </div>
-                    <div class="error-message" id="pinErrorMessage" style="display: none;">
-                        ⚠️ <span id="pinErrorText"></span>
-                    </div>
-                    
+                    <div class="success-message" id="successMessage" style="display: none;">✅ <span id="successText"></span></div>
+                    <div class="error-message" id="pinErrorMessage" style="display: none;">⚠️ <span id="pinErrorText"></span></div>
                     <div class="form-group">
                         <label>4-अंकों का PIN बनाएं</label>
                         <div class="pin-inputs">
@@ -640,7 +810,6 @@
                             <input type="password" maxlength="1" class="pin-input" id="pin4" inputmode="numeric">
                         </div>
                     </div>
-                    
                     <div class="form-group">
                         <label>PIN दोबारा डालें</label>
                         <div class="pin-inputs">
@@ -650,20 +819,13 @@
                             <input type="password" maxlength="1" class="pin-input" id="pinC4" inputmode="numeric">
                         </div>
                     </div>
-                    
                     <button class="btn-primary" id="createPinBtn">✅ PIN सेट करें</button>
-                    <div class="forgot-link">
-                        <a href="#" id="backToLogin">← वापस लॉगिन पर</a>
-                    </div>
-                    <div class="warning-text">
-                        ⚠️ यह PIN आपके खाते की सुरक्षा के लिए है। इसे किसी के साथ साझा न करें।
-                    </div>
+                    <div class="forgot-link"><a href="#" id="backToLogin">← वापस लॉगिन पर</a></div>
+                    <div class="warning-text">⚠️ यह PIN आपके खाते की सुरक्षा के लिए है। इसे किसी के साथ साझा न करें।</div>
                 </div>
             `;
-            
             appContainer.innerHTML = html;
             
-            // Auto-focus and move between PIN inputs
             const pinInputs = ['pin1', 'pin2', 'pin3', 'pin4'];
             const pinConfirmInputs = ['pinC1', 'pinC2', 'pinC3', 'pinC4'];
             
@@ -675,7 +837,6 @@
                     }
                 });
             });
-            
             pinConfirmInputs.forEach((id, index) => {
                 const input = document.getElementById(id);
                 input?.addEventListener('input', (e) => {
@@ -686,16 +847,10 @@
             });
             
             document.getElementById('createPinBtn')?.addEventListener('click', async () => {
-                const pin = (document.getElementById('pin1').value + 
-                            document.getElementById('pin2').value + 
-                            document.getElementById('pin3').value + 
-                            document.getElementById('pin4').value);
-                
-                const confirmPin = (document.getElementById('pinC1').value + 
-                                   document.getElementById('pinC2').value + 
-                                   document.getElementById('pinC3').value + 
-                                   document.getElementById('pinC4').value);
-                
+                const pin = (document.getElementById('pin1').value + document.getElementById('pin2').value + 
+                            document.getElementById('pin3').value + document.getElementById('pin4').value);
+                const confirmPin = (document.getElementById('pinC1').value + document.getElementById('pinC2').value + 
+                                   document.getElementById('pinC3').value + document.getElementById('pinC4').value);
                 const errorDiv = document.getElementById('pinErrorMessage');
                 const errorText = document.getElementById('pinErrorText');
                 
@@ -705,31 +860,29 @@
                     setTimeout(() => errorDiv.style.display = 'none', 3000);
                     return;
                 }
-                
                 if (pin !== confirmPin) {
                     errorText.innerText = 'PIN मैच नहीं हुआ। दोबारा डालें।';
                     errorDiv.style.display = 'block';
-                    setTimeout(() => errorDiv.style.display = 'none', 3000);
                     return;
                 }
                 
-                try {
-                    await createCustomerPin(currentCustomerId, pin);
-                    showToast('✅ PIN सेट हो गया! अब लॉगिन करें।');
-                    showPinLoginScreen(currentCustomer);
-                } catch (error) {
-                    errorText.innerText = 'एरर: ' + error.message;
+                const success = await createCustomerPin(currentCustomerId, pin);
+                if (success) {
+                    showToast('✅ PIN सेट हो गया!');
+                    saveSession(currentCustomerId, currentCustomer);
+                    await loadFullDashboard(currentCustomer);
+                } else {
+                    errorText.innerText = 'PIN सेट नहीं हो पाया। कृपया बाद में प्रयास करें।';
                     errorDiv.style.display = 'block';
                 }
             });
-            
             document.getElementById('backToLogin')?.addEventListener('click', (e) => {
                 e.preventDefault();
-                location.reload();
+                clearSession();
+                showLoginScreen();
             });
         }
         
-        // Show PIN login screen
         function showPinLoginScreen(customer) {
             currentCustomer = customer;
             currentCustomerId = customer.id;
@@ -738,13 +891,9 @@
                 <div class="pin-card">
                     <div class="header">
                         <div class="title">🔐 PIN दर्ज करें</div>
-                        <div class="subtitle">${customer.name}</div>
+                        <div class="subtitle">${escapeHtml(customer.name)}</div>
                     </div>
-                    
-                    <div class="error-message" id="pinErrorMessage" style="display: none;">
-                        ⚠️ <span id="pinErrorText"></span>
-                    </div>
-                    
+                    <div class="error-message" id="pinErrorMessage" style="display: none;">⚠️ <span id="pinErrorText"></span></div>
                     <div class="form-group">
                         <label>4-अंकों का PIN</label>
                         <div class="pin-inputs">
@@ -754,18 +903,11 @@
                             <input type="password" maxlength="1" class="pin-input" id="pin4" inputmode="numeric">
                         </div>
                     </div>
-                    
                     <button class="btn-primary" id="verifyPinBtn">🔓 वेरिफाई करें</button>
-                    
-                    <div class="forgot-link">
-                        <a href="#" id="forgotPinLink">भूल गए? दुकान से संपर्क करें</a>
-                    </div>
-                    <div class="forgot-link">
-                        <a href="#" id="backToLogin">← दूसरे नंबर से लॉगिन</a>
-                    </div>
+                    <div class="forgot-link"><a href="#" id="forgotPinLink">भूल गए? दुकान से संपर्क करें</a></div>
+                    <div class="forgot-link"><a href="#" id="backToLogin">← दूसरे नंबर से लॉगिन</a></div>
                 </div>
             `;
-            
             appContainer.innerHTML = html;
             
             const pinInputs = ['pin1', 'pin2', 'pin3', 'pin4'];
@@ -779,50 +921,34 @@
             });
             
             document.getElementById('verifyPinBtn')?.addEventListener('click', async () => {
-                const pin = (document.getElementById('pin1').value + 
-                            document.getElementById('pin2').value + 
-                            document.getElementById('pin3').value + 
-                            document.getElementById('pin4').value);
-                
+                const pin = (document.getElementById('pin1').value + document.getElementById('pin2').value + 
+                            document.getElementById('pin3').value + document.getElementById('pin4').value);
                 const errorDiv = document.getElementById('pinErrorMessage');
                 const errorText = document.getElementById('pinErrorText');
                 
                 if (pin.length !== 4) {
                     errorText.innerText = 'कृपया 4 अंकों का PIN डालें';
                     errorDiv.style.display = 'block';
-                    setTimeout(() => errorDiv.style.display = 'none', 3000);
                     return;
                 }
                 
-                try {
-                    const result = await verifyCustomerPin(currentCustomerId, pin);
-                    
-                    if (result.success) {
-                        // Load and show dashboard
-                        const transactions = await loadCustomerTransactions(currentCustomerId);
-                        allTransactions = transactions;
-                        
-                        const settingsRef = doc(db, 'settings', 'store_settings');
-                        const settingsSnap = await getDoc(settingsRef);
-                        const settings = settingsSnap.exists() ? settingsSnap.data() : {};
-                        
-                        renderDashboard(currentCustomer, transactions, settings);
-                    } else if (result.needCreate) {
-                        showPinCreateScreen(currentCustomer);
-                    } else if (result.locked) {
-                        const lockedDate = new Date(result.lockedUntil);
-                        errorText.innerText = `बहुत सारे गलत प्रयास। ${lockedDate.toLocaleTimeString()} तक प्रयास करें।`;
-                        errorDiv.style.display = 'block';
-                    } else {
-                        errorText.innerText = `गलत PIN! ${result.attemptsLeft || 2} प्रयास बाकी।`;
-                        errorDiv.style.display = 'block';
-                        // Clear PIN inputs
-                        pinInputs.forEach(id => document.getElementById(id).value = '');
-                        document.getElementById('pin1')?.focus();
-                    }
-                } catch (error) {
-                    errorText.innerText = 'एरर: ' + error.message;
+                const result = await verifyCustomerPin(currentCustomerId, pin);
+                if (result.success) {
+                    saveSession(currentCustomerId, currentCustomer);
+                    await loadFullDashboard(currentCustomer);
+                } else if (result.needCreate) {
+                    showPinCreateScreen(currentCustomer);
+                } else if (result.locked) {
+                    errorText.innerText = `बहुत सारे गलत प्रयास। 15 मिनट बाद प्रयास करें।`;
                     errorDiv.style.display = 'block';
+                } else if (result.error) {
+                    errorText.innerText = 'कुछ गलत हो गया। कृपया बाद में प्रयास करें।';
+                    errorDiv.style.display = 'block';
+                } else {
+                    errorText.innerText = `गलत PIN! ${result.attemptsLeft || 2} प्रयास बाकी।`;
+                    errorDiv.style.display = 'block';
+                    pinInputs.forEach(id => document.getElementById(id).value = '');
+                    document.getElementById('pin1')?.focus();
                 }
             });
             
@@ -830,14 +956,13 @@
                 e.preventDefault();
                 showToast('कृपया दुकान से संपर्क करें। प्रबंधक आपका PIN रीसेट कर देंगे।');
             });
-            
             document.getElementById('backToLogin')?.addEventListener('click', (e) => {
                 e.preventDefault();
-                location.reload();
+                clearSession();
+                showLoginScreen();
             });
         }
         
-        // Render Customer Dashboard
         function renderDashboard(customer, transactions, settings) {
             const dueAmount = (customer.totalDue || 0);
             const totalAdded = (customer.totalAdded || 0);
@@ -850,51 +975,22 @@
                         <div class="name">👤 ${escapeHtml(customer.name || 'ग्राहक')}</div>
                         <div class="phone">📞 ${customer.phone || ''}</div>
                     </div>
-                    
                     <div class="stats-row">
-                        <div class="stat-card">
-                            <div class="label">कुल जोड़ा</div>
-                            <div class="value">₹${totalAdded.toLocaleString()}</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="label">कुल भुगतान</div>
-                            <div class="value success">₹${totalPaid.toLocaleString()}</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="label">बकाया</div>
-                            <div class="value danger">₹${dueAmount.toLocaleString()}</div>
-                        </div>
+                        <div class="stat-card"><div class="label">कुल जोड़ा</div><div class="value">₹${totalAdded.toLocaleString()}</div></div>
+                        <div class="stat-card"><div class="label">कुल भुगतान</div><div class="value success">₹${totalPaid.toLocaleString()}</div></div>
+                        <div class="stat-card"><div class="label">बकाया</div><div class="value danger">₹${dueAmount.toLocaleString()}</div></div>
                     </div>
-                    
                     <div class="quick-actions">
-                        <div class="action-btn" id="pdfBtn">
-                            <span>📄</span>
-                            <small>स्टेटमेंट</small>
-                        </div>
-                        <div class="action-btn" id="whatsappBtn">
-                            <span>💬</span>
-                            <small>सपोर्ट</small>
-                        </div>
+                        <div class="action-btn" id="pdfBtn"><span>📄</span><small>स्टेटमेंट</small></div>
+                        <div class="action-btn" id="whatsappBtn"><span>💬</span><small>सपोर्ट</small></div>
                     </div>
             `;
             
             if (settings && settings.qrUrl) {
-                html += `
-                    <div class="qr-section">
-                        <div>📱 स्कैन करें और भुगतान करें</div>
-                        <div class="qr-image">
-                            <img src="${settings.qrUrl}" alt="Payment QR" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                `;
+                html += `<div class="qr-section"><div>📱 स्कैन करें और भुगतान करें</div><div class="qr-image"><img src="${settings.qrUrl}" alt="Payment QR" onerror="this.style.display='none'"></div></div>`;
             }
             
-            html += `
-                    <div class="ledger-section">
-                        <div class="section-title">📋 लेनदेन इतिहास (${transactions.length})</div>
-                        <div class="transaction-list" id="transactionList">
-            `;
-            
+            html += `<div class="ledger-section"><div class="section-title">📋 लेनदेन इतिहास (${transactions.length})</div><div class="transaction-list">`;
             if (transactions.length === 0) {
                 html += `<div class="empty-state">📭 कोई लेनदेन नहीं</div>`;
             } else {
@@ -903,210 +999,75 @@
                     const typeIcon = t.type === 'credit' ? '➕ क्रेडिट' : '💰 पेमेंट';
                     const amountSign = t.type === 'credit' ? '+' : '-';
                     const dateStr = t.date.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-                    
-                    html += `
-                        <div class="transaction-item">
-                            <div class="transaction-info">
-                                <div class="transaction-type ${typeClass}">${typeIcon}</div>
-                                <div class="transaction-date">📅 ${dateStr}</div>
-                                ${t.note ? `<div style="font-size: 10px; color: #757575; margin-top: 2px;">📝 ${escapeHtml(t.note)}</div>` : ''}
-                            </div>
-                            <div class="transaction-amount ${typeClass}">
-                                ${amountSign} ₹${t.amount.toLocaleString()}
-                            </div>
-                        </div>
-                    `;
+                    html += `<div class="transaction-item"><div class="transaction-info"><div class="transaction-type ${typeClass}">${typeIcon}</div><div class="transaction-date">📅 ${dateStr}</div>${t.note ? `<div style="font-size: 10px; color: #757575; margin-top: 2px;">📝 ${escapeHtml(t.note)}</div>` : ''}</div><div class="transaction-amount ${typeClass}">${amountSign} ₹${t.amount.toLocaleString()}</div></div>`;
                 });
             }
-            
-            html += `
-                        </div>
-                    </div>
-                </div>
-            `;
-            
+            html += `</div></div></div>`;
             appContainer.innerHTML = html;
             
-            document.getElementById('logoutBtn')?.addEventListener('click', () => location.reload());
+            document.getElementById('logoutBtn')?.addEventListener('click', () => { clearSession(); showLoginScreen(); });
             document.getElementById('pdfBtn')?.addEventListener('click', () => generatePDF(customer, transactions, settings));
             document.getElementById('whatsappBtn')?.addEventListener('click', () => {
                 const whatsappNumber = settings?.whatsappNumber || '';
-                if (whatsappNumber) {
-                    window.open(`https://wa.me/${whatsappNumber}?text=नमस्ते, मुझे सहायता चाहिए`, '_blank');
-                } else {
-                    showToast('सपोर्ट नंबर उपलब्ध नहीं है');
-                }
+                whatsappNumber ? window.open(`https://wa.me/${whatsappNumber}?text=नमस्ते, मुझे सहायता चाहिए`, '_blank') : showToast('सपोर्ट नंबर उपलब्ध नहीं है');
             });
         }
         
-        // Generate PDF Statement
         function generatePDF(customer, transactions, settings) {
-            if (transactions.length === 0) {
-                showToast('कोई लेनदेन नहीं है');
-                return;
-            }
-            
+            if (transactions.length === 0) { showToast('कोई लेनदेन नहीं है'); return; }
             const printWindow = window.open('', '_blank');
             const today = new Date().toLocaleDateString('hi-IN');
-            let totalCredit = 0;
-            let totalPayment = 0;
-            
-            transactions.forEach(t => {
-                if (t.type === 'credit') totalCredit += t.amount;
-                else totalPayment += t.amount;
-            });
-            
-            let html = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Statement - ${customer.name}</title>
-                    <meta charset="UTF-8">
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        .header { text-align: center; margin-bottom: 30px; }
-                        .store-name { font-size: 22px; font-weight: bold; color: #FF5722; }
-                        .title { font-size: 16px; margin-top: 10px; }
-                        .customer-details { margin: 20px 0; padding: 10px; background: #f5f5f5; border-radius: 8px; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                        th { background: #FF5722; color: white; }
-                        .total-row { font-weight: bold; background: #f5f5f5; }
-                        .due { color: red; font-weight: bold; }
-                        .footer { margin-top: 30px; text-align: center; font-size: 11px; color: gray; }
-                        @media print {
-                            body { padding: 0; }
-                            .no-print { display: none; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <div class="store-name">${settings?.storeName || 'OK Mart'}</div>
-                        <div class="title">खाता स्टेटमेंट</div>
-                        <div>दिनांक: ${today}</div>
-                    </div>
-                    
-                    <div class="customer-details">
-                        <strong>ग्राहक नाम:</strong> ${customer.name}<br>
-                        <strong>मोबाइल:</strong> ${customer.phone}<br>
-                        <strong>पता:</strong> ${customer.address || 'N/A'}
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr><th>दिनांक</th><th>टाइप</th><th>रकम</th><th>नोट</th></tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            transactions.slice(0, 50).forEach(t => {
-                html += `
-                    <tr>
-                        <td>${t.date.toLocaleDateString('hi-IN')}</td>
-                        <td>${t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट'}</td>
-                        <td>${t.type === 'credit' ? '+' : '-'} ₹${t.amount.toLocaleString()}</td>
-                        <td>${escapeHtml(t.note) || '-'}</td>
-                    </tr>
-                `;
-            });
-            
+            let totalCredit = 0, totalPayment = 0;
+            transactions.forEach(t => { if (t.type === 'credit') totalCredit += t.amount; else totalPayment += t.amount; });
+            let html = `<!DOCTYPE html><html><head><title>Statement - ${customer.name}</title><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;padding:20px}.header{text-align:center;margin-bottom:30px}.store-name{font-size:22px;font-weight:bold;color:#FF5722}.customer-details{margin:20px 0;padding:10px;background:#f5f5f5;border-radius:8px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#FF5722;color:white}.total-row{font-weight:bold;background:#f5f5f5}.due{color:red;font-weight:bold}.footer{margin-top:30px;text-align:center;font-size:11px;color:gray}@media print{body{padding:0}.no-print{display:none}}</style></head><body><div class="header"><div class="store-name">${settings?.storeName || 'OK Mart'}</div><div class="title">खाता स्टेटमेंट</div><div>दिनांक: ${today}</div></div><div class="customer-details"><strong>ग्राहक नाम:</strong> ${customer.name}<br><strong>मोबाइल:</strong> ${customer.phone}<br><strong>पता:</strong> ${customer.address || 'N/A'}</div><table><thead><tr><th>दिनांक</th><th>टाइप</th><th>रकम</th><th>नोट</th></tr></thead><tbody>`;
+            transactions.slice(0, 50).forEach(t => { html += `<tr><td>${t.date.toLocaleDateString('hi-IN')}</td><td>${t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट'}</td><td>${t.type === 'credit' ? '+' : '-'} ₹${t.amount.toLocaleString()}</td><td>${escapeHtml(t.note) || '-'}</td></tr>`; });
             const balance = totalCredit - totalPayment;
-            
-            html += `
-                        <tr class="total-row">
-                            <td colspan="3"><strong>कुल क्रेडिट</strong></td>
-                            <td><strong>₹${totalCredit.toLocaleString()}</strong></td>
-                        </tr>
-                        <tr class="total-row">
-                            <td colspan="3"><strong>कुल भुगतान</strong></td>
-                            <td><strong>₹${totalPayment.toLocaleString()}</strong></td>
-                        </tr>
-                        <tr class="total-row">
-                            <td colspan="3"><strong>शेष बकाया</strong></td>
-                            <td class="due"><strong>₹${balance.toLocaleString()}</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="footer">
-                    <p>यह एक कंप्यूटर जनरेटेड स्टेटमेंट है।</p>
-                    <p>${settings?.storeName || 'OK Mart'} - धन्यवाद!</p>
-                </div>
-                <div class="no-print" style="text-align: center; margin-top: 20px;">
-                    <button onclick="window.print()" style="padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
-                </div>
-                </body>
-                </html>
-            `;
-            
+            html += `<tr class="total-row"><td colspan="3"><strong>कुल क्रेडिट</strong></td><td><strong>₹${totalCredit.toLocaleString()}</strong></td></tr><tr class="total-row"><td colspan="3"><strong>कुल भुगतान</strong></td><td><strong>₹${totalPayment.toLocaleString()}</strong></td></tr><tr class="total-row"><td colspan="3"><strong>शेष बकाया</strong></td><td class="due"><strong>₹${balance.toLocaleString()}</strong></td></tr></tbody></table><div class="footer"><p>यह एक कंप्यूटर जनरेटेड स्टेटमेंट है।</p><p>${settings?.storeName || 'OK Mart'} - धन्यवाद!</p></div><div class="no-print" style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:10px 20px;background:#FF5722;color:white;border:none;border-radius:8px;">🖨️ प्रिंट करें</button></div></body></html>`;
             printWindow.document.write(html);
             printWindow.document.close();
         }
         
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+        
+        // Initialize - Check for existing session
+        async function init() {
+            await loadStoreSettings();
+            const session = getSession();
+            if (session) {
+                try {
+                    const customer = session.customerData;
+                    const transactions = await loadCustomerTransactions(session.customerId);
+                    const settingsRef = doc(db, 'settings', 'store_settings');
+                    const settingsSnap = await getDoc(settingsRef);
+                    const settings = settingsSnap.exists() ? settingsSnap.data() : {};
+                    renderDashboard(customer, transactions, settings);
+                } catch (e) {
+                    showLoginScreen();
+                }
+            } else {
+                showLoginScreen();
+            }
+        }
+        
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installDiv = document.createElement('div');
+            installDiv.className = 'install-prompt';
+            installDiv.innerHTML = '<span>📲 ऐप इंस्टॉल करें</span><button id="installBtn">इंस्टॉल करें</button>';
+            document.body.appendChild(installDiv);
+            document.getElementById('installBtn')?.addEventListener('click', () => {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => { installDiv.remove(); });
             });
-        }
-        
-        // Login Handler
-        document.getElementById('loginBtn')?.addEventListener('click', async () => {
-            const phone = document.getElementById('phoneInput').value.trim();
-            const errorDiv = document.getElementById('errorMessage');
-            const errorText = document.getElementById('errorText');
-            
-            if (!phone || phone.length < 10) {
-                errorText.innerText = 'सही मोबाइल नंबर डालें (10 अंक)';
-                errorDiv.style.display = 'block';
-                setTimeout(() => errorDiv.style.display = 'none', 3000);
-                return;
-            }
-            
-            errorDiv.style.display = 'none';
-            
-            try {
-                const customer = await findCustomerByPhone(phone);
-                
-                if (!customer) {
-                    errorText.innerText = 'यह नंबर रजिस्टर्ड नहीं है। कृपया दुकान से संपर्क करें।';
-                    errorDiv.style.display = 'block';
-                    setTimeout(() => errorDiv.style.display = 'none', 3000);
-                    return;
-                }
-                
-                // Check if PIN exists
-                const pinData = await getCustomerPin(customer.id);
-                
-                if (pinData) {
-                    showPinLoginScreen(customer);
-                } else {
-                    showPinCreateScreen(customer);
-                }
-                
-            } catch (error) {
-                console.error("Login error:", error);
-                errorText.innerText = 'कुछ गलत हो गया। कृपया बाद में प्रयास करें।';
-                errorDiv.style.display = 'block';
-                setTimeout(() => errorDiv.style.display = 'none', 3000);
-            }
         });
         
-        loadStoreSettings();
+        // Dark Mode
+        if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
         
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
-        
-        document.getElementById('phoneInput')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('loginBtn')?.click();
-            }
-        });
+        init();
     </script>
 </body>
 </html>
