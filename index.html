@@ -1,269 +1,446 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>OK Mart Khata - डैशबोर्ड</title>
-  <meta name="theme-color" content="#FF5722">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="OK Khata">
-  
-  <!-- CSS -->
-  <link rel="stylesheet" href="/css/khata.css">
-  <link rel="stylesheet" href="/css/mobile.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/dark-mode.css">
-  
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
-  
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>OK Mart Khata - Dashboard</title>
+    <link rel="stylesheet" href="css/khata.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+    <meta name="theme-color" content="#FF5722">
 </head>
 <body>
-  <div class="app-container">
-    
-    <!-- ========== HEADER ========== -->
-    <header class="app-header">
-      <div class="header-left">
-        <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
-        <h1 class="app-title">OK Mart Khata</h1>
-      </div>
-      <div class="header-right">
-        <button class="notif-btn" id="notifBtn" aria-label="Notifications">🔔</button>
-        <button class="profile-btn" id="profileBtn" aria-label="Profile">👤</button>
-      </div>
-    </header>
-    
-    <!-- ========== MAIN CONTENT ========== -->
-    <main class="main-content">
-      
-      <!-- Stats Cards Row -->
-      <div class="stats-grid">
-        <div class="stat-card" onclick="showDetail('due')">
-          <div class="stat-icon">💰</div>
-          <div class="stat-info">
-            <span class="stat-label">कुल बकाया</span>
-            <span class="stat-value" id="totalDue">₹0</span>
-          </div>
+
+<!-- Mobile Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item active" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item" data-page="profile">
+        <span>👤</span>
+        <span class="nav-label">प्रोफाइल</span>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="menuBtn">☰</button>
+            <img src="assets/images/logo-placeholder.png" alt="Logo" class="logo" id="storeLogo">
         </div>
-        <div class="stat-card" onclick="showDetail('today')">
-          <div class="stat-icon">📥</div>
-          <div class="stat-info">
-            <span class="stat-label">आज की जमा</span>
-            <span class="stat-value" id="todayCollection">₹0</span>
-          </div>
+        <div class="header-right">
+            <button class="notification-btn" id="notifyBtn">🔔</button>
+            <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
         </div>
-        <div class="stat-card" onclick="showDetail('customers')">
-          <div class="stat-icon">👥</div>
-          <div class="stat-info">
-            <span class="stat-label">कुल ग्राहक</span>
-            <span class="stat-value" id="totalCustomers">0</span>
-          </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h2>नमस्ते, 👋</h2>
+        <p id="storeName">OK Mart</p>
+    </div>
+
+    <!-- Stats Cards Grid -->
+    <div class="stats-grid">
+        <div class="stat-card" id="totalDueCard">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+                <span class="stat-label">कुल बकाया</span>
+                <span class="stat-value" id="totalDue">₹0</span>
+            </div>
         </div>
-        <div class="stat-card" onclick="showDetail('overdue')">
-          <div class="stat-icon">⚠️</div>
-          <div class="stat-info">
-            <span class="stat-label">बकायेदार</span>
-            <span class="stat-value" id="overdueCustomers">0</span>
-          </div>
+        
+        <div class="stat-card" id="todayCollectionCard">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+                <span class="stat-label">आज की कलेक्शन</span>
+                <span class="stat-value" id="todayCollection">₹0</span>
+            </div>
         </div>
-      </div>
-      
-      <!-- Second Row Stats -->
-      <div class="stats-grid small">
-        <div class="stat-card-mini">
-          <span>इस हफ्ते</span>
-          <strong id="weeklyCollection">₹0</strong>
+        
+        <div class="stat-card" id="totalPaidCard">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <span class="stat-label">कुल भुगतान</span>
+                <span class="stat-value" id="totalPaid">₹0</span>
+            </div>
         </div>
-        <div class="stat-card-mini">
-          <span>इस महीने</span>
-          <strong id="monthlyCollection">₹0</strong>
+        
+        <div class="stat-card" id="totalCustomersCard">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+                <span class="stat-label">कुल ग्राहक</span>
+                <span class="stat-value" id="totalCustomers">0</span>
+            </div>
         </div>
-        <div class="stat-card-mini">
-          <span>औसत बकाया</span>
-          <strong id="avgDue">₹0</strong>
+        
+        <div class="stat-card" id="overdueCustomersCard">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-info">
+                <span class="stat-label">बकाया ग्राहक</span>
+                <span class="stat-value" id="overdueCustomers">0</span>
+            </div>
         </div>
-      </div>
-      
-      <!-- Top Due Customers -->
-      <section class="section">
+        
+        <div class="stat-card" id="netProfitCard">
+            <div class="stat-icon">💸</div>
+            <div class="stat-info">
+                <span class="stat-label">नेट प्रॉफिट</span>
+                <span class="stat-value" id="netProfit">₹0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Most Due Customers Section -->
+    <div class="section">
         <div class="section-header">
-          <h2>📊 सबसे ज्यादा बकाया</h2>
-          <a href="/customers.html" class="view-all">सभी देखें →</a>
+            <h3>📊 सबसे ज्यादा बकाया ग्राहक</h3>
+            <button class="view-all">सभी देखें →</button>
         </div>
-        <div class="customer-list" id="topDueList">
-          <div class="loading-state">लोड हो रहा है...</div>
+        <div class="customer-list" id="topDueCustomers">
+            <div class="skeleton">लोड हो रहा है...</div>
         </div>
-      </section>
-      
-      <!-- Recent Transactions -->
-      <section class="section">
+    </div>
+
+    <!-- Recent Transactions Section -->
+    <div class="section">
         <div class="section-header">
-          <h2>📝 हाल के लेन-देन</h2>
-          <a href="/reports.html" class="view-all">सभी देखें →</a>
+            <h3>📝 हाल के लेनदेन</h3>
+            <button class="view-all">सभी देखें →</button>
         </div>
         <div class="transaction-list" id="recentTransactions">
-          <div class="loading-state">लोड हो रहा है...</div>
+            <div class="skeleton">लोड हो रहा है...</div>
         </div>
-      </section>
-      
-      <!-- Expense Summary -->
-      <section class="section">
-        <div class="section-header">
-          <h2>💸 दुकान के खर्चे</h2>
-          <a href="/expenses.html" class="view-all">प्रबंधित करें →</a>
-        </div>
-        <div class="expense-summary" id="expenseSummary">
-          <div class="expense-item">
-            <span>आज का खर्च</span>
-            <strong id="todayExpense">₹0</strong>
-          </div>
-          <div class="expense-item">
-            <span>इस महीने</span>
-            <strong id="monthlyExpense">₹0</strong>
-          </div>
-          <div class="expense-item">
-            <span>शुद्ध लाभ</span>
-            <strong id="netProfit" class="profit">₹0</strong>
-          </div>
-        </div>
-      </section>
-      
-    </main>
-    
-    <!-- ========== BOTTOM NAVIGATION (MOBILE) ========== -->
-    <nav class="bottom-nav">
-      <a href="/index.html" class="nav-item active">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-label">होम</span>
-      </a>
-      <a href="/customers.html" class="nav-item">
-        <span class="nav-icon">👥</span>
-        <span class="nav-label">ग्राहक</span>
-      </a>
-      <button class="nav-item fab-center" id="fabAddBtn">
-        <span class="nav-icon">➕</span>
-        <span class="nav-label">एंट्री</span>
-      </button>
-      <a href="/reports.html" class="nav-item">
-        <span class="nav-icon">📊</span>
-        <span class="nav-label">रिपोर्ट</span>
-      </a>
-      <a href="/settings.html" class="nav-item">
-        <span class="nav-icon">⚙️</span>
-        <span class="nav-label">सेटिंग</span>
-      </a>
-    </nav>
-    
-    <!-- ========== ADD ENTRY BOTTOM SHEET ========== -->
-    <div class="bottom-sheet" id="addEntrySheet">
-      <div class="sheet-handle"></div>
-      <div class="sheet-content">
-        <div class="sheet-header">
-          <h3>➕ नई एंट्री</h3>
-          <button class="sheet-close" id="closeSheetBtn">✕</button>
-        </div>
-        
-        <div class="form-group">
-          <label>ग्राहक चुनें *</label>
-          <select id="sheetCustomerId" class="form-select">
-            <option value="">-- ग्राहक चुनें --</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label>एंट्री प्रकार *</label>
-          <div class="type-buttons">
-            <button type="button" class="type-btn active" data-type="credit">
-              ➕ जमा (Customer ने लिया)
-            </button>
-            <button type="button" class="type-btn" data-type="debit">
-              💰 भुगतान (Customer ने दिया)
-            </button>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label>रकम *</label>
-          <div class="amount-keypad">
-            <input type="number" id="sheetAmount" class="amount-input" placeholder="₹0" inputmode="decimal">
-            <div class="quick-amounts">
-              <button type="button" class="quick-amt">+100</button>
-              <button type="button" class="quick-amt">+200</button>
-              <button type="button" class="quick-amt">+500</button>
-              <button type="button" class="quick-amt">+1000</button>
-              <button type="button" class="quick-amt">+2000</button>
-              <button type="button" class="quick-amt">+5000</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label>नोट (वैकल्पिक)</label>
-          <input type="text" id="sheetNote" class="form-input" placeholder="जैसे: किराना सामान, नकद भुगतान...">
-        </div>
-        
-        <div class="form-group">
-          <label>भुगतान का तरीका</label>
-          <div class="payment-modes">
-            <button type="button" class="mode-btn" data-mode="cash">💵 कैश</button>
-            <button type="button" class="mode-btn" data-mode="upi">📱 UPI</button>
-            <button type="button" class="mode-btn" data-mode="card">💳 कार्ड</button>
-            <button type="button" class="mode-btn" data-mode="bank">🏦 बैंक</button>
-          </div>
-        </div>
-        
-        <div class="split-payment-ui" id="splitPaymentUI" style="display: none;">
-          <label>स्प्लिट पेमेंट</label>
-          <div class="split-inputs">
-            <input type="number" placeholder="कैश" id="splitCash" class="split-input">
-            <input type="number" placeholder="UPI" id="splitUpi" class="split-input">
-            <input type="number" placeholder="कार्ड" id="splitCard" class="split-input">
-          </div>
-          <div class="split-remaining">
-            शेष: ₹<span id="splitRemaining">0</span>
-          </div>
-        </div>
-        
-        <button class="btn-primary" id="saveEntryBtn">
-          💾 एंट्री सेव करें
-        </button>
-      </div>
     </div>
+</div>
+
+<!-- Floating Action Button -->
+<button class="fab" id="fabBtn">
+    <span>➕</span>
+</button>
+
+<!-- Bottom Sheet for Add Entry -->
+<div class="bottom-sheet" id="addEntrySheet">
+    <div class="sheet-overlay"></div>
+    <div class="sheet-content">
+        <div class="sheet-handle"></div>
+        <div class="sheet-body">
+            <h3>नई एंट्री जोड़ें</h3>
+            
+            <div class="form-group">
+                <label>ग्राहक चुनें</label>
+                <select id="customerSelect" class="form-control">
+                    <option value="">-- ग्राहक चुनें --</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>एंट्री टाइप</label>
+                <div class="segmented-control">
+                    <button class="segment active" data-type="credit">➕ क्रेडिट</button>
+                    <button class="segment" data-type="payment">💰 पेमेंट</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>रकम (₹)</label>
+                <div class="amount-input-wrapper">
+                    <span class="currency">₹</span>
+                    <input type="number" id="amount" class="form-control" placeholder="0" inputmode="decimal">
+                </div>
+            </div>
+            
+            <div class="quick-amounts">
+                <button class="quick-amount" data-amount="10">+10</button>
+                <button class="quick-amount" data-amount="20">+20</button>
+                <button class="quick-amount" data-amount="50">+50</button>
+                <button class="quick-amount" data-amount="100">+100</button>
+                <button class="quick-amount" data-amount="500">+500</button>
+                <button class="quick-amount" data-amount="1000">+1000</button>
+            </div>
+            
+            <div class="form-group">
+                <label>नोट (वैकल्पिक)</label>
+                <input type="text" id="note" class="form-control" placeholder="जैसे: किराना सामान">
+            </div>
+            
+            <button class="btn-primary" id="saveEntryBtn">💾 एंट्री सेव करें</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // Firebase Import
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+    import { getFirestore, collection, query, getDocs, orderBy, limit, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
     
-    <!-- Overlay -->
-    <div class="overlay" id="overlay"></div>
+    // Your Firebase Config (YAHAN APNA CONFIG DALO)
+    const firebaseConfig = {
+        apiKey: "AIzaSyB...",  // 🔴 YAHAN APNA API KEY DALO
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "123456789",
+        appId: "1:123456789:web:abc123"
+    };
     
-    <!-- Toast -->
-    <div class="toast-message" id="toast"></div>
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
     
-  </div>
-  
-  <script src="/js/firebase-config.js"></script>
-  <script src="/js/firebase-service.js"></script>
-  <script src="/js/auth.js"></script>
-  <script src="/js/utils.js"></script>
-  <script src="/js/dashboard.js"></script>
-  <script src="/js/dark-mode.js"></script>
-  <script src="/js/offline-sync.js"></script>
-  <script src="/js/notifications.js"></script>
-  
-  <script>
-    // Register Service Worker for PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(reg => console.log('✅ SW registered:', reg.scope))
-        .catch(err => console.error('❌ SW error:', err));
+    // Load Dashboard Data
+    async function loadDashboard() {
+        try {
+            // Get customers collection
+            const customersRef = collection(db, 'customers');
+            const customersSnapshot = await getDocs(customersRef);
+            let totalDue = 0;
+            let totalCustomers = 0;
+            let overdueCount = 0;
+            
+            customersSnapshot.forEach(doc => {
+                const data = doc.data();
+                totalDue += data.totalDue || 0;
+                totalCustomers++;
+                if ((data.totalDue || 0) > 0) overdueCount++;
+            });
+            
+            document.getElementById('totalDue').innerText = '₹' + totalDue.toLocaleString();
+            document.getElementById('totalCustomers').innerText = totalCustomers;
+            document.getElementById('overdueCustomers').innerText = overdueCount;
+            
+            // Get today's collection
+            const today = new Date().toISOString().slice(0,10);
+            const ledgerRef = collection(db, 'ledger');
+            const todayQuery = query(ledgerRef, where('type', '==', 'payment'), where('date', '==', today));
+            const todaySnapshot = await getDocs(todayQuery);
+            let todayTotal = 0;
+            todaySnapshot.forEach(doc => {
+                todayTotal += doc.data().amount || 0;
+            });
+            document.getElementById('todayCollection').innerText = '₹' + todayTotal.toLocaleString();
+            
+        } catch (error) {
+            console.error("Error loading dashboard:", error);
+        }
     }
-  </script>
+    
+    // Load Top Due Customers
+    async function loadTopDueCustomers() {
+        try {
+            const customersRef = collection(db, 'customers');
+            const q = query(customersRef, orderBy('totalDue', 'desc'), limit(5));
+            const snapshot = await getDocs(q);
+            const container = document.getElementById('topDueCustomers');
+            container.innerHTML = '';
+            
+            snapshot.forEach((doc, index) => {
+                const data = doc.data();
+                const percent = (data.totalDue / (data.totalAdded || 1)) * 100;
+                container.innerHTML += `
+                    <div class="customer-item" onclick="location.href='customer-detail.html?id=${doc.id}'">
+                        <div class="customer-rank">${index + 1}</div>
+                        <div class="customer-info">
+                            <div class="customer-name">${data.name || 'N/A'}</div>
+                            <div class="customer-phone">${data.phone || ''}</div>
+                        </div>
+                        <div class="customer-due">
+                            <div class="due-amount">₹${(data.totalDue || 0).toLocaleString()}</div>
+                            <div class="due-percent">${Math.round(percent)}%</div>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error("Error loading top due customers:", error);
+        }
+    }
+    
+    // Load Recent Transactions
+    async function loadRecentTransactions() {
+        try {
+            const ledgerRef = collection(db, 'ledger');
+            const q = query(ledgerRef, orderBy('createdAt', 'desc'), limit(10));
+            const snapshot = await getDocs(q);
+            const container = document.getElementById('recentTransactions');
+            container.innerHTML = '';
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const typeIcon = data.type === 'credit' ? '🔴 +' : '🟢 -';
+                const typeClass = data.type === 'credit' ? 'credit-amount' : 'payment-amount';
+                container.innerHTML += `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-customer">${data.customerName || 'Customer'}</div>
+                            <div class="transaction-date">${new Date(data.createdAt?.toDate()).toLocaleString() || 'Just now'}</div>
+                        </div>
+                        <div class="transaction-amount ${typeClass}">
+                            ${typeIcon} ₹${(data.amount || 0).toLocaleString()}
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error("Error loading recent transactions:", error);
+        }
+    }
+    
+    // Load Customers for Dropdown
+    async function loadCustomerDropdown() {
+        try {
+            const customersRef = collection(db, 'customers');
+            const snapshot = await getDocs(customersRef);
+            const select = document.getElementById('customerSelect');
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                select.innerHTML += `<option value="${doc.id}">${data.name} (${data.phone})</option>`;
+            });
+        } catch (error) {
+            console.error("Error loading customers:", error);
+        }
+    }
+    
+    // Save Entry
+    window.saveEntry = async function() {
+        const customerId = document.getElementById('customerSelect').value;
+        const type = document.querySelector('.segment.active').dataset.type;
+        const amount = parseFloat(document.getElementById('amount').value);
+        const note = document.getElementById('note').value;
+        
+        if (!customerId) {
+            alert('कृपया ग्राहक चुनें');
+            return;
+        }
+        if (!amount || amount <= 0) {
+            alert('कृपया सही रकम डालें');
+            return;
+        }
+        
+        try {
+            const ledgerRef = collection(db, 'ledger');
+            await addDoc(ledgerRef, {
+                customerId: customerId,
+                type: type,
+                amount: amount,
+                note: note,
+                createdAt: new Date(),
+                date: new Date().toISOString().slice(0,10)
+            });
+            
+            // Update customer totals
+            const customerRef = doc(db, 'customers', customerId);
+            const customerSnap = await getDoc(customerRef);
+            const customerData = customerSnap.data();
+            
+            let newTotalAdded = customerData.totalAdded || 0;
+            let newTotalPaid = customerData.totalPaid || 0;
+            
+            if (type === 'credit') {
+                newTotalAdded += amount;
+            } else {
+                newTotalPaid += amount;
+            }
+            
+            const newTotalDue = newTotalAdded - newTotalPaid;
+            
+            await updateDoc(customerRef, {
+                totalAdded: newTotalAdded,
+                totalPaid: newTotalPaid,
+                totalDue: newTotalDue,
+                lastPaymentDate: type === 'payment' ? new Date() : customerData.lastPaymentDate
+            });
+            
+            alert('✅ एंट्री सेव हो गई!');
+            closeBottomSheet();
+            loadDashboard();
+            loadRecentTransactions();
+            loadTopDueCustomers();
+            
+            // Reset form
+            document.getElementById('amount').value = '';
+            document.getElementById('note').value = '';
+            
+        } catch (error) {
+            console.error("Error saving entry:", error);
+            alert('❌ एरर: ' + error.message);
+        }
+    };
+    
+    // Bottom Sheet Functions
+    function openBottomSheet() {
+        document.getElementById('addEntrySheet').classList.add('open');
+        loadCustomerDropdown();
+    }
+    
+    function closeBottomSheet() {
+        document.getElementById('addEntrySheet').classList.remove('open');
+    }
+    
+    // Event Listeners
+    document.getElementById('fabBtn').onclick = openBottomSheet;
+    document.querySelector('.sheet-overlay').onclick = closeBottomSheet;
+    document.getElementById('saveEntryBtn').onclick = window.saveEntry;
+    
+    // Quick amount buttons
+    document.querySelectorAll('.quick-amount').forEach(btn => {
+        btn.onclick = () => {
+            document.getElementById('amount').value = btn.dataset.amount;
+        };
+    });
+    
+    // Segment control
+    document.querySelectorAll('.segment').forEach(seg => {
+        seg.onclick = () => {
+            document.querySelectorAll('.segment').forEach(s => s.classList.remove('active'));
+            seg.classList.add('active');
+        };
+    });
+    
+    // Dark Mode
+    const darkModeBtn = document.getElementById('darkModeBtn');
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        darkModeBtn.innerText = '☀️';
+    }
+    darkModeBtn.onclick = () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkModeBtn.innerText = isDark ? '☀️' : '🌙';
+    };
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.onclick = (e) => {
+            const page = nav.dataset.page;
+            if (page === 'customers') location.href = 'customers.html';
+            if (page === 'reports') location.href = 'reports.html';
+            if (page === 'profile') location.href = 'login.html';
+            // add is handled by FAB
+        };
+    });
+    
+    // Load all data on page load
+    loadDashboard();
+    loadTopDueCustomers();
+    loadRecentTransactions();
+</script>
+
 </body>
 </html>
