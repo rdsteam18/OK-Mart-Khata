@@ -53,7 +53,7 @@
             padding: 20px;
         }
 
-        .login-card {
+        .login-card, .pin-card {
             background: var(--light);
             border-radius: var(--radius-lg);
             padding: 24px;
@@ -64,6 +64,7 @@
         }
 
         body.dark-mode .login-card,
+        body.dark-mode .pin-card,
         body.dark-mode .customer-dashboard,
         body.dark-mode .transaction-item {
             background: #1e1e1e;
@@ -132,6 +133,32 @@
             border-color: var(--primary);
         }
 
+        .pin-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .pin-input {
+            width: 55px;
+            height: 55px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--light);
+        }
+        body.dark-mode .pin-input {
+            background: #2d2d2d;
+            color: #fff;
+            border-color: #404040;
+        }
+        .pin-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
         .btn-primary {
             width: 100%;
             padding: 14px;
@@ -147,6 +174,9 @@
         .btn-primary:active {
             transform: scale(0.98);
         }
+        .btn-secondary {
+            background: var(--gray);
+        }
 
         .error-message {
             background: #FFEBEE;
@@ -160,6 +190,17 @@
         }
         body.dark-mode .error-message {
             background: #2d2d2d;
+        }
+
+        .success-message {
+            background: #E8F5E9;
+            color: var(--success);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+            border-left: 3px solid var(--success);
         }
 
         .customer-dashboard {
@@ -356,34 +397,27 @@
             opacity: 1;
         }
 
-        .demo-hint {
-            background: var(--light-gray);
-            padding: 10px;
-            border-radius: var(--radius-md);
-            margin-top: 16px;
-            font-size: 12px;
+        .forgot-link {
             text-align: center;
+            margin-top: 16px;
         }
-        body.dark-mode .demo-hint {
-            background: #2d2d2d;
+        .forgot-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 13px;
         }
 
-        /* Debug Panel */
-        .debug-panel {
-            background: #333;
-            color: #0f0;
-            padding: 10px;
-            margin: 10px;
-            font-size: 11px;
-            border-radius: 8px;
-            font-family: monospace;
-            display: none;
+        .warning-text {
+            font-size: 12px;
+            color: var(--warning);
+            text-align: center;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container" id="appContainer">
-        <!-- Login View -->
+        <!-- Login View (Phone Number) -->
         <div id="loginView" class="login-card">
             <div class="header">
                 <img src="assets/images/logo-placeholder.png" alt="Logo" class="logo" id="storeLogo"
@@ -401,9 +435,7 @@
                 <input type="tel" id="phoneInput" class="form-control" placeholder="9876543210" maxlength="10" inputmode="numeric">
             </div>
 
-            <button class="btn-primary" id="loginBtn">🔓 लॉगिन करें</button>
-
-           
+            <button class="btn-primary" id="loginBtn">🔓 जारी रखें</button>
 
             <div style="text-align: center; margin-top: 16px;">
                 <a href="login.html" style="color: var(--primary); text-decoration: none;">← एडमिन लॉगिन</a>
@@ -415,8 +447,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
@@ -428,11 +459,12 @@
         };
         
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
         
         let currentCustomer = null;
+        let currentCustomerId = null;
         let allTransactions = [];
+        let pinAttempts = 0;
         
         const appContainer = document.getElementById('appContainer');
         const toastMessage = document.getElementById('toastMessage');
@@ -458,43 +490,97 @@
             } catch (e) { console.log(e); }
         }
         
-        // SIMPLE SEARCH - Direct string comparison with multiple formats
+        // Normalize phone number
+        function normalizePhone(phone) {
+            let cleaned = phone.toString().trim().replace(/[^0-9]/g, '');
+            if (cleaned.startsWith('91')) cleaned = cleaned.substring(2);
+            if (cleaned.startsWith('0')) cleaned = cleaned.substring(1);
+            return cleaned;
+        }
+        
+        // Find customer by phone
         async function findCustomerByPhone(inputPhone) {
-            // Clean input phone (remove spaces, +91, 91 prefix)
-            let cleanInput = inputPhone.toString().trim();
-            cleanInput = cleanInput.replace(/[^0-9]/g, '');
-            if (cleanInput.startsWith('91')) cleanInput = cleanInput.substring(2);
-            if (cleanInput.startsWith('0')) cleanInput = cleanInput.substring(1);
-            
-            console.log("Searching for:", cleanInput);
-            
+            const cleanInput = normalizePhone(inputPhone);
             const customersRef = collection(db, 'customers');
             const snapshot = await getDocs(customersRef);
             
             let matchedCustomer = null;
-            
             snapshot.forEach(doc => {
                 const data = doc.data();
-                const dbPhone = data.phone || '';
-                console.log("Checking DB phone:", dbPhone);
-                
-                // Clean DB phone for comparison
-                let cleanDbPhone = dbPhone.toString().trim();
-                cleanDbPhone = cleanDbPhone.replace(/[^0-9]/g, '');
-                if (cleanDbPhone.startsWith('91')) cleanDbPhone = cleanDbPhone.substring(2);
-                if (cleanDbPhone.startsWith('0')) cleanDbPhone = cleanDbPhone.substring(1);
-                
-                console.log("Comparing:", cleanDbPhone, "vs", cleanInput);
-                
-                if (cleanDbPhone === cleanInput || cleanDbPhone === cleanInput.slice(-10)) {
+                const dbPhone = normalizePhone(data.phone || '');
+                if (dbPhone === cleanInput) {
                     matchedCustomer = { id: doc.id, ...data };
-                    console.log("MATCH FOUND!");
                 }
             });
-            
             return matchedCustomer;
         }
         
+        // Get or create customer PIN
+        async function getCustomerPin(customerId) {
+            const pinRef = doc(db, 'customer_pins', customerId);
+            const pinSnap = await getDoc(pinRef);
+            
+            if (pinSnap.exists()) {
+                return pinSnap.data();
+            }
+            return null;
+        }
+        
+        // Create new PIN for customer
+        async function createCustomerPin(customerId, pin) {
+            const pinRef = doc(db, 'customer_pins', customerId);
+            await setDoc(pinRef, {
+                customerId: customerId,
+                pin: pin,
+                pinCreatedAt: new Date(),
+                pinAttempts: 0,
+                pinLockedUntil: null,
+                createdAt: new Date()
+            });
+            return true;
+        }
+        
+        // Verify PIN
+        async function verifyCustomerPin(customerId, enteredPin) {
+            const pinRef = doc(db, 'customer_pins', customerId);
+            const pinSnap = await getDoc(pinRef);
+            
+            if (!pinSnap.exists()) {
+                return { success: false, needCreate: true };
+            }
+            
+            const pinData = pinSnap.data();
+            
+            // Check if locked
+            if (pinData.pinLockedUntil && pinData.pinLockedUntil.toDate() > new Date()) {
+                return { success: false, locked: true, lockedUntil: pinData.pinLockedUntil.toDate() };
+            }
+            
+            // Verify PIN
+            if (pinData.pin === enteredPin) {
+                // Reset attempts on success
+                await updateDoc(pinRef, { pinAttempts: 0 });
+                return { success: true };
+            } else {
+                // Increment attempts
+                const newAttempts = (pinData.pinAttempts || 0) + 1;
+                let lockedUntil = null;
+                
+                if (newAttempts >= 3) {
+                    lockedUntil = new Date();
+                    lockedUntil.setMinutes(lockedUntil.getMinutes() + 15);
+                }
+                
+                await updateDoc(pinRef, {
+                    pinAttempts: newAttempts,
+                    pinLockedUntil: lockedUntil
+                });
+                
+                return { success: false, attemptsLeft: 3 - newAttempts, locked: lockedUntil !== null, lockedUntil: lockedUntil };
+            }
+        }
+        
+        // Load customer transactions
         async function loadCustomerTransactions(customerId) {
             const ledgerRef = collection(db, 'ledger');
             const snapshot = await getDocs(ledgerRef);
@@ -526,6 +612,232 @@
             return transactions;
         }
         
+        // Show PIN creation screen
+        function showPinCreateScreen(customer) {
+            currentCustomer = customer;
+            currentCustomerId = customer.id;
+            
+            let html = `
+                <div class="pin-card">
+                    <div class="header">
+                        <div class="title">🔐 सुरक्षा PIN सेट करें</div>
+                        <div class="subtitle">${customer.name}</div>
+                    </div>
+                    
+                    <div class="success-message" id="successMessage" style="display: none;">
+                        ✅ <span id="successText"></span>
+                    </div>
+                    <div class="error-message" id="pinErrorMessage" style="display: none;">
+                        ⚠️ <span id="pinErrorText"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>4-अंकों का PIN बनाएं</label>
+                        <div class="pin-inputs">
+                            <input type="password" maxlength="1" class="pin-input" id="pin1" inputmode="numeric">
+                            <input type="password" maxlength="1" class="pin-input" id="pin2" inputmode="numeric">
+                            <input type="password" maxlength="1" class="pin-input" id="pin3" inputmode="numeric">
+                            <input type="password" maxlength="1" class="pin-input" id="pin4" inputmode="numeric">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>PIN दोबारा डालें</label>
+                        <div class="pin-inputs">
+                            <input type="password" maxlength="1" class="pin-input" id="pinC1" inputmode="numeric">
+                            <input type="password" maxlength="1" class="pin-input" id="pinC2" inputmode="numeric">
+                            <input type="password" maxlength="1" class="pin-input" id="pinC3" inputmode="numeric">
+                            <input type="password" maxlength="1" class="pin-input" id="pinC4" inputmode="numeric">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" id="createPinBtn">✅ PIN सेट करें</button>
+                    <div class="forgot-link">
+                        <a href="#" id="backToLogin">← वापस लॉगिन पर</a>
+                    </div>
+                    <div class="warning-text">
+                        ⚠️ यह PIN आपके खाते की सुरक्षा के लिए है। इसे किसी के साथ साझा न करें।
+                    </div>
+                </div>
+            `;
+            
+            appContainer.innerHTML = html;
+            
+            // Auto-focus and move between PIN inputs
+            const pinInputs = ['pin1', 'pin2', 'pin3', 'pin4'];
+            const pinConfirmInputs = ['pinC1', 'pinC2', 'pinC3', 'pinC4'];
+            
+            pinInputs.forEach((id, index) => {
+                const input = document.getElementById(id);
+                input?.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1 && index < 3) {
+                        document.getElementById(pinInputs[index + 1])?.focus();
+                    }
+                });
+            });
+            
+            pinConfirmInputs.forEach((id, index) => {
+                const input = document.getElementById(id);
+                input?.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1 && index < 3) {
+                        document.getElementById(pinConfirmInputs[index + 1])?.focus();
+                    }
+                });
+            });
+            
+            document.getElementById('createPinBtn')?.addEventListener('click', async () => {
+                const pin = (document.getElementById('pin1').value + 
+                            document.getElementById('pin2').value + 
+                            document.getElementById('pin3').value + 
+                            document.getElementById('pin4').value);
+                
+                const confirmPin = (document.getElementById('pinC1').value + 
+                                   document.getElementById('pinC2').value + 
+                                   document.getElementById('pinC3').value + 
+                                   document.getElementById('pinC4').value);
+                
+                const errorDiv = document.getElementById('pinErrorMessage');
+                const errorText = document.getElementById('pinErrorText');
+                
+                if (pin.length !== 4) {
+                    errorText.innerText = 'कृपया 4 अंकों का PIN डालें';
+                    errorDiv.style.display = 'block';
+                    setTimeout(() => errorDiv.style.display = 'none', 3000);
+                    return;
+                }
+                
+                if (pin !== confirmPin) {
+                    errorText.innerText = 'PIN मैच नहीं हुआ। दोबारा डालें।';
+                    errorDiv.style.display = 'block';
+                    setTimeout(() => errorDiv.style.display = 'none', 3000);
+                    return;
+                }
+                
+                try {
+                    await createCustomerPin(currentCustomerId, pin);
+                    showToast('✅ PIN सेट हो गया! अब लॉगिन करें।');
+                    showPinLoginScreen(currentCustomer);
+                } catch (error) {
+                    errorText.innerText = 'एरर: ' + error.message;
+                    errorDiv.style.display = 'block';
+                }
+            });
+            
+            document.getElementById('backToLogin')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                location.reload();
+            });
+        }
+        
+        // Show PIN login screen
+        function showPinLoginScreen(customer) {
+            currentCustomer = customer;
+            currentCustomerId = customer.id;
+            
+            let html = `
+                <div class="pin-card">
+                    <div class="header">
+                        <div class="title">🔐 PIN दर्ज करें</div>
+                        <div class="subtitle">${customer.name}</div>
+                    </div>
+                    
+                    <div class="error-message" id="pinErrorMessage" style="display: none;">
+                        ⚠️ <span id="pinErrorText"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>4-अंकों का PIN</label>
+                        <div class="pin-inputs">
+                            <input type="password" maxlength="1" class="pin-input" id="pin1" inputmode="numeric">
+                            <input type="password" maxlength="1" class="pin-input" id="pin2" inputmode="numeric">
+                            <input type="password" maxlength="1" class="pin-input" id="pin3" inputmode="numeric">
+                            <input type="password" maxlength="1" class="pin-input" id="pin4" inputmode="numeric">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" id="verifyPinBtn">🔓 वेरिफाई करें</button>
+                    
+                    <div class="forgot-link">
+                        <a href="#" id="forgotPinLink">भूल गए? दुकान से संपर्क करें</a>
+                    </div>
+                    <div class="forgot-link">
+                        <a href="#" id="backToLogin">← दूसरे नंबर से लॉगिन</a>
+                    </div>
+                </div>
+            `;
+            
+            appContainer.innerHTML = html;
+            
+            const pinInputs = ['pin1', 'pin2', 'pin3', 'pin4'];
+            pinInputs.forEach((id, index) => {
+                const input = document.getElementById(id);
+                input?.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1 && index < 3) {
+                        document.getElementById(pinInputs[index + 1])?.focus();
+                    }
+                });
+            });
+            
+            document.getElementById('verifyPinBtn')?.addEventListener('click', async () => {
+                const pin = (document.getElementById('pin1').value + 
+                            document.getElementById('pin2').value + 
+                            document.getElementById('pin3').value + 
+                            document.getElementById('pin4').value);
+                
+                const errorDiv = document.getElementById('pinErrorMessage');
+                const errorText = document.getElementById('pinErrorText');
+                
+                if (pin.length !== 4) {
+                    errorText.innerText = 'कृपया 4 अंकों का PIN डालें';
+                    errorDiv.style.display = 'block';
+                    setTimeout(() => errorDiv.style.display = 'none', 3000);
+                    return;
+                }
+                
+                try {
+                    const result = await verifyCustomerPin(currentCustomerId, pin);
+                    
+                    if (result.success) {
+                        // Load and show dashboard
+                        const transactions = await loadCustomerTransactions(currentCustomerId);
+                        allTransactions = transactions;
+                        
+                        const settingsRef = doc(db, 'settings', 'store_settings');
+                        const settingsSnap = await getDoc(settingsRef);
+                        const settings = settingsSnap.exists() ? settingsSnap.data() : {};
+                        
+                        renderDashboard(currentCustomer, transactions, settings);
+                    } else if (result.needCreate) {
+                        showPinCreateScreen(currentCustomer);
+                    } else if (result.locked) {
+                        const lockedDate = new Date(result.lockedUntil);
+                        errorText.innerText = `बहुत सारे गलत प्रयास। ${lockedDate.toLocaleTimeString()} तक प्रयास करें।`;
+                        errorDiv.style.display = 'block';
+                    } else {
+                        errorText.innerText = `गलत PIN! ${result.attemptsLeft || 2} प्रयास बाकी।`;
+                        errorDiv.style.display = 'block';
+                        // Clear PIN inputs
+                        pinInputs.forEach(id => document.getElementById(id).value = '');
+                        document.getElementById('pin1')?.focus();
+                    }
+                } catch (error) {
+                    errorText.innerText = 'एरर: ' + error.message;
+                    errorDiv.style.display = 'block';
+                }
+            });
+            
+            document.getElementById('forgotPinLink')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showToast('कृपया दुकान से संपर्क करें। प्रबंधक आपका PIN रीसेट कर देंगे।');
+            });
+            
+            document.getElementById('backToLogin')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                location.reload();
+            });
+        }
+        
+        // Render Customer Dashboard
         function renderDashboard(customer, transactions, settings) {
             const dueAmount = (customer.totalDue || 0);
             const totalAdded = (customer.totalAdded || 0);
@@ -627,6 +939,7 @@
             });
         }
         
+        // Generate PDF Statement
         function generatePDF(customer, transactions, settings) {
             if (transactions.length === 0) {
                 showToast('कोई लेनदेन नहीं है');
@@ -766,15 +1079,14 @@
                     return;
                 }
                 
-                currentCustomer = customer;
-                const transactions = await loadCustomerTransactions(customer.id);
-                allTransactions = transactions;
+                // Check if PIN exists
+                const pinData = await getCustomerPin(customer.id);
                 
-                const settingsRef = doc(db, 'settings', 'store_settings');
-                const settingsSnap = await getDoc(settingsRef);
-                const settings = settingsSnap.exists() ? settingsSnap.data() : {};
-                
-                renderDashboard(customer, transactions, settings);
+                if (pinData) {
+                    showPinLoginScreen(customer);
+                } else {
+                    showPinCreateScreen(customer);
+                }
                 
             } catch (error) {
                 console.error("Login error:", error);
@@ -793,13 +1105,6 @@
         document.getElementById('phoneInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 document.getElementById('loginBtn')?.click();
-            }
-        });
-        
-        // Check if admin is logged in (optional - just for debugging)
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("Admin logged in:", user.email);
             }
         });
     </script>
