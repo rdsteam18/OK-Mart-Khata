@@ -4,96 +4,407 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>OK Mart Khata - Dashboard</title>
-    <link rel="stylesheet" href="css/khata.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#FF5722">
+    <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/a/AVvXsEjqUODVL4iyLalUMIzsfwPSpjOSA_8OEz7zn7WiCOxVySl8TqcLxulYNt7tBT9C85tto_EoafNkIMbgV1AMPkOJjkeZ52VLY5PR02z06GFwwFPb9WQBAun4WHcd3JB2Heky3Q2WdDGPy8DGZn7suo0_8RdY7Wd7i7wTMA4osYIiL6NZ1CbuPJHGzmeX">
+  <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/a/AVvXsEjqUODVL4iyLalUMIzsfwPSpjOSA_8OEz7zn7WiCOxVySl8TqcLxulYNt7tBT9C85tto_EoafNkIMbgV1AMPkOJjkeZ52VLY5PR02z06GFwwFPb9WQBAun4WHcd3JB2Heky3Q2WdDGPy8DGZn7suo0_8RdY7Wd7i7wTMA4osYIiL6NZ1CbuPJHGzmeX">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card, 
+        body.dark-mode .stat-card,
+        body.dark-mode .customer-item,
+        body.dark-mode .transaction-item,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .bottom-sheet .sheet-content {
+            background: #1e1e1e;
+            color: #fff;
+        }
+        body.dark-mode .stat-label,
+        body.dark-mode .customer-phone,
+        body.dark-mode .transaction-date {
+            color: #aaa;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Container */
+        .container {
+            padding: 16px;
+            max-width: 100%;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+        .dark-mode-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            min-width: 44px;
+            cursor: pointer;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            margin-bottom: 20px;
+        }
+        .welcome-section h2 {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .welcome-section p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-icon {
+            font-size: 32px;
+        }
+        .stat-info {
+            flex: 1;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            display: block;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 24px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .section-header h3 {
+            font-size: 16px;
+        }
+        .view-all {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Customer List */
+        .customer-list, .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .customer-item, .transaction-item {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .customer-info {
+            flex: 1;
+        }
+        .customer-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .customer-phone {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .customer-due {
+            text-align: right;
+        }
+        .due-amount {
+            font-weight: bold;
+            color: var(--danger);
+        }
+        .due-percent {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .transaction-customer {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .transaction-date {
+            font-size: 10px;
+            color: var(--gray);
+        }
+        .credit-amount {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        .payment-amount {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        /* FAB */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 90;
+        }
+
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            visibility: hidden;
+        }
+        .bottom-sheet.open {
+            visibility: visible;
+        }
+        .sheet-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bottom-sheet.open .sheet-overlay {
+            opacity: 1;
+        }
+        .sheet-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            border-radius: 16px 16px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .bottom-sheet.open .sheet-content {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+        .sheet-body {
+            padding: 16px;
+        }
+        .sheet-body h3 {
+            margin-bottom: 16px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-control, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--light);
+        }
+        .segmented-control {
+            display: flex;
+            background: var(--light-gray);
+            border-radius: 8px;
+            padding: 4px;
+        }
+        .segment {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .segment.active {
+            background: var(--primary);
+            color: white;
+        }
+        .quick-amounts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .quick-amount {
+            background: var(--light-gray);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .container {
+                max-width: 90%;
+                margin: 0 auto;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Login Protection Script - MUST be first -->
-<script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-    import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-    
-    // 🔴🔴🔴 YAHAN APNA FIREBASE CONFIG DALO 🔴🔴🔴
-   const firebaseConfig = {
-  apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
-  authDomain: "ok-mart-khata.firebaseapp.com",
-  projectId: "ok-mart-khata",
-  storageBucket: "ok-mart-khata.firebasestorage.app",
-  messagingSenderId: "334851811921",
-  appId: "1:334851811921:web:804863c35baa17dd61a670",
-  measurementId: "G-GFM55V38D2"
-};
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    
-    // Make auth and db available globally
-    window.auth = auth;
-    window.db = db;
-    
-    // Check login status
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            // Not logged in - redirect to login
-            console.log("No user found, redirecting to login...");
-            window.location.href = 'login.html';
-        } else {
-            console.log("Logged in as:", user.email);
-            document.body.style.display = 'block';
-            loadDashboardData();
-            loadStoreSettings();
-        }
-    });
-    
-    // Load store settings (logo, name)
-    async function loadStoreSettings() {
-        try {
-            const settingsRef = doc(db, 'settings', 'store_settings');
-            const settingsSnap = await getDoc(settingsRef);
-            if (settingsSnap.exists()) {
-                const data = settingsSnap.data();
-                if (data.logoUrl) {
-                    const logoImg = document.getElementById('storeLogo');
-                    if (logoImg) logoImg.src = data.logoUrl;
-                }
-                if (data.storeName) {
-                    const storeNameEl = document.getElementById('storeName');
-                    if (storeNameEl) storeNameEl.innerText = data.storeName;
-                }
-                if (data.primaryColor) {
-                    document.documentElement.style.setProperty('--primary', data.primaryColor);
-                }
-            }
-        } catch (error) {
-            console.log("Settings load error:", error);
-        }
-    }
-    
-    // Make logout function global
-    window.logout = async function() {
-        try {
-            await signOut(auth);
-            window.location.href = 'login.html';
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
-    };
-    
-    // Dashboard data functions
-    async function loadDashboardData() {
-        // Your existing dashboard load functions here
-        console.log("Loading dashboard data...");
-    }
-    
-    // Initially hide body until login check
-    document.body.style.display = 'none';
-</script>
-
-<!-- Mobile Bottom Navigation -->
+<!-- Bottom Navigation -->
 <div class="mobile-bottom-nav">
     <div class="nav-item active" data-page="dashboard">
         <span>🏠</span>
@@ -111,7 +422,7 @@
         <span>📊</span>
         <span class="nav-label">रिपोर्ट</span>
     </div>
-    <div class="nav-item" data-page="profile" id="logoutNavBtn">
+    <div class="nav-item" data-page="profile" id="logoutBtn">
         <span>🚪</span>
         <span class="nav-label">लॉगआउट</span>
     </div>
@@ -119,24 +430,18 @@
 
 <!-- Main Content -->
 <div class="container">
-    <!-- Header -->
     <div class="header">
-        <div class="header-left">
-            <img src="assets/images/logo-placeholder.png" alt="Logo" class="logo" id="storeLogo">
-        </div>
-        <div class="header-right">
-            <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
-        </div>
+        <img src="https://blogger.googleusercontent.com/img/a/AVvXsEjqUODVL4iyLalUMIzsfwPSpjOSA_8OEz7zn7WiCOxVySl8TqcLxulYNt7tBT9C85tto_EoafNkIMbgV1AMPkOJjkeZ52VLY5PR02z06GFwwFPb9WQBAun4WHcd3JB2Heky3Q2WdDGPy8DGZn7suo0_8RdY7Wd7i7wTMA4osYIiL6NZ1CbuPJHGzmeX" alt="Logo" class="logo" id="storeLogo" onerror="this.style.display='none'">
+        <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
     </div>
 
-    <!-- Welcome Section -->
     <div class="welcome-section">
         <h2>नमस्ते, 👋</h2>
         <p id="storeName">OK Mart</p>
     </div>
 
-    <!-- Stats Cards Grid -->
-    <div class="stats-grid">
+    <!-- Stats Cards -->
+    <div class="stats-grid" id="statsGrid">
         <div class="stat-card">
             <div class="stat-icon">💰</div>
             <div class="stat-info">
@@ -144,7 +449,6 @@
                 <span class="stat-value" id="totalDue">₹0</span>
             </div>
         </div>
-        
         <div class="stat-card">
             <div class="stat-icon">📅</div>
             <div class="stat-info">
@@ -152,7 +456,6 @@
                 <span class="stat-value" id="todayCollection">₹0</span>
             </div>
         </div>
-        
         <div class="stat-card">
             <div class="stat-icon">✅</div>
             <div class="stat-info">
@@ -160,7 +463,6 @@
                 <span class="stat-value" id="totalPaid">₹0</span>
             </div>
         </div>
-        
         <div class="stat-card">
             <div class="stat-icon">👥</div>
             <div class="stat-info">
@@ -170,284 +472,347 @@
         </div>
     </div>
 
-    <!-- Loading indicator -->
-    <div id="loadingMessage" style="text-align: center; padding: 40px;">
-        ⏳ Loading dashboard data...
+    <!-- Top Due Customers -->
+    <div class="section">
+        <div class="section-header">
+            <h3>📊 सबसे ज्यादा बकाया ग्राहक</h3>
+        </div>
+        <div id="topCustomersList" class="customer-list">
+            <div class="loading">लोड हो रहा है...</div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="section">
+        <div class="section-header">
+            <h3>📝 हाल के लेनदेन</h3>
+        </div>
+        <div id="recentTransactionsList" class="transaction-list">
+            <div class="loading">लोड हो रहा है...</div>
+        </div>
     </div>
 </div>
 
-<!-- Floating Action Button -->
-<button class="fab" id="fabBtn">
-    <span>➕</span>
-</button>
+<!-- FAB -->
+<button class="fab" id="fabBtn">➕</button>
 
-<!-- Bottom Sheet for Add Entry -->
+<!-- Bottom Sheet -->
 <div class="bottom-sheet" id="addEntrySheet">
     <div class="sheet-overlay"></div>
     <div class="sheet-content">
         <div class="sheet-handle"></div>
         <div class="sheet-body">
-            <h3>नई एंट्री जोड़ें</h3>
-            
+            <h3>➕ नई एंट्री</h3>
             <div class="form-group">
-                <label>ग्राहक चुनें</label>
+                <label>ग्राहक</label>
                 <select id="customerSelect" class="form-control">
                     <option value="">-- ग्राहक चुनें --</option>
                 </select>
             </div>
-            
             <div class="form-group">
-                <label>एंट्री टाइप</label>
+                <label>टाइप</label>
                 <div class="segmented-control">
-                    <button class="segment active" data-type="credit">➕ क्रेडिट</button>
-                    <button class="segment" data-type="payment">💰 पेमेंट</button>
+                    <button class="segment active" data-type="credit">📝 क्रेडिट</button>
+                    <button class="segment" data-type="payment">💳 पेमेंट</button>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label>रकम (₹)</label>
                 <input type="number" id="amount" class="form-control" placeholder="0" inputmode="decimal">
             </div>
-            
             <div class="quick-amounts">
                 <button class="quick-amount" data-amount="10">+10</button>
                 <button class="quick-amount" data-amount="20">+20</button>
                 <button class="quick-amount" data-amount="50">+50</button>
                 <button class="quick-amount" data-amount="100">+100</button>
                 <button class="quick-amount" data-amount="500">+500</button>
+                <button class="quick-amount" data-amount="1000">+1000</button>
             </div>
-            
             <div class="form-group">
                 <label>नोट (वैकल्पिक)</label>
-                <input type="text" id="note" class="form-control" placeholder="जैसे: किराना सामान">
+                <input type="text" id="note" class="form-control" placeholder="नोट...">
             </div>
-            
-            <button class="btn-primary" id="saveEntryBtn">💾 एंट्री सेव करें</button>
+            <button class="btn-primary" id="saveEntryBtn">✅ एंट्री सेव करें</button>
         </div>
     </div>
 </div>
 
 <script type="module">
-    import { getFirestore, collection, query, getDocs, orderBy, limit, where, addDoc, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+    // Firebase Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, getDoc, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
     
-    const db = window.db;
-    const auth = window.auth;
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670",
+        measurementId: "G-GFM55V38D2"
+    };
     
-    // Load Dashboard Data
-    async function loadDashboardData() {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    // Check Login - Agar login nahi to login page pe bhejo
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            console.log("Logged in as:", user.email);
+            loadAllData();
+            loadSettings();
+        }
+    });
+    
+    // Load Settings (Logo, Store Name)
+    async function loadSettings() {
         try {
-            const loadingMsg = document.getElementById('loadingMessage');
-            
-            // Get customers
-            const customersRef = collection(db, 'customers');
-            const customersSnapshot = await getDocs(customersRef);
+            const settingsRef = doc(db, 'settings', 'store_settings');
+            const settingsSnap = await getDoc(settingsRef);
+            if (settingsSnap.exists()) {
+                const data = settingsSnap.data();
+                if (data.logoUrl) document.getElementById('storeLogo').src = data.logoUrl;
+                if (data.storeName) document.getElementById('storeName').innerText = data.storeName;
+                if (data.primaryColor) document.documentElement.style.setProperty('--primary', data.primaryColor);
+            }
+        } catch (e) { console.log("Settings error:", e); }
+    }
+    
+    // Load All Dashboard Data
+    async function loadAllData() {
+        try {
+            await loadStats();
+            await loadTopCustomers();
+            await loadRecentTransactions();
+        } catch (error) {
+            console.error("Load error:", error);
+        }
+    }
+    
+    // Load Statistics
+    async function loadStats() {
+        try {
+            const customersSnap = await getDocs(collection(db, 'customers'));
             let totalDue = 0;
             let totalCustomers = 0;
-            
-            customersSnapshot.forEach(doc => {
+            customersSnap.forEach(doc => {
                 const data = doc.data();
                 totalDue += data.totalDue || 0;
                 totalCustomers++;
             });
-            
             document.getElementById('totalDue').innerText = '₹' + totalDue.toLocaleString();
             document.getElementById('totalCustomers').innerText = totalCustomers;
             
-            // Get today's collection
+            // Today's Collection
             const today = new Date().toISOString().slice(0,10);
-            const ledgerRef = collection(db, 'ledger');
-            const todayQuery = query(ledgerRef, where('type', '==', 'payment'), where('date', '==', today));
-            const todaySnapshot = await getDocs(todayQuery);
+            const ledgerSnap = await getDocs(collection(db, 'ledger'));
             let todayTotal = 0;
-            todaySnapshot.forEach(doc => {
-                todayTotal += doc.data().amount || 0;
+            let totalPaid = 0;
+            ledgerSnap.forEach(doc => {
+                const data = doc.data();
+                if (data.type === 'payment') {
+                    totalPaid += data.amount || 0;
+                    if (data.date === today) todayTotal += data.amount || 0;
+                }
             });
             document.getElementById('todayCollection').innerText = '₹' + todayTotal.toLocaleString();
-            
-            // Get total paid (all time)
-            const paidQuery = query(ledgerRef, where('type', '==', 'payment'));
-            const paidSnapshot = await getDocs(paidQuery);
-            let totalPaid = 0;
-            paidSnapshot.forEach(doc => {
-                totalPaid += doc.data().amount || 0;
-            });
             document.getElementById('totalPaid').innerText = '₹' + totalPaid.toLocaleString();
+        } catch (e) { console.error("Stats error:", e); }
+    }
+    
+    // Load Top 5 Due Customers
+    async function loadTopCustomers() {
+        try {
+            const customersSnap = await getDocs(collection(db, 'customers'));
+            const customers = [];
+            customersSnap.forEach(doc => {
+                const data = doc.data();
+                customers.push({ id: doc.id, ...data });
+            });
+            customers.sort((a, b) => (b.totalDue || 0) - (a.totalDue || 0));
+            const top5 = customers.slice(0, 5);
             
-            if (loadingMsg) loadingMsg.style.display = 'none';
-            
-        } catch (error) {
-            console.error("Error loading dashboard:", error);
-            const loadingMsg = document.getElementById('loadingMessage');
-            if (loadingMsg) loadingMsg.innerHTML = '❌ Error loading data. Please refresh.';
-        }
+            const container = document.getElementById('topCustomersList');
+            if (top5.length === 0) {
+                container.innerHTML = '<div class="empty-state">कोई ग्राहक नहीं</div>';
+                return;
+            }
+            container.innerHTML = top5.map(c => {
+                const percent = ((c.totalDue || 0) / (c.totalAdded || 1)) * 100;
+                return `
+                    <div class="customer-item" onclick="window.location.href='customer-detail.html?id=${c.id}'">
+                        <div class="customer-info">
+                            <div class="customer-name">${c.name || 'N/A'}</div>
+                            <div class="customer-phone">${c.phone || ''}</div>
+                        </div>
+                        <div class="customer-due">
+                            <div class="due-amount">₹${(c.totalDue || 0).toLocaleString()}</div>
+                            <div class="due-percent">${Math.round(percent)}%</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) { console.error("Top customers error:", e); }
+    }
+    
+    // Load Recent 10 Transactions
+    async function loadRecentTransactions() {
+        try {
+            const ledgerSnap = await getDocs(query(collection(db, 'ledger'), orderBy('createdAt', 'desc'), limit(10)));
+            const container = document.getElementById('recentTransactionsList');
+            if (ledgerSnap.empty) {
+                container.innerHTML = '<div class="empty-state">कोई लेनदेन नहीं</div>';
+                return;
+            }
+            const transactions = [];
+            for (const docSnap of ledgerSnap.docs) {
+                const data = docSnap.data();
+                let customerName = data.customerName || '';
+                if (!customerName && data.customerId) {
+                    try {
+                        const custSnap = await getDoc(doc(db, 'customers', data.customerId));
+                        if (custSnap.exists()) customerName = custSnap.data().name || '';
+                    } catch(e) {}
+                }
+                const date = data.createdAt?.toDate ? new Date(data.createdAt.toDate()) : new Date();
+                transactions.push({ ...data, customerName, date });
+            }
+            container.innerHTML = transactions.map(t => {
+                const typeIcon = t.type === 'credit' ? '🔴 +' : '🟢 -';
+                const typeClass = t.type === 'credit' ? 'credit-amount' : 'payment-amount';
+                return `
+                    <div class="transaction-item">
+                        <div>
+                            <div class="transaction-customer">${t.customerName || 'ग्राहक'}</div>
+                            <div class="transaction-date">${date.toLocaleString()}</div>
+                        </div>
+                        <div class="${typeClass}">${typeIcon} ₹${(t.amount || 0).toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) { console.error("Transactions error:", e); }
     }
     
     // Load Customers for Dropdown
     async function loadCustomerDropdown() {
         try {
-            const customersRef = collection(db, 'customers');
-            const snapshot = await getDocs(customersRef);
+            const snap = await getDocs(collection(db, 'customers'));
             const select = document.getElementById('customerSelect');
-            if (!select) return;
             select.innerHTML = '<option value="">-- ग्राहक चुनें --</option>';
-            snapshot.forEach(doc => {
+            snap.forEach(doc => {
                 const data = doc.data();
                 select.innerHTML += `<option value="${doc.id}">${data.name} (${data.phone})</option>`;
             });
-        } catch (error) {
-            console.error("Error loading customers:", error);
-        }
+        } catch (e) { console.error("Dropdown error:", e); }
     }
     
     // Save Entry
     async function saveEntry() {
         const customerId = document.getElementById('customerSelect').value;
-        const type = document.querySelector('.segment.active').dataset.type;
+        const type = document.querySelector('.segment.active')?.dataset.type || 'credit';
         const amount = parseFloat(document.getElementById('amount').value);
         const note = document.getElementById('note').value;
         
-        if (!customerId) {
-            alert('कृपया ग्राहक चुनें');
-            return;
-        }
-        if (!amount || amount <= 0) {
-            alert('कृपया सही रकम डालें');
-            return;
-        }
+        if (!customerId) { alert('ग्राहक चुनें'); return; }
+        if (!amount || amount <= 0) { alert('सही रकम डालें'); return; }
         
         try {
-            const ledgerRef = collection(db, 'ledger');
             const today = new Date().toISOString().slice(0,10);
-            
-            await addDoc(ledgerRef, {
+            await addDoc(collection(db, 'ledger'), {
                 customerId: customerId,
                 type: type,
                 amount: amount,
                 note: note,
                 createdAt: new Date(),
-                date: today,
-                createdBy: auth.currentUser?.email || 'admin'
+                date: today
             });
             
-            // Update customer totals
             const customerRef = doc(db, 'customers', customerId);
-            const customerSnap = await getDoc(customerRef);
-            const customerData = customerSnap.data();
-            
-            let newTotalAdded = customerData.totalAdded || 0;
-            let newTotalPaid = customerData.totalPaid || 0;
-            
-            if (type === 'credit') {
-                newTotalAdded += amount;
-            } else {
-                newTotalPaid += amount;
-            }
-            
-            const newTotalDue = newTotalAdded - newTotalPaid;
+            const custSnap = await getDoc(customerRef);
+            const custData = custSnap.data();
+            let newAdded = custData.totalAdded || 0;
+            let newPaid = custData.totalPaid || 0;
+            if (type === 'credit') newAdded += amount;
+            else newPaid += amount;
+            const newDue = newAdded - newPaid;
             
             await updateDoc(customerRef, {
-                totalAdded: newTotalAdded,
-                totalPaid: newTotalPaid,
-                totalDue: newTotalDue,
-                lastPaymentDate: type === 'payment' ? new Date() : customerData.lastPaymentDate
+                totalAdded: newAdded,
+                totalPaid: newPaid,
+                totalDue: newDue,
+                lastPaymentDate: type === 'payment' ? new Date() : (custData.lastPaymentDate || null)
             });
             
-            alert('✅ एंट्री सेव हो गई!');
+            alert('✅ एंट्री सेव हो गई');
             closeBottomSheet();
-            loadDashboardData();
-            
-            // Reset form
+            loadAllData();
             document.getElementById('amount').value = '';
             document.getElementById('note').value = '';
-            
-        } catch (error) {
-            console.error("Error saving entry:", error);
-            alert('❌ एरर: ' + error.message);
+        } catch (e) {
+            console.error("Save error:", e);
+            alert('❌ एरर: ' + e.message);
         }
     }
     
-    // Bottom Sheet Functions
     function openBottomSheet() {
-        const sheet = document.getElementById('addEntrySheet');
-        if (sheet) {
-            sheet.classList.add('open');
-            loadCustomerDropdown();
-        }
+        document.getElementById('addEntrySheet').classList.add('open');
+        loadCustomerDropdown();
     }
-    
     function closeBottomSheet() {
-        const sheet = document.getElementById('addEntrySheet');
-        if (sheet) sheet.classList.remove('open');
+        document.getElementById('addEntrySheet').classList.remove('open');
     }
     
-    // Make functions global
-    window.saveEntry = saveEntry;
-    window.loadDashboardData = loadDashboardData;
+    // Logout
+    async function logout() {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    }
     
     // Event Listeners
-    const fabBtn = document.getElementById('fabBtn');
-    const fabNavBtn = document.getElementById('fabNavBtn');
-    if (fabBtn) fabBtn.onclick = openBottomSheet;
-    if (fabNavBtn) fabNavBtn.onclick = openBottomSheet;
+    document.getElementById('fabBtn')?.addEventListener('click', openBottomSheet);
+    document.getElementById('fabNavBtn')?.addEventListener('click', openBottomSheet);
+    document.querySelector('.sheet-overlay')?.addEventListener('click', closeBottomSheet);
+    document.getElementById('saveEntryBtn')?.addEventListener('click', saveEntry);
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
     
-    const sheetOverlay = document.querySelector('.sheet-overlay');
-    if (sheetOverlay) sheetOverlay.onclick = closeBottomSheet;
-    
-    const saveBtn = document.getElementById('saveEntryBtn');
-    if (saveBtn) saveBtn.onclick = saveEntry;
-    
-    // Quick amount buttons
     document.querySelectorAll('.quick-amount').forEach(btn => {
-        btn.onclick = () => {
-            const amountInput = document.getElementById('amount');
-            if (amountInput) amountInput.value = btn.dataset.amount;
-        };
+        btn.addEventListener('click', () => {
+            document.getElementById('amount').value = btn.dataset.amount;
+        });
     });
     
-    // Segment control
     document.querySelectorAll('.segment').forEach(seg => {
-        seg.onclick = () => {
+        seg.addEventListener('click', () => {
             document.querySelectorAll('.segment').forEach(s => s.classList.remove('active'));
             seg.classList.add('active');
-        };
+        });
     });
     
     // Dark Mode
-    const darkModeBtn = document.getElementById('darkModeBtn');
-    if (darkModeBtn) {
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            darkModeBtn.innerText = '☀️';
-        }
-        darkModeBtn.onclick = () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDark);
-            darkModeBtn.innerText = isDark ? '☀️' : '🌙';
-        };
+    const darkBtn = document.getElementById('darkModeBtn');
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        darkBtn.innerText = '☀️';
     }
+    darkBtn?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkBtn.innerText = isDark ? '☀️' : '🌙';
+    });
     
     // Navigation
     document.querySelectorAll('.nav-item').forEach(nav => {
-        nav.onclick = (e) => {
+        nav.addEventListener('click', () => {
             const page = nav.dataset.page;
             if (page === 'customers') location.href = 'customers.html';
             if (page === 'reports') location.href = 'reports.html';
-            if (page === 'profile') logout();
-        };
+        });
     });
-    
-    // Call loadDashboardData when ready (will be called after auth check)
-    window.loadDashboardData = loadDashboardData;
-    
-    // Initial load (will be triggered after auth)
-    setTimeout(() => {
-        if (auth.currentUser) {
-            loadDashboardData();
-        }
-    }, 1000);
 </script>
-
 </body>
 </html>
