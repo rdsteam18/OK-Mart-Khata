@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>रिपोर्ट्स - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card,
+        body.dark-mode .stat-card,
+        body.dark-mode .report-card,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .header,
+        body.dark-mode .filter-bar {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .header h1 {
+            font-size: 18px;
+            flex: 1;
+        }
+        .dark-mode-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+
+        /* Date Filter */
+        .filter-bar {
+            background: var(--light);
+            padding: 12px;
+            margin: 12px;
+            border-radius: var(--radius-md);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .date-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            background: var(--light);
+        }
+        .filter-btn {
+            padding: 10px 16px;
+            background: var(--light-gray);
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 12px;
+        }
+        .stat-card {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: var(--gray);
+            display: block;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .stat-value.danger {
+            color: var(--danger);
+        }
+        .stat-value.success {
+            color: var(--success);
+        }
+
+        /* Report Cards */
+        .report-section {
+            margin: 12px;
+        }
+        .section-title {
+            font-size: 16px;
+            margin-bottom: 12px;
+            padding-left: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .report-card {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .report-header {
+            padding: 12px 16px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        .report-body {
+            padding: 12px;
+        }
+        .customer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+        .customer-row:last-child {
+            border-bottom: none;
+        }
+        .customer-name {
+            font-weight: 500;
+        }
+        .customer-phone {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .customer-amount {
+            font-weight: bold;
+            color: var(--danger);
+        }
+        .progress-bar {
+            background: var(--light-gray);
+            border-radius: 10px;
+            height: 6px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: var(--primary);
+            height: 100%;
+            border-radius: 10px;
+            width: 0%;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin: 12px;
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 4px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: none;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .chart-title {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: var(--gray);
+        }
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bar-label {
+            width: 80px;
+            font-size: 12px;
+        }
+        .bar {
+            flex: 1;
+            background: var(--light-gray);
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            background: var(--primary);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        /* Export Buttons */
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 12px;
+        }
+        .export-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .export-btn:active {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item active" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item" data-page="profile" id="logoutBtn">
+        <span>🚪</span>
+        <span class="nav-label">लॉगआउट</span>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1>📊 रिपोर्ट्स</h1>
+    <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
+</div>
+
+<!-- Date Filter -->
+<div class="filter-bar">
+    <input type="date" id="startDate" class="date-input">
+    <input type="date" id="endDate" class="date-input">
+    <button class="filter-btn" id="applyFilter">लागू करें</button>
+    <button class="filter-btn" id="resetFilter">रीसेट</button>
+</div>
+
+<!-- Quick Stats -->
+<div class="stats-grid" id="statsGrid">
+    <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">कुल कलेक्शन</div>
+        <div class="stat-value success" id="totalCollection">₹0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📝</div>
+        <div class="stat-label">कुल क्रेडिट</div>
+        <div class="stat-value danger" id="totalCredit">₹0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">सक्रिय ग्राहक</div>
+        <div class="stat-value" id="activeCustomers">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-label">बकाया ग्राहक</div>
+        <div class="stat-value danger" id="dueCustomers">0</div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <button class="tab active" data-tab="due">📋 बकाया ग्राहक</button>
+    <button class="tab" data-tab="top">🏆 टॉप ग्राहक</button>
+    <button class="tab" data-tab="collection">📅 दैनिक कलेक्शन</button>
+</div>
+
+<!-- Due Customers Tab -->
+<div id="dueTab" class="report-section">
+    <div class="section-title">
+        <span>📋 बकाया ग्राहक सूची</span>
+        <span id="dueCount">0 ग्राहक</span>
+    </div>
+    <div id="dueCustomersList" class="report-card">
+        <div class="loading">लोड हो रहा है...</div>
+    </div>
+</div>
+
+<!-- Top Customers Tab -->
+<div id="topTab" class="report-section" style="display: none;">
+    <div class="section-title">
+        <span>🏆 टॉप क्रेडिट ग्राहक</span>
+        <span id="topCount">0 ग्राहक</span>
+    </div>
+    <div id="topCustomersList" class="report-card">
+        <div class="loading">लोड हो रहा है...</div>
+    </div>
+</div>
+
+<!-- Collection Tab -->
+<div id="collectionTab" class="report-section" style="display: none;">
+    <div class="section-title">
+        <span>📅 दैनिक कलेक्शन</span>
+        <span id="collectionDaysCount">0 दिन</span>
+    </div>
+    <div class="chart-container">
+        <div class="chart-title">दिन के हिसाब से कलेक्शन</div>
+        <div id="dailyCollectionChart" class="bar-chart">
+            <div class="loading">लोड हो रहा है...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="export-buttons">
+    <div class="export-btn" id="exportCSVBtn">📄 CSV एक्सपोर्ट</div>
+    <div class="export-btn" id="exportPDFBtn">📑 PDF एक्सपोर्ट</div>
+</div>
+
+<script type="module">
+    // Firebase Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    let allCustomers = [];
+    let allTransactions = [];
+    let startDate = '';
+    let endDate = '';
+    let currentTab = 'due';
+    
+    // Check Login
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        await loadData();
+    });
+    
+    // Load all data
+    async function loadData() {
+        try {
+            // Load customers
+            const customersSnap = await getDocs(collection(db, 'customers'));
+            allCustomers = [];
+            customersSnap.forEach(doc => {
+                const data = doc.data();
+                allCustomers.push({
+                    id: doc.id,
+                    name: data.name || 'N/A',
+                    phone: data.phone || '',
+                    totalAdded: data.totalAdded || 0,
+                    totalPaid: data.totalPaid || 0,
+                    totalDue: data.totalDue || 0,
+                    address: data.address || ''
+                });
+            });
+            
+            // Load all transactions
+            const ledgerSnap = await getDocs(collection(db, 'ledger'));
+            allTransactions = [];
+            ledgerSnap.forEach(doc => {
+                const data = doc.data();
+                let date = new Date();
+                if (data.createdAt && data.createdAt.toDate) {
+                    date = data.createdAt.toDate();
+                } else if (data.createdAt && data.createdAt.seconds) {
+                    date = new Date(data.createdAt.seconds * 1000);
+                } else if (data.createdAt) {
+                    date = new Date(data.createdAt);
+                }
+                
+                allTransactions.push({
+                    id: doc.id,
+                    customerId: data.customerId,
+                    type: data.type,
+                    amount: data.amount || 0,
+                    note: data.note || '',
+                    date: date,
+                    dateStr: date.toISOString().slice(0,10)
+                });
+            });
+            
+            updateAllReports();
+            
+        } catch (error) {
+            console.error("Error loading data:", error);
+        }
+    }
+    
+    // Filter transactions by date range
+    function getFilteredTransactions() {
+        if (!startDate && !endDate) return allTransactions;
+        
+        return allTransactions.filter(t => {
+            if (startDate && t.dateStr < startDate) return false;
+            if (endDate && t.dateStr > endDate) return false;
+            return true;
+        });
+    }
+    
+    // Update all reports
+    function updateAllReports() {
+        updateStats();
+        updateDueCustomers();
+        updateTopCustomers();
+        updateDailyCollection();
+    }
+    
+    // Update statistics
+    function updateStats() {
+        const filteredTransactions = getFilteredTransactions();
+        
+        let totalCollection = 0;
+        let totalCredit = 0;
+        
+        filteredTransactions.forEach(t => {
+            if (t.type === 'payment') totalCollection += t.amount;
+            else totalCredit += t.amount;
+        });
+        
+        const activeCustomers = allCustomers.filter(c => c.totalAdded > 0).length;
+        const dueCustomers = allCustomers.filter(c => c.totalDue > 0).length;
+        
+        document.getElementById('totalCollection').innerHTML = '₹' + totalCollection.toLocaleString();
+        document.getElementById('totalCredit').innerHTML = '₹' + totalCredit.toLocaleString();
+        document.getElementById('activeCustomers').innerText = activeCustomers;
+        document.getElementById('dueCustomers').innerText = dueCustomers;
+    }
+    
+    // Update due customers list
+    function updateDueCustomers() {
+        const dueCustomers = allCustomers
+            .filter(c => c.totalDue > 0)
+            .sort((a, b) => b.totalDue - a.totalDue);
+        
+        const container = document.getElementById('dueCustomersList');
+        document.getElementById('dueCount').innerText = dueCustomers.length + ' ग्राहक';
+        
+        if (dueCustomers.length === 0) {
+            container.innerHTML = '<div class="empty-state">✅ कोई बकाया ग्राहक नहीं</div>';
+            return;
+        }
+        
+        container.innerHTML = dueCustomers.map(c => {
+            const percent = c.totalAdded > 0 ? (c.totalDue / c.totalAdded) * 100 : 0;
+            return `
+                <div class="customer-row" onclick="window.location.href='customer-detail.html?id=${c.id}'">
+                    <div>
+                        <div class="customer-name">${escapeHtml(c.name)}</div>
+                        <div class="customer-phone">📞 ${c.phone}</div>
+                    </div>
+                    <div class="customer-amount">₹${c.totalDue.toLocaleString()}</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${percent}%"></div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Update top customers (by total credit)
+    function updateTopCustomers() {
+        const topCustomers = [...allCustomers]
+            .sort((a, b) => b.totalAdded - a.totalAdded)
+            .slice(0, 10);
+        
+        const container = document.getElementById('topCustomersList');
+        document.getElementById('topCount').innerText = topCustomers.length + ' ग्राहक';
+        
+        if (topCustomers.length === 0) {
+            container.innerHTML = '<div class="empty-state">📭 कोई ग्राहक नहीं</div>';
+            return;
+        }
+        
+        container.innerHTML = topCustomers.map((c, index) => {
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '📌';
+            return `
+                <div class="customer-row" onclick="window.location.href='customer-detail.html?id=${c.id}'">
+                    <div>
+                        <div class="customer-name">${medal} ${escapeHtml(c.name)}</div>
+                        <div class="customer-phone">📞 ${c.phone}</div>
+                    </div>
+                    <div class="customer-amount">₹${c.totalAdded.toLocaleString()}</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Update daily collection chart
+    function updateDailyCollection() {
+        const filteredTransactions = getFilteredTransactions();
+        
+        // Group by date
+        const dailyMap = new Map();
+        filteredTransactions.forEach(t => {
+            if (t.type === 'payment') {
+                const amount = dailyMap.get(t.dateStr) || 0;
+                dailyMap.set(t.dateStr, amount + t.amount);
+            }
+        });
+        
+        // Convert to array and sort by date
+        const dailyData = Array.from(dailyMap.entries())
+            .map(([date, amount]) => ({ date, amount }))
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .slice(-14); // Last 14 days
+        
+        const container = document.getElementById('dailyCollectionChart');
+        document.getElementById('collectionDaysCount').innerText = dailyData.length + ' दिन';
+        
+        if (dailyData.length === 0) {
+            container.innerHTML = '<div class="empty-state">📭 कोई कलेक्शन डेटा नहीं</div>';
+            return;
+        }
+        
+        const maxAmount = Math.max(...dailyData.map(d => d.amount), 1);
+        
+        container.innerHTML = dailyData.map(d => {
+            const percent = (d.amount / maxAmount) * 100;
+            const dateStr = new Date(d.date).toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' });
+            return `
+                <div class="bar-item">
+                    <div class="bar-label">${dateStr}</div>
+                    <div class="bar">
+                        <div class="bar-fill" style="width: ${percent}%;">₹${d.amount.toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Export to CSV
+    function exportToCSV() {
+        const filteredTransactions = getFilteredTransactions();
+        
+        if (filteredTransactions.length === 0) {
+            alert('कोई डेटा नहीं है');
+            return;
+        }
+        
+        // Get customer names mapping
+        const customerMap = new Map();
+        allCustomers.forEach(c => customerMap.set(c.id, c.name));
+        
+        const headers = ['दिनांक', 'ग्राहक', 'टाइप', 'रकम', 'नोट'];
+        const rows = filteredTransactions.map(t => [
+            t.dateStr,
+            customerMap.get(t.customerId) || 'N/A',
+            t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट',
+            t.amount,
+            t.note
+        ]);
+        
+        const csvContent = [headers, ...rows]
+            .map(row => row.join(','))
+            .join('\n');
+        
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', `report_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert('✅ CSV डाउनलोड हो गया');
+    }
+    
+    // Export to PDF (print version)
+    function exportToPDF() {
+        const printWindow = window.open('', '_blank');
+        const today = new Date().toLocaleDateString('hi-IN');
+        const filteredTransactions = getFilteredTransactions();
+        
+        let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Report - OK Mart</title>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .title { font-size: 24px; font-weight: bold; color: #FF5722; }
+                    .date-range { margin: 10px 0; color: gray; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background: #FF5722; color: white; }
+                    .total { font-weight: bold; background: #f5f5f5; }
+                    @media print {
+                        body { padding: 0; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="title">OK Mart - रिपोर्ट</div>
+                    <div class="date-range">दिनांक: ${today}</div>
+                    ${startDate || endDate ? `<div class="date-range">फ़िल्टर: ${startDate || 'शुरू'} से ${endDate || 'अंत'} तक</div>` : ''}
+                </div>
+                
+                <tr>
+                    <thead>
+                        <tr><th>दिनांक</th><th>ग्राहक</th><th>टाइप</th><th>रकम</th></tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        let totalCredit = 0;
+        let totalPayment = 0;
+        
+        const customerMap = new Map();
+        allCustomers.forEach(c => customerMap.set(c.id, c.name));
+        
+        filteredTransactions.forEach(t => {
+            if (t.type === 'credit') totalCredit += t.amount;
+            else totalPayment += t.amount;
+            
+            html += `
+                <tr>
+                    <td>${t.dateStr}</td>
+                    <td>${customerMap.get(t.customerId) || 'N/A'}</td>
+                    <td>${t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट'}</td>
+                    <td>₹${t.amount.toLocaleString()}</td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    <tr class="total">
+                        <td colspan="2"><strong>कुल क्रेडिट</strong></td>
+                        <td colspan="2"><strong>₹${totalCredit.toLocaleString()}</strong></td>
+                    </tr>
+                    <tr class="total">
+                        <td colspan="2"><strong>कुल कलेक्शन</strong></td>
+                        <td colspan="2"><strong>₹${totalPayment.toLocaleString()}</strong></td>
+                    </tr>
+                    <tr class="total">
+                        <td colspan="2"><strong>शेष बकाया</strong></td>
+                        <td colspan="2"><strong>₹${(totalCredit - totalPayment).toLocaleString()}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="no-print" style="text-align: center; margin-top: 20px;">
+                <button onclick="window.print()" style="padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
+            </div>
+            </body>
+            </html>
+        `;
+        
+        printWindow.document.write(html);
+        printWindow.document.close();
+    }
+    
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Apply filter
+    function applyFilter() {
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+        updateAllReports();
+    }
+    
+    function resetFilter() {
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        startDate = '';
+        endDate = '';
+        updateAllReports();
+    }
+    
+    // Tab switching
+    function switchTab(tab) {
+        currentTab = tab;
+        
+        document.getElementById('dueTab').style.display = tab === 'due' ? 'block' : 'none';
+        document.getElementById('topTab').style.display = tab === 'top' ? 'block' : 'none';
+        document.getElementById('collectionTab').style.display = tab === 'collection' ? 'block' : 'none';
+        
+        document.querySelectorAll('.tab').forEach(t => {
+            if (t.dataset.tab === tab) t.classList.add('active');
+            else t.classList.remove('active');
+        });
+    }
+    
+    // Event Listeners
+    document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'index.html');
+    document.getElementById('applyFilter')?.addEventListener('click', applyFilter);
+    document.getElementById('resetFilter')?.addEventListener('click', resetFilter);
+    document.getElementById('exportCSVBtn')?.addEventListener('click', exportToCSV);
+    document.getElementById('exportPDFBtn')?.addEventListener('click', exportToPDF);
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => {
+            const page = nav.dataset.page;
+            if (page === 'dashboard') location.href = 'index.html';
+            if (page === 'customers') location.href = 'customers.html';
+            if (page === 'add') location.href = 'index.html';
+        });
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    });
+    
+    // Dark Mode
+    const darkBtn = document.getElementById('darkModeBtn');
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        darkBtn.innerText = '☀️';
+    }
+    darkBtn?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkBtn.innerText = isDark ? '☀️' : '🌙';
+    });
+</script>
+</body>
+</html>
