@@ -45,7 +45,6 @@
             padding-bottom: 70px;
         }
 
-        /* Dark Mode */
         body.dark-mode {
             background: #121212;
         }
@@ -55,7 +54,8 @@
         body.dark-mode .mobile-bottom-nav,
         body.dark-mode .bottom-sheet .sheet-content,
         body.dark-mode .header,
-        body.dark-mode .filter-bar {
+        body.dark-mode .filter-bar,
+        body.dark-mode .customer-info {
             background: #1e1e1e;
             color: #fff;
         }
@@ -119,6 +119,9 @@
         .header h1 {
             font-size: 18px;
             flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .whatsapp-btn, .call-btn {
             background: none;
@@ -170,7 +173,7 @@
             color: var(--gray);
         }
         .stat-card .value {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
         }
         .stat-card .value.danger {
@@ -225,14 +228,14 @@
         }
         .date-input {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
-            font-size: 12px;
+            font-size: 13px;
             background: var(--light);
         }
         .filter-btn {
-            padding: 8px 16px;
+            padding: 10px 16px;
             background: var(--light-gray);
             border: none;
             border-radius: 20px;
@@ -246,14 +249,18 @@
         .download-btn {
             background: var(--success);
             color: white;
-            padding: 8px 12px;
+            padding: 10px 12px;
             border: none;
             border-radius: var(--radius-sm);
             font-size: 12px;
             cursor: pointer;
         }
+        .clear-filter {
+            background: var(--gray);
+            color: white;
+        }
 
-        /* Ledger Timeline */
+        /* Ledger Section */
         .ledger-section {
             margin: 12px;
         }
@@ -261,11 +268,20 @@
             font-size: 16px;
             margin-bottom: 12px;
             padding-left: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .transaction-count {
+            font-size: 12px;
+            color: var(--gray);
         }
         .transaction-list {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            max-height: 500px;
+            overflow-y: auto;
         }
         .transaction-item {
             background: var(--light);
@@ -326,6 +342,21 @@
             text-align: center;
             padding: 40px;
             color: var(--gray);
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: var(--radius-sm);
+            height: 70px;
+            margin-bottom: 8px;
+        }
+        body.dark-mode .skeleton {
+            background: linear-gradient(90deg, #2d2d2d 25%, #3d3d3d 50%, #2d2d2d 75%);
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         /* Bottom Sheet */
@@ -455,7 +486,7 @@
         <span>🏠</span>
         <span class="nav-label">डैशबोर्ड</span>
     </div>
-    <div class="nav-item active" data-page="customers">
+    <div class="nav-item" data-page="customers">
         <span>👥</span>
         <span class="nav-label">ग्राहक</span>
     </div>
@@ -526,17 +557,23 @@
 
 <!-- Filter Bar -->
 <div class="filter-bar">
-    <input type="date" id="startDate" class="date-input" placeholder="शुरू">
-    <input type="date" id="endDate" class="date-input" placeholder="अंत">
-    <button class="filter-btn" id="applyDateFilter">लागू</button>
+    <input type="date" id="startDate" class="date-input" placeholder="शुरू तारीख">
+    <input type="date" id="endDate" class="date-input" placeholder="अंत तारीख">
+    <button class="filter-btn" id="applyDateFilter">लागू करें</button>
+    <button class="filter-btn clear-filter" id="clearFilter">साफ़ करें</button>
     <button class="download-btn" id="downloadStatementBtn">📥 स्टेटमेंट</button>
 </div>
 
 <!-- Ledger Section -->
 <div class="ledger-section">
-    <div class="section-title">📋 लेनदेन इतिहास</div>
+    <div class="section-title">
+        <span>📋 लेनदेन इतिहास</span>
+        <span class="transaction-count" id="transactionCount">0 लेनदेन</span>
+    </div>
     <div class="transaction-list" id="transactionList">
-        <div class="loading">लोड हो रहा है...</div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
     </div>
 </div>
 
@@ -565,10 +602,12 @@
                 <button class="quick-amount" data-amount="100">+100</button>
                 <button class="quick-amount" data-amount="500">+500</button>
                 <button class="quick-amount" data-amount="1000">+1000</button>
+                <button class="quick-amount" data-amount="2000">+2000</button>
+                <button class="quick-amount" data-amount="5000">+5000</button>
             </div>
             <div class="form-group">
                 <label>नोट (वैकल्पिक)</label>
-                <input type="text" id="entryNote" class="form-control" placeholder="नोट...">
+                <input type="text" id="entryNote" class="form-control" placeholder="जैसे: किराना सामान">
             </div>
             <button class="btn-primary" id="saveEntryBtn">✅ एंट्री सेव करें</button>
         </div>
@@ -600,6 +639,7 @@
     let allTransactions = [];
     let startDate = '';
     let endDate = '';
+    let realtimeListener = null;
     
     // Get customer ID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -613,9 +653,59 @@
             window.location.href = 'customers.html';
         } else {
             loadCustomerData();
-            loadTransactions();
+            setupRealtimeListener();
         }
     });
+    
+    // Setup Realtime Listener for Transactions
+    function setupRealtimeListener() {
+        if (realtimeListener) {
+            realtimeListener();
+        }
+        
+        const ledgerRef = collection(db, 'ledger');
+        const q = query(ledgerRef, where('customerId', '==', customerId), orderBy('createdAt', 'desc'));
+        
+        realtimeListener = onSnapshot(q, (snapshot) => {
+            allTransactions = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                let date = new Date();
+                if (data.createdAt && data.createdAt.toDate) {
+                    date = data.createdAt.toDate();
+                } else if (data.createdAt) {
+                    date = new Date(data.createdAt);
+                }
+                
+                allTransactions.push({
+                    id: doc.id,
+                    type: data.type,
+                    amount: data.amount || 0,
+                    note: data.note || '',
+                    date: date,
+                    dateStr: date.toISOString().slice(0,10),
+                    voucherNumber: data.voucherNumber || generateVoucherNumber(date)
+                });
+            });
+            
+            // Sort by date (newest first)
+            allTransactions.sort((a, b) => b.date - a.date);
+            
+            renderTransactions();
+            
+        }, (error) => {
+            console.error("Realtime error:", error);
+            document.getElementById('transactionList').innerHTML = '<div class="empty-state">❌ लोड करने में एरर</div>';
+        });
+    }
+    
+    // Generate Voucher Number
+    function generateVoucherNumber(date) {
+        const d = new Date(date);
+        const dateStr = d.toISOString().slice(0,10).replace(/-/g, '');
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        return `OKMART-${dateStr}-${random}`;
+    }
     
     // Load Customer Data
     async function loadCustomerData() {
@@ -645,43 +735,6 @@
         }
     }
     
-    // Load Transactions
-    async function loadTransactions() {
-        try {
-            const ledgerRef = collection(db, 'ledger');
-            let q = query(ledgerRef, where('customerId', '==', customerId), orderBy('createdAt', 'desc'));
-            
-            const snapshot = await getDocs(q);
-            allTransactions = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const date = data.createdAt?.toDate ? new Date(data.createdAt.toDate()) : new Date();
-                allTransactions.push({
-                    id: doc.id,
-                    type: data.type,
-                    amount: data.amount || 0,
-                    note: data.note || '',
-                    date: date,
-                    dateStr: date.toISOString().slice(0,10),
-                    voucherNumber: data.voucherNumber || generateVoucherNumber(date)
-                });
-            });
-            
-            renderTransactions();
-            
-        } catch (error) {
-            console.error("Error loading transactions:", error);
-        }
-    }
-    
-    // Generate Voucher Number
-    function generateVoucherNumber(date) {
-        const d = new Date(date);
-        const dateStr = d.toISOString().slice(0,10).replace(/-/g, '');
-        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        return `OKMART-${dateStr}-${random}`;
-    }
-    
     // Render Transactions with Date Filter
     function renderTransactions() {
         let filtered = [...allTransactions];
@@ -694,22 +747,30 @@
         }
         
         const container = document.getElementById('transactionList');
+        const countSpan = document.getElementById('transactionCount');
         
         if (filtered.length === 0) {
             container.innerHTML = '<div class="empty-state">📭 कोई लेनदेन नहीं</div>';
+            countSpan.innerText = '0 लेनदेन';
             return;
         }
+        
+        countSpan.innerText = filtered.length + ' लेनदेन';
         
         container.innerHTML = filtered.map(t => {
             const typeClass = t.type === 'credit' ? 'credit' : 'payment';
             const typeIcon = t.type === 'credit' ? '➕ क्रेडिट' : '💰 पेमेंट';
             const amountSign = t.type === 'credit' ? '+' : '-';
             
+            // Format date nicely
+            const dateStr = t.date.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            const timeStr = t.date.toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' });
+            
             return `
                 <div class="transaction-item">
                     <div class="transaction-info">
                         <div class="transaction-type ${typeClass}">${typeIcon}</div>
-                        <div class="transaction-date">${t.date.toLocaleString()}</div>
+                        <div class="transaction-date">📅 ${dateStr} | 🕐 ${timeStr}</div>
                         ${t.note ? `<div class="transaction-note">📝 ${escapeHtml(t.note)}</div>` : ''}
                         <div class="voucher-number">🧾 ${t.voucherNumber}</div>
                     </div>
@@ -783,7 +844,6 @@
             document.getElementById('totalPaid').innerHTML = '₹' + newPaid.toLocaleString();
             document.getElementById('totalDue').innerHTML = '₹' + newDue.toLocaleString();
             
-            await loadTransactions();
             return true;
             
         } catch (error) {
@@ -824,27 +884,32 @@
         window.location.href = `tel:${phone}`;
     }
     
-    // Generate PDF Statement (Simple version)
+    // Generate PDF Statement
     function generatePDF() {
-        // Simple print version
-        const printWindow = window.open('', '_blank');
-        const today = new Date().toLocaleDateString();
-        
         let filteredTransactions = [...allTransactions];
         if (startDate) filteredTransactions = filteredTransactions.filter(t => t.dateStr >= startDate);
         if (endDate) filteredTransactions = filteredTransactions.filter(t => t.dateStr <= endDate);
+        
+        if (filteredTransactions.length === 0) {
+            alert('कोई लेनदेन नहीं है इस तारीख रेंज में');
+            return;
+        }
+        
+        const printWindow = window.open('', '_blank');
+        const today = new Date().toLocaleDateString('hi-IN');
         
         let html = `
             <!DOCTYPE html>
             <html>
             <head>
                 <title>Statement - ${customerData?.name}</title>
+                <meta charset="UTF-8">
                 <style>
                     body { font-family: Arial, sans-serif; padding: 20px; }
                     .header { text-align: center; margin-bottom: 30px; }
                     .store-name { font-size: 24px; font-weight: bold; color: #FF5722; }
                     .title { font-size: 18px; margin-top: 10px; }
-                    .customer-details { margin: 20px 0; padding: 10px; background: #f5f5f5; }
+                    .customer-details { margin: 20px 0; padding: 10px; background: #f5f5f5; border-radius: 8px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                     th { background: #FF5722; color: white; }
@@ -852,6 +917,10 @@
                     .due { color: red; font-weight: bold; }
                     .paid { color: green; }
                     .footer { margin-top: 30px; text-align: center; font-size: 12px; color: gray; }
+                    @media print {
+                        body { padding: 0; }
+                        .no-print { display: none; }
+                    }
                 </style>
             </head>
             <body>
@@ -884,7 +953,7 @@
             
             html += `
                 <tr>
-                    <td>${t.date.toLocaleDateString()}</td>
+                    <td>${t.date.toLocaleDateString('hi-IN')}</td>
                     <td>${t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट'}</td>
                     <td>${t.type === 'credit' ? '+' : '-'} ₹${t.amount.toLocaleString()}</td>
                     <td>${escapeHtml(t.note) || '-'}</td>
@@ -903,15 +972,19 @@
                         <td></td>
                     </tr>
                     <tr class="total-row">
-                        <td colspan="4"><strong>शेष बकाया</strong></td>
+                        <td colspan="3"><strong>शेष बकाया</strong></td>
                         <td class="${balance > 0 ? 'due' : 'paid'}"><strong>₹${balance.toLocaleString()}</strong></td>
+                        <td></td>
                     </tr>
                 </tbody>
-            </table>
+             </table>
             
             <div class="footer">
                 <p>यह एक कंप्यूटर जनरेटेड स्टेटमेंट है। हस्ताक्षर की आवश्यकता नहीं है।</p>
                 <p>OK Mart Khata System</p>
+            </div>
+            <div class="no-print" style="text-align: center; margin-top: 20px;">
+                <button onclick="window.print()" style="padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
             </div>
             </body>
             </html>
@@ -919,7 +992,6 @@
         
         printWindow.document.write(html);
         printWindow.document.close();
-        printWindow.print();
     }
     
     // Bottom Sheet Functions
@@ -931,7 +1003,6 @@
         document.getElementById('entryAmount').value = '';
         document.getElementById('entryNote').value = '';
         
-        // Set active segment
         document.querySelectorAll('.segment').forEach(seg => {
             if (seg.dataset.type === type) seg.classList.add('active');
             else seg.classList.remove('active');
@@ -955,6 +1026,21 @@
         }
     }
     
+    // Apply Date Filter
+    function applyDateFilter() {
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+        renderTransactions();
+    }
+    
+    function clearFilter() {
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        startDate = '';
+        endDate = '';
+        renderTransactions();
+    }
+    
     // Event Listeners
     document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'customers.html');
     document.getElementById('addCreditBtn')?.addEventListener('click', () => openEntrySheet('credit'));
@@ -966,13 +1052,8 @@
     document.getElementById('downloadStatementBtn')?.addEventListener('click', generatePDF);
     document.getElementById('saveEntryBtn')?.addEventListener('click', saveEntryFromSheet);
     document.querySelector('.sheet-overlay')?.addEventListener('click', closeSheet);
-    
-    // Date filter
-    document.getElementById('applyDateFilter')?.addEventListener('click', () => {
-        startDate = document.getElementById('startDate').value;
-        endDate = document.getElementById('endDate').value;
-        renderTransactions();
-    });
+    document.getElementById('applyDateFilter')?.addEventListener('click', applyDateFilter);
+    document.getElementById('clearFilter')?.addEventListener('click', clearFilter);
     
     // Quick amounts
     document.querySelectorAll('.quick-amount').forEach(btn => {
@@ -1009,6 +1090,9 @@
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark-mode');
     }
+    
+    // FAB Navigation
+    document.getElementById('fabNavBtn')?.addEventListener('click', () => openEntrySheet('credit'));
 </script>
 </body>
 </html>
