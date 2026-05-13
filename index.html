@@ -6,10 +6,92 @@
     <title>OK Mart Khata - Dashboard</title>
     <link rel="stylesheet" href="css/khata.css">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/a/AVvXsEjqUODVL4iyLalUMIzsfwPSpjOSA_8OEz7zn7WiCOxVySl8TqcLxulYNt7tBT9C85tto_EoafNkIMbgV1AMPkOJjkeZ52VLY5PR02z06GFwwFPb9WQBAun4WHcd3JB2Heky3Q2WdDGPy8DGZn7suo0_8RdY7Wd7i7wTMA4osYIiL6NZ1CbuPJHGzmeX">
     <meta name="theme-color" content="#FF5722">
 </head>
 <body>
+
+<!-- Login Protection Script - MUST be first -->
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+    import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+    
+    // 🔴🔴🔴 YAHAN APNA FIREBASE CONFIG DALO 🔴🔴🔴
+   const firebaseConfig = {
+  apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+  authDomain: "ok-mart-khata.firebaseapp.com",
+  projectId: "ok-mart-khata",
+  storageBucket: "ok-mart-khata.firebasestorage.app",
+  messagingSenderId: "334851811921",
+  appId: "1:334851811921:web:804863c35baa17dd61a670",
+  measurementId: "G-GFM55V38D2"
+};
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    // Make auth and db available globally
+    window.auth = auth;
+    window.db = db;
+    
+    // Check login status
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            // Not logged in - redirect to login
+            console.log("No user found, redirecting to login...");
+            window.location.href = 'login.html';
+        } else {
+            console.log("Logged in as:", user.email);
+            document.body.style.display = 'block';
+            loadDashboardData();
+            loadStoreSettings();
+        }
+    });
+    
+    // Load store settings (logo, name)
+    async function loadStoreSettings() {
+        try {
+            const settingsRef = doc(db, 'settings', 'store_settings');
+            const settingsSnap = await getDoc(settingsRef);
+            if (settingsSnap.exists()) {
+                const data = settingsSnap.data();
+                if (data.logoUrl) {
+                    const logoImg = document.getElementById('storeLogo');
+                    if (logoImg) logoImg.src = data.logoUrl;
+                }
+                if (data.storeName) {
+                    const storeNameEl = document.getElementById('storeName');
+                    if (storeNameEl) storeNameEl.innerText = data.storeName;
+                }
+                if (data.primaryColor) {
+                    document.documentElement.style.setProperty('--primary', data.primaryColor);
+                }
+            }
+        } catch (error) {
+            console.log("Settings load error:", error);
+        }
+    }
+    
+    // Make logout function global
+    window.logout = async function() {
+        try {
+            await signOut(auth);
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    };
+    
+    // Dashboard data functions
+    async function loadDashboardData() {
+        // Your existing dashboard load functions here
+        console.log("Loading dashboard data...");
+    }
+    
+    // Initially hide body until login check
+    document.body.style.display = 'none';
+</script>
 
 <!-- Mobile Bottom Navigation -->
 <div class="mobile-bottom-nav">
@@ -21,7 +103,7 @@
         <span>👥</span>
         <span class="nav-label">ग्राहक</span>
     </div>
-    <div class="nav-item" data-page="add">
+    <div class="nav-item" data-page="add" id="fabNavBtn">
         <span>➕</span>
         <span class="nav-label">एड</span>
     </div>
@@ -29,9 +111,9 @@
         <span>📊</span>
         <span class="nav-label">रिपोर्ट</span>
     </div>
-    <div class="nav-item" data-page="profile">
-        <span>👤</span>
-        <span class="nav-label">प्रोफाइल</span>
+    <div class="nav-item" data-page="profile" id="logoutNavBtn">
+        <span>🚪</span>
+        <span class="nav-label">लॉगआउट</span>
     </div>
 </div>
 
@@ -40,11 +122,9 @@
     <!-- Header -->
     <div class="header">
         <div class="header-left">
-            <button class="menu-btn" id="menuBtn">☰</button>
-            <img src="https://blogger.googleusercontent.com/img/a/AVvXsEjqUODVL4iyLalUMIzsfwPSpjOSA_8OEz7zn7WiCOxVySl8TqcLxulYNt7tBT9C85tto_EoafNkIMbgV1AMPkOJjkeZ52VLY5PR02z06GFwwFPb9WQBAun4WHcd3JB2Heky3Q2WdDGPy8DGZn7suo0_8RdY7Wd7i7wTMA4osYIiL6NZ1CbuPJHGzmeX" alt="Logo" class="logo" id="storeLogo">
+            <img src="assets/images/logo-placeholder.png" alt="Logo" class="logo" id="storeLogo">
         </div>
         <div class="header-right">
-            <button class="notification-btn" id="notifyBtn">🔔</button>
             <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
         </div>
     </div>
@@ -57,7 +137,7 @@
 
     <!-- Stats Cards Grid -->
     <div class="stats-grid">
-        <div class="stat-card" id="totalDueCard">
+        <div class="stat-card">
             <div class="stat-icon">💰</div>
             <div class="stat-info">
                 <span class="stat-label">कुल बकाया</span>
@@ -65,7 +145,7 @@
             </div>
         </div>
         
-        <div class="stat-card" id="todayCollectionCard">
+        <div class="stat-card">
             <div class="stat-icon">📅</div>
             <div class="stat-info">
                 <span class="stat-label">आज की कलेक्शन</span>
@@ -73,7 +153,7 @@
             </div>
         </div>
         
-        <div class="stat-card" id="totalPaidCard">
+        <div class="stat-card">
             <div class="stat-icon">✅</div>
             <div class="stat-info">
                 <span class="stat-label">कुल भुगतान</span>
@@ -81,51 +161,18 @@
             </div>
         </div>
         
-        <div class="stat-card" id="totalCustomersCard">
+        <div class="stat-card">
             <div class="stat-icon">👥</div>
             <div class="stat-info">
                 <span class="stat-label">कुल ग्राहक</span>
                 <span class="stat-value" id="totalCustomers">0</span>
             </div>
         </div>
-        
-        <div class="stat-card" id="overdueCustomersCard">
-            <div class="stat-icon">⚠️</div>
-            <div class="stat-info">
-                <span class="stat-label">बकाया ग्राहक</span>
-                <span class="stat-value" id="overdueCustomers">0</span>
-            </div>
-        </div>
-        
-        <div class="stat-card" id="netProfitCard">
-            <div class="stat-icon">💸</div>
-            <div class="stat-info">
-                <span class="stat-label">नेट प्रॉफिट</span>
-                <span class="stat-value" id="netProfit">₹0</span>
-            </div>
-        </div>
     </div>
 
-    <!-- Most Due Customers Section -->
-    <div class="section">
-        <div class="section-header">
-            <h3>📊 सबसे ज्यादा बकाया ग्राहक</h3>
-            <button class="view-all">सभी देखें →</button>
-        </div>
-        <div class="customer-list" id="topDueCustomers">
-            <div class="skeleton">लोड हो रहा है...</div>
-        </div>
-    </div>
-
-    <!-- Recent Transactions Section -->
-    <div class="section">
-        <div class="section-header">
-            <h3>📝 हाल के लेनदेन</h3>
-            <button class="view-all">सभी देखें →</button>
-        </div>
-        <div class="transaction-list" id="recentTransactions">
-            <div class="skeleton">लोड हो रहा है...</div>
-        </div>
+    <!-- Loading indicator -->
+    <div id="loadingMessage" style="text-align: center; padding: 40px;">
+        ⏳ Loading dashboard data...
     </div>
 </div>
 
@@ -159,10 +206,7 @@
             
             <div class="form-group">
                 <label>रकम (₹)</label>
-                <div class="amount-input-wrapper">
-                    <span class="currency">₹</span>
-                    <input type="number" id="amount" class="form-control" placeholder="0" inputmode="decimal">
-                </div>
+                <input type="number" id="amount" class="form-control" placeholder="0" inputmode="decimal">
             </div>
             
             <div class="quick-amounts">
@@ -171,7 +215,6 @@
                 <button class="quick-amount" data-amount="50">+50</button>
                 <button class="quick-amount" data-amount="100">+100</button>
                 <button class="quick-amount" data-amount="500">+500</button>
-                <button class="quick-amount" data-amount="1000">+1000</button>
             </div>
             
             <div class="form-group">
@@ -185,45 +228,31 @@
 </div>
 
 <script type="module">
-    // Firebase Import
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-    import { getFirestore, collection, query, getDocs, orderBy, limit, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+    import { getFirestore, collection, query, getDocs, orderBy, limit, where, addDoc, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
     
-    // Your Firebase Config (YAHAN APNA CONFIG DALO)
-    const firebaseConfig = {
-  apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
-  authDomain: "ok-mart-khata.firebaseapp.com",
-  projectId: "ok-mart-khata",
-  storageBucket: "ok-mart-khata.firebasestorage.app",
-  messagingSenderId: "334851811921",
-  appId: "1:334851811921:web:804863c35baa17dd61a670",
-  measurementId: "G-GFM55V38D2"
-};
-    
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = window.db;
+    const auth = window.auth;
     
     // Load Dashboard Data
-    async function loadDashboard() {
+    async function loadDashboardData() {
         try {
-            // Get customers collection
+            const loadingMsg = document.getElementById('loadingMessage');
+            
+            // Get customers
             const customersRef = collection(db, 'customers');
             const customersSnapshot = await getDocs(customersRef);
             let totalDue = 0;
             let totalCustomers = 0;
-            let overdueCount = 0;
             
             customersSnapshot.forEach(doc => {
                 const data = doc.data();
                 totalDue += data.totalDue || 0;
                 totalCustomers++;
-                if ((data.totalDue || 0) > 0) overdueCount++;
             });
             
             document.getElementById('totalDue').innerText = '₹' + totalDue.toLocaleString();
             document.getElementById('totalCustomers').innerText = totalCustomers;
-            document.getElementById('overdueCustomers').innerText = overdueCount;
             
             // Get today's collection
             const today = new Date().toISOString().slice(0,10);
@@ -236,69 +265,21 @@
             });
             document.getElementById('todayCollection').innerText = '₹' + todayTotal.toLocaleString();
             
+            // Get total paid (all time)
+            const paidQuery = query(ledgerRef, where('type', '==', 'payment'));
+            const paidSnapshot = await getDocs(paidQuery);
+            let totalPaid = 0;
+            paidSnapshot.forEach(doc => {
+                totalPaid += doc.data().amount || 0;
+            });
+            document.getElementById('totalPaid').innerText = '₹' + totalPaid.toLocaleString();
+            
+            if (loadingMsg) loadingMsg.style.display = 'none';
+            
         } catch (error) {
             console.error("Error loading dashboard:", error);
-        }
-    }
-    
-    // Load Top Due Customers
-    async function loadTopDueCustomers() {
-        try {
-            const customersRef = collection(db, 'customers');
-            const q = query(customersRef, orderBy('totalDue', 'desc'), limit(5));
-            const snapshot = await getDocs(q);
-            const container = document.getElementById('topDueCustomers');
-            container.innerHTML = '';
-            
-            snapshot.forEach((doc, index) => {
-                const data = doc.data();
-                const percent = (data.totalDue / (data.totalAdded || 1)) * 100;
-                container.innerHTML += `
-                    <div class="customer-item" onclick="location.href='customer-detail.html?id=${doc.id}'">
-                        <div class="customer-rank">${index + 1}</div>
-                        <div class="customer-info">
-                            <div class="customer-name">${data.name || 'N/A'}</div>
-                            <div class="customer-phone">${data.phone || ''}</div>
-                        </div>
-                        <div class="customer-due">
-                            <div class="due-amount">₹${(data.totalDue || 0).toLocaleString()}</div>
-                            <div class="due-percent">${Math.round(percent)}%</div>
-                        </div>
-                    </div>
-                `;
-            });
-        } catch (error) {
-            console.error("Error loading top due customers:", error);
-        }
-    }
-    
-    // Load Recent Transactions
-    async function loadRecentTransactions() {
-        try {
-            const ledgerRef = collection(db, 'ledger');
-            const q = query(ledgerRef, orderBy('createdAt', 'desc'), limit(10));
-            const snapshot = await getDocs(q);
-            const container = document.getElementById('recentTransactions');
-            container.innerHTML = '';
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const typeIcon = data.type === 'credit' ? '🔴 +' : '🟢 -';
-                const typeClass = data.type === 'credit' ? 'credit-amount' : 'payment-amount';
-                container.innerHTML += `
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-customer">${data.customerName || 'Customer'}</div>
-                            <div class="transaction-date">${new Date(data.createdAt?.toDate()).toLocaleString() || 'Just now'}</div>
-                        </div>
-                        <div class="transaction-amount ${typeClass}">
-                            ${typeIcon} ₹${(data.amount || 0).toLocaleString()}
-                        </div>
-                    </div>
-                `;
-            });
-        } catch (error) {
-            console.error("Error loading recent transactions:", error);
+            const loadingMsg = document.getElementById('loadingMessage');
+            if (loadingMsg) loadingMsg.innerHTML = '❌ Error loading data. Please refresh.';
         }
     }
     
@@ -308,6 +289,8 @@
             const customersRef = collection(db, 'customers');
             const snapshot = await getDocs(customersRef);
             const select = document.getElementById('customerSelect');
+            if (!select) return;
+            select.innerHTML = '<option value="">-- ग्राहक चुनें --</option>';
             snapshot.forEach(doc => {
                 const data = doc.data();
                 select.innerHTML += `<option value="${doc.id}">${data.name} (${data.phone})</option>`;
@@ -318,7 +301,7 @@
     }
     
     // Save Entry
-    window.saveEntry = async function() {
+    async function saveEntry() {
         const customerId = document.getElementById('customerSelect').value;
         const type = document.querySelector('.segment.active').dataset.type;
         const amount = parseFloat(document.getElementById('amount').value);
@@ -335,13 +318,16 @@
         
         try {
             const ledgerRef = collection(db, 'ledger');
+            const today = new Date().toISOString().slice(0,10);
+            
             await addDoc(ledgerRef, {
                 customerId: customerId,
                 type: type,
                 amount: amount,
                 note: note,
                 createdAt: new Date(),
-                date: new Date().toISOString().slice(0,10)
+                date: today,
+                createdBy: auth.currentUser?.email || 'admin'
             });
             
             // Update customer totals
@@ -369,9 +355,7 @@
             
             alert('✅ एंट्री सेव हो गई!');
             closeBottomSheet();
-            loadDashboard();
-            loadRecentTransactions();
-            loadTopDueCustomers();
+            loadDashboardData();
             
             // Reset form
             document.getElementById('amount').value = '';
@@ -381,27 +365,43 @@
             console.error("Error saving entry:", error);
             alert('❌ एरर: ' + error.message);
         }
-    };
+    }
     
     // Bottom Sheet Functions
     function openBottomSheet() {
-        document.getElementById('addEntrySheet').classList.add('open');
-        loadCustomerDropdown();
+        const sheet = document.getElementById('addEntrySheet');
+        if (sheet) {
+            sheet.classList.add('open');
+            loadCustomerDropdown();
+        }
     }
     
     function closeBottomSheet() {
-        document.getElementById('addEntrySheet').classList.remove('open');
+        const sheet = document.getElementById('addEntrySheet');
+        if (sheet) sheet.classList.remove('open');
     }
     
+    // Make functions global
+    window.saveEntry = saveEntry;
+    window.loadDashboardData = loadDashboardData;
+    
     // Event Listeners
-    document.getElementById('fabBtn').onclick = openBottomSheet;
-    document.querySelector('.sheet-overlay').onclick = closeBottomSheet;
-    document.getElementById('saveEntryBtn').onclick = window.saveEntry;
+    const fabBtn = document.getElementById('fabBtn');
+    const fabNavBtn = document.getElementById('fabNavBtn');
+    if (fabBtn) fabBtn.onclick = openBottomSheet;
+    if (fabNavBtn) fabNavBtn.onclick = openBottomSheet;
+    
+    const sheetOverlay = document.querySelector('.sheet-overlay');
+    if (sheetOverlay) sheetOverlay.onclick = closeBottomSheet;
+    
+    const saveBtn = document.getElementById('saveEntryBtn');
+    if (saveBtn) saveBtn.onclick = saveEntry;
     
     // Quick amount buttons
     document.querySelectorAll('.quick-amount').forEach(btn => {
         btn.onclick = () => {
-            document.getElementById('amount').value = btn.dataset.amount;
+            const amountInput = document.getElementById('amount');
+            if (amountInput) amountInput.value = btn.dataset.amount;
         };
     });
     
@@ -415,16 +415,18 @@
     
     // Dark Mode
     const darkModeBtn = document.getElementById('darkModeBtn');
-    if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark-mode');
-        darkModeBtn.innerText = '☀️';
+    if (darkModeBtn) {
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            darkModeBtn.innerText = '☀️';
+        }
+        darkModeBtn.onclick = () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            darkModeBtn.innerText = isDark ? '☀️' : '🌙';
+        };
     }
-    darkModeBtn.onclick = () => {
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        localStorage.setItem('darkMode', isDark);
-        darkModeBtn.innerText = isDark ? '☀️' : '🌙';
-    };
     
     // Navigation
     document.querySelectorAll('.nav-item').forEach(nav => {
@@ -432,15 +434,19 @@
             const page = nav.dataset.page;
             if (page === 'customers') location.href = 'customers.html';
             if (page === 'reports') location.href = 'reports.html';
-            if (page === 'profile') location.href = 'login.html';
-            // add is handled by FAB
+            if (page === 'profile') logout();
         };
     });
     
-    // Load all data on page load
-    loadDashboard();
-    loadTopDueCustomers();
-    loadRecentTransactions();
+    // Call loadDashboardData when ready (will be called after auth check)
+    window.loadDashboardData = loadDashboardData;
+    
+    // Initial load (will be triggered after auth)
+    setTimeout(() => {
+        if (auth.currentUser) {
+            loadDashboardData();
+        }
+    }, 1000);
 </script>
 
 </body>
