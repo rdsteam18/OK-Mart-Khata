@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ग्राहक खाता - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card, 
+        body.dark-mode .stat-card,
+        body.dark-mode .transaction-item,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .bottom-sheet .sheet-content,
+        body.dark-mode .header,
+        body.dark-mode .filter-bar {
+            background: #1e1e1e;
+            color: #fff;
+        }
+        body.dark-mode .customer-phone,
+        body.dark-mode .stat-label,
+        body.dark-mode .transaction-date {
+            color: #aaa;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .header h1 {
+            font-size: 18px;
+            flex: 1;
+        }
+        .whatsapp-btn, .call-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+
+        /* Customer Info */
+        .customer-info {
+            background: var(--light);
+            padding: 16px;
+            margin: 12px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+        .customer-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .customer-phone {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .customer-address {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin: 12px;
+        }
+        .stat-card {
+            flex: 1;
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .stat-card .value.danger {
+            color: var(--danger);
+        }
+        .stat-card .value.success {
+            color: var(--success);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .action-btn {
+            flex: 1;
+            min-width: 60px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:active {
+            transform: scale(0.95);
+            background: var(--primary);
+            color: white;
+        }
+        .action-btn span {
+            font-size: 20px;
+            display: block;
+        }
+        .action-btn small {
+            font-size: 10px;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--light);
+            padding: 12px;
+            margin: 0 12px 12px;
+            border-radius: var(--radius-md);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .date-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            background: var(--light);
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--light-gray);
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .download-btn {
+            background: var(--success);
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Ledger Timeline */
+        .ledger-section {
+            margin: 12px;
+        }
+        .section-title {
+            font-size: 16px;
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .transaction-item {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .transaction-info {
+            flex: 1;
+        }
+        .transaction-type {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .transaction-type.credit {
+            color: var(--danger);
+        }
+        .transaction-type.payment {
+            color: var(--success);
+        }
+        .transaction-date {
+            font-size: 10px;
+            color: var(--gray);
+        }
+        .transaction-note {
+            font-size: 11px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .transaction-amount.credit {
+            color: var(--danger);
+        }
+        .transaction-amount.payment {
+            color: var(--success);
+        }
+        .voucher-number {
+            font-size: 9px;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            visibility: hidden;
+        }
+        .bottom-sheet.open {
+            visibility: visible;
+        }
+        .sheet-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bottom-sheet.open .sheet-overlay {
+            opacity: 1;
+        }
+        .sheet-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            border-radius: 16px 16px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .bottom-sheet.open .sheet-content {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+        .sheet-body {
+            padding: 16px;
+        }
+        .sheet-body h3 {
+            margin-bottom: 16px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-control, select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--light);
+        }
+        .quick-amounts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .quick-amount {
+            background: var(--light-gray);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .segmented-control {
+            display: flex;
+            background: var(--light-gray);
+            border-radius: 8px;
+            padding: 4px;
+        }
+        .segment {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .segment.active {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item active" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add" id="fabNavBtn">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item" data-page="profile" id="logoutBtn">
+        <span>🚪</span>
+        <span class="nav-label">लॉगआउट</span>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1 id="pageTitle">ग्राहक खाता</h1>
+    <button class="call-btn" id="callBtn">📞</button>
+    <button class="whatsapp-btn" id="whatsappBtn">💬</button>
+</div>
+
+<!-- Customer Info -->
+<div class="customer-info" id="customerInfo">
+    <div class="customer-name" id="custName">लोड हो रहा...</div>
+    <div class="customer-phone" id="custPhone"></div>
+    <div class="customer-address" id="custAddress"></div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="label">कुल जोड़ा</div>
+        <div class="value" id="totalAdded">₹0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">कुल भुगतान</div>
+        <div class="value success" id="totalPaid">₹0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">बकाया</div>
+        <div class="value danger" id="totalDue">₹0</div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+    <div class="action-btn" id="addCreditBtn">
+        <span>➕</span>
+        <small>क्रेडिट</small>
+    </div>
+    <div class="action-btn" id="addPaymentBtn">
+        <span>💰</span>
+        <small>पेमेंट</small>
+    </div>
+    <div class="action-btn" id="pdfBtn">
+        <span>📄</span>
+        <small>पीडीएफ</small>
+    </div>
+    <div class="action-btn" id="reminderBtn">
+        <span>📲</span>
+        <small>रिमाइंडर</small>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <input type="date" id="startDate" class="date-input" placeholder="शुरू">
+    <input type="date" id="endDate" class="date-input" placeholder="अंत">
+    <button class="filter-btn" id="applyDateFilter">लागू</button>
+    <button class="download-btn" id="downloadStatementBtn">📥 स्टेटमेंट</button>
+</div>
+
+<!-- Ledger Section -->
+<div class="ledger-section">
+    <div class="section-title">📋 लेनदेन इतिहास</div>
+    <div class="transaction-list" id="transactionList">
+        <div class="loading">लोड हो रहा है...</div>
+    </div>
+</div>
+
+<!-- Add Entry Bottom Sheet -->
+<div class="bottom-sheet" id="entrySheet">
+    <div class="sheet-overlay"></div>
+    <div class="sheet-content">
+        <div class="sheet-handle"></div>
+        <div class="sheet-body">
+            <h3 id="sheetTitle">➕ नई एंट्री</h3>
+            <div class="form-group">
+                <label>टाइप</label>
+                <div class="segmented-control">
+                    <button class="segment active" data-type="credit">📝 क्रेडिट</button>
+                    <button class="segment" data-type="payment">💳 पेमेंट</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>रकम (₹)</label>
+                <input type="number" id="entryAmount" class="form-control" placeholder="0" inputmode="decimal">
+            </div>
+            <div class="quick-amounts">
+                <button class="quick-amount" data-amount="10">+10</button>
+                <button class="quick-amount" data-amount="20">+20</button>
+                <button class="quick-amount" data-amount="50">+50</button>
+                <button class="quick-amount" data-amount="100">+100</button>
+                <button class="quick-amount" data-amount="500">+500</button>
+                <button class="quick-amount" data-amount="1000">+1000</button>
+            </div>
+            <div class="form-group">
+                <label>नोट (वैकल्पिक)</label>
+                <input type="text" id="entryNote" class="form-control" placeholder="नोट...">
+            </div>
+            <button class="btn-primary" id="saveEntryBtn">✅ एंट्री सेव करें</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // Firebase Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670",
+        measurementId: "G-GFM55V38D2"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    let customerId = null;
+    let customerData = null;
+    let allTransactions = [];
+    let startDate = '';
+    let endDate = '';
+    
+    // Get customer ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    customerId = urlParams.get('id');
+    
+    // Check Login
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+        } else if (!customerId) {
+            window.location.href = 'customers.html';
+        } else {
+            loadCustomerData();
+            loadTransactions();
+        }
+    });
+    
+    // Load Customer Data
+    async function loadCustomerData() {
+        try {
+            const customerRef = doc(db, 'customers', customerId);
+            const customerSnap = await getDoc(customerRef);
+            
+            if (!customerSnap.exists()) {
+                alert('ग्राहक नहीं मिला');
+                window.location.href = 'customers.html';
+                return;
+            }
+            
+            customerData = customerSnap.data();
+            
+            document.getElementById('custName').innerText = customerData.name || 'N/A';
+            document.getElementById('custPhone').innerText = '📞 ' + (customerData.phone || '');
+            document.getElementById('custAddress').innerText = '📍 ' + (customerData.address || 'पता नहीं');
+            document.getElementById('pageTitle').innerText = customerData.name || 'ग्राहक';
+            
+            document.getElementById('totalAdded').innerHTML = '₹' + (customerData.totalAdded || 0).toLocaleString();
+            document.getElementById('totalPaid').innerHTML = '₹' + (customerData.totalPaid || 0).toLocaleString();
+            document.getElementById('totalDue').innerHTML = '₹' + (customerData.totalDue || 0).toLocaleString();
+            
+        } catch (error) {
+            console.error("Error loading customer:", error);
+        }
+    }
+    
+    // Load Transactions
+    async function loadTransactions() {
+        try {
+            const ledgerRef = collection(db, 'ledger');
+            let q = query(ledgerRef, where('customerId', '==', customerId), orderBy('createdAt', 'desc'));
+            
+            const snapshot = await getDocs(q);
+            allTransactions = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const date = data.createdAt?.toDate ? new Date(data.createdAt.toDate()) : new Date();
+                allTransactions.push({
+                    id: doc.id,
+                    type: data.type,
+                    amount: data.amount || 0,
+                    note: data.note || '',
+                    date: date,
+                    dateStr: date.toISOString().slice(0,10),
+                    voucherNumber: data.voucherNumber || generateVoucherNumber(date)
+                });
+            });
+            
+            renderTransactions();
+            
+        } catch (error) {
+            console.error("Error loading transactions:", error);
+        }
+    }
+    
+    // Generate Voucher Number
+    function generateVoucherNumber(date) {
+        const d = new Date(date);
+        const dateStr = d.toISOString().slice(0,10).replace(/-/g, '');
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        return `OKMART-${dateStr}-${random}`;
+    }
+    
+    // Render Transactions with Date Filter
+    function renderTransactions() {
+        let filtered = [...allTransactions];
+        
+        if (startDate) {
+            filtered = filtered.filter(t => t.dateStr >= startDate);
+        }
+        if (endDate) {
+            filtered = filtered.filter(t => t.dateStr <= endDate);
+        }
+        
+        const container = document.getElementById('transactionList');
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-state">📭 कोई लेनदेन नहीं</div>';
+            return;
+        }
+        
+        container.innerHTML = filtered.map(t => {
+            const typeClass = t.type === 'credit' ? 'credit' : 'payment';
+            const typeIcon = t.type === 'credit' ? '➕ क्रेडिट' : '💰 पेमेंट';
+            const amountSign = t.type === 'credit' ? '+' : '-';
+            
+            return `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-type ${typeClass}">${typeIcon}</div>
+                        <div class="transaction-date">${t.date.toLocaleString()}</div>
+                        ${t.note ? `<div class="transaction-note">📝 ${escapeHtml(t.note)}</div>` : ''}
+                        <div class="voucher-number">🧾 ${t.voucherNumber}</div>
+                    </div>
+                    <div class="transaction-amount ${typeClass}">
+                        ${amountSign} ₹${t.amount.toLocaleString()}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Add Entry (Credit or Payment)
+    async function addEntry(type, amount, note) {
+        if (!amount || amount <= 0) {
+            alert('कृपया सही रकम डालें');
+            return false;
+        }
+        
+        try {
+            const today = new Date().toISOString().slice(0,10);
+            const voucherNumber = `OKMART-${today.replace(/-/g, '')}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+            
+            await addDoc(collection(db, 'ledger'), {
+                customerId: customerId,
+                customerName: customerData?.name || '',
+                type: type,
+                amount: amount,
+                note: note || '',
+                createdAt: new Date(),
+                date: today,
+                voucherNumber: voucherNumber
+            });
+            
+            // Update customer totals
+            let newAdded = customerData.totalAdded || 0;
+            let newPaid = customerData.totalPaid || 0;
+            
+            if (type === 'credit') {
+                newAdded += amount;
+            } else {
+                newPaid += amount;
+            }
+            
+            const newDue = newAdded - newPaid;
+            
+            const customerRef = doc(db, 'customers', customerId);
+            await updateDoc(customerRef, {
+                totalAdded: newAdded,
+                totalPaid: newPaid,
+                totalDue: newDue,
+                lastPaymentDate: type === 'payment' ? new Date() : (customerData.lastPaymentDate || null)
+            });
+            
+            // Update local data
+            customerData.totalAdded = newAdded;
+            customerData.totalPaid = newPaid;
+            customerData.totalDue = newDue;
+            
+            document.getElementById('totalAdded').innerHTML = '₹' + newAdded.toLocaleString();
+            document.getElementById('totalPaid').innerHTML = '₹' + newPaid.toLocaleString();
+            document.getElementById('totalDue').innerHTML = '₹' + newDue.toLocaleString();
+            
+            await loadTransactions();
+            return true;
+            
+        } catch (error) {
+            console.error("Error adding entry:", error);
+            alert('❌ एरर: ' + error.message);
+            return false;
+        }
+    }
+    
+    // Send WhatsApp Reminder
+    function sendReminder() {
+        const dueAmount = customerData?.totalDue || 0;
+        const name = customerData?.name || 'ग्राहक';
+        const phone = customerData?.phone || '';
+        
+        if (!phone) {
+            alert('ग्राहक का फोन नंबर नहीं है');
+            return;
+        }
+        
+        let message = `नमस्ते ${name},%0A%0A`;
+        message += `आपका बकाया रुपये ${dueAmount.toLocaleString()} है।%0A`;
+        message += `कृपया जल्द से जल्द भुगतान करें।%0A%0A`;
+        message += `धन्यवाद,%0A`;
+        message += `OK Mart`;
+        
+        const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+    }
+    
+    // Make Call
+    function makeCall() {
+        const phone = customerData?.phone || '';
+        if (!phone) {
+            alert('ग्राहक का फोन नंबर नहीं है');
+            return;
+        }
+        window.location.href = `tel:${phone}`;
+    }
+    
+    // Generate PDF Statement (Simple version)
+    function generatePDF() {
+        // Simple print version
+        const printWindow = window.open('', '_blank');
+        const today = new Date().toLocaleDateString();
+        
+        let filteredTransactions = [...allTransactions];
+        if (startDate) filteredTransactions = filteredTransactions.filter(t => t.dateStr >= startDate);
+        if (endDate) filteredTransactions = filteredTransactions.filter(t => t.dateStr <= endDate);
+        
+        let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Statement - ${customerData?.name}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .store-name { font-size: 24px; font-weight: bold; color: #FF5722; }
+                    .title { font-size: 18px; margin-top: 10px; }
+                    .customer-details { margin: 20px 0; padding: 10px; background: #f5f5f5; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background: #FF5722; color: white; }
+                    .total-row { font-weight: bold; background: #f5f5f5; }
+                    .due { color: red; font-weight: bold; }
+                    .paid { color: green; }
+                    .footer { margin-top: 30px; text-align: center; font-size: 12px; color: gray; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="store-name">OK Mart</div>
+                    <div class="title">खाता स्टेटमेंट</div>
+                    <div>दिनांक: ${today}</div>
+                </div>
+                
+                <div class="customer-details">
+                    <strong>ग्राहक नाम:</strong> ${customerData?.name}<br>
+                    <strong>मोबाइल:</strong> ${customerData?.phone}<br>
+                    <strong>पता:</strong> ${customerData?.address || 'N/A'}<br>
+                    <strong>तारीख सीमा:</strong> ${startDate || 'शुरू'} से ${endDate || 'अंत'} तक
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr><th>दिनांक</th><th>टाइप</th><th>रकम</th><th>नोट</th><th>वाउचर नं.</th></tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        let totalCredit = 0;
+        let totalPayment = 0;
+        
+        filteredTransactions.forEach(t => {
+            if (t.type === 'credit') totalCredit += t.amount;
+            else totalPayment += t.amount;
+            
+            html += `
+                <tr>
+                    <td>${t.date.toLocaleDateString()}</td>
+                    <td>${t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट'}</td>
+                    <td>${t.type === 'credit' ? '+' : '-'} ₹${t.amount.toLocaleString()}</td>
+                    <td>${escapeHtml(t.note) || '-'}</td>
+                    <td>${t.voucherNumber}</td>
+                </tr>
+            `;
+        });
+        
+        const balance = totalCredit - totalPayment;
+        
+        html += `
+                    <tr class="total-row">
+                        <td colspan="2"><strong>कुल</strong></td>
+                        <td><strong>क्रेडिट: ₹${totalCredit.toLocaleString()}</strong></td>
+                        <td><strong>पेमेंट: ₹${totalPayment.toLocaleString()}</strong></td>
+                        <td></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="4"><strong>शेष बकाया</strong></td>
+                        <td class="${balance > 0 ? 'due' : 'paid'}"><strong>₹${balance.toLocaleString()}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="footer">
+                <p>यह एक कंप्यूटर जनरेटेड स्टेटमेंट है। हस्ताक्षर की आवश्यकता नहीं है।</p>
+                <p>OK Mart Khata System</p>
+            </div>
+            </body>
+            </html>
+        `;
+        
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.print();
+    }
+    
+    // Bottom Sheet Functions
+    let currentEntryType = 'credit';
+    
+    function openEntrySheet(type) {
+        currentEntryType = type;
+        document.getElementById('sheetTitle').innerHTML = type === 'credit' ? '➕ क्रेडिट जोड़ें' : '💰 पेमेंट जोड़ें';
+        document.getElementById('entryAmount').value = '';
+        document.getElementById('entryNote').value = '';
+        
+        // Set active segment
+        document.querySelectorAll('.segment').forEach(seg => {
+            if (seg.dataset.type === type) seg.classList.add('active');
+            else seg.classList.remove('active');
+        });
+        
+        document.getElementById('entrySheet').classList.add('open');
+    }
+    
+    function closeSheet() {
+        document.getElementById('entrySheet').classList.remove('open');
+    }
+    
+    async function saveEntryFromSheet() {
+        const amount = parseFloat(document.getElementById('entryAmount').value);
+        const note = document.getElementById('entryNote').value;
+        const type = document.querySelector('.segment.active')?.dataset.type || currentEntryType;
+        
+        const success = await addEntry(type, amount, note);
+        if (success) {
+            closeSheet();
+        }
+    }
+    
+    // Event Listeners
+    document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'customers.html');
+    document.getElementById('addCreditBtn')?.addEventListener('click', () => openEntrySheet('credit'));
+    document.getElementById('addPaymentBtn')?.addEventListener('click', () => openEntrySheet('payment'));
+    document.getElementById('reminderBtn')?.addEventListener('click', sendReminder);
+    document.getElementById('callBtn')?.addEventListener('click', makeCall);
+    document.getElementById('whatsappBtn')?.addEventListener('click', sendReminder);
+    document.getElementById('pdfBtn')?.addEventListener('click', generatePDF);
+    document.getElementById('downloadStatementBtn')?.addEventListener('click', generatePDF);
+    document.getElementById('saveEntryBtn')?.addEventListener('click', saveEntryFromSheet);
+    document.querySelector('.sheet-overlay')?.addEventListener('click', closeSheet);
+    
+    // Date filter
+    document.getElementById('applyDateFilter')?.addEventListener('click', () => {
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+        renderTransactions();
+    });
+    
+    // Quick amounts
+    document.querySelectorAll('.quick-amount').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('entryAmount').value = btn.dataset.amount;
+        });
+    });
+    
+    // Segment control
+    document.querySelectorAll('.segment').forEach(seg => {
+        seg.addEventListener('click', () => {
+            document.querySelectorAll('.segment').forEach(s => s.classList.remove('active'));
+            seg.classList.add('active');
+        });
+    });
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => {
+            const page = nav.dataset.page;
+            if (page === 'dashboard') location.href = 'index.html';
+            if (page === 'customers') location.href = 'customers.html';
+            if (page === 'reports') location.href = 'reports.html';
+        });
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    });
+    
+    // Dark Mode
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+</script>
+</body>
+</html>
