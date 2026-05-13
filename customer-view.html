@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ग्राहक लॉगिन - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            min-height: 100vh;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        /* Container */
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Login Card */
+        .login-card {
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        body.dark-mode .login-card,
+        body.dark-mode .customer-dashboard,
+        body.dark-mode .transaction-item,
+        body.dark-mode .bottom-sheet .sheet-content {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 12px;
+            display: block;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .subtitle {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            background: var(--light);
+            text-align: center;
+            letter-spacing: 4px;
+            font-weight: bold;
+        }
+        body.dark-mode .form-control {
+            background: #2d2d2d;
+            color: #fff;
+            border-color: #404040;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* PIN Input */
+        .pin-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .pin-input {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--light);
+        }
+        .pin-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        /* Button */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .btn-secondary {
+            background: var(--gray);
+        }
+        .btn-success {
+            background: var(--success);
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #FFEBEE;
+            color: var(--danger);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+            border-left: 3px solid var(--danger);
+        }
+        body.dark-mode .error-message {
+            background: #2d2d2d;
+        }
+
+        /* Customer Dashboard */
+        .customer-dashboard {
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.4s ease-out;
+            overflow: hidden;
+        }
+
+        /* Dashboard Header */
+        .dash-header {
+            background: var(--primary);
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        .dash-header .name {
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .dash-header .phone {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+        .logout-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: flex;
+            padding: 20px;
+            gap: 12px;
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+        }
+        .stat-card {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: var(--light-gray);
+            border-radius: var(--radius-md);
+        }
+        body.dark-mode .stat-card {
+            background: #2d2d2d;
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .stat-card .value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .stat-card .value.danger {
+            color: var(--danger);
+        }
+        .stat-card .value.success {
+            color: var(--success);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+        }
+        .action-btn {
+            flex: 1;
+            background: var(--light-gray);
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+        body.dark-mode .action-btn {
+            background: #2d2d2d;
+        }
+        .action-btn span {
+            font-size: 24px;
+            display: block;
+        }
+        .action-btn small {
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        /* QR Section */
+        .qr-section {
+            text-align: center;
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .qr-image {
+            width: 150px;
+            height: 150px;
+            margin: 10px auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .qr-image img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Ledger Section */
+        .ledger-section {
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .transaction-item {
+            background: var(--light-gray);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .transaction-info {
+            flex: 1;
+        }
+        .transaction-type {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .transaction-type.credit {
+            color: var(--danger);
+        }
+        .transaction-type.payment {
+            color: var(--success);
+        }
+        .transaction-date {
+            font-size: 10px;
+            color: var(--gray);
+        }
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .transaction-amount.credit {
+            color: var(--danger);
+        }
+        .transaction-amount.payment {
+            color: var(--success);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            visibility: hidden;
+        }
+        .bottom-sheet.open {
+            visibility: visible;
+        }
+        .sheet-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bottom-sheet.open .sheet-overlay {
+            opacity: 1;
+        }
+        .sheet-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            border-radius: 16px 16px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .bottom-sheet.open .sheet-content {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+        .sheet-body {
+            padding: 20px;
+            text-align: center;
+        }
+        .sheet-body h3 {
+            margin-bottom: 16px;
+        }
+        .pin-display {
+            font-size: 32px;
+            letter-spacing: 8px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .warning-text {
+            color: var(--warning);
+            font-size: 12px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        /* Toast */
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast-message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="appContainer">
+        <!-- Login View -->
+        <div id="loginView" class="login-card">
+            <div class="header">
+                <img src="assets/images/logo-placeholder.png" alt="Logo" class="logo" id="storeLogo"
+                     onerror="this.src='https://via.placeholder.com/70?text=OK'">
+                <div class="title" id="storeName">OK Mart</div>
+                <div class="subtitle">ग्राहक लॉगिन</div>
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                ⚠️ <span id="errorText"></span>
+            </div>
+
+            <div class="form-group">
+                <label>📞 मोबाइल नंबर</label>
+                <input type="tel" id="phoneInput" class="form-control" placeholder="9876543210" maxlength="10" inputmode="numeric">
+            </div>
+
+            <button class="btn-primary" id="loginBtn">🔓 लॉगिन करें</button>
+
+            <div style="text-align: center; margin-top: 16px;">
+                <a href="login.html" style="color: var(--primary); text-decoration: none;">← एडमिन लॉगिन</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toastMessage" class="toast-message"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, getDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+            authDomain: "ok-mart-khata.firebaseapp.com",
+            projectId: "ok-mart-khata",
+            storageBucket: "ok-mart-khata.firebasestorage.app",
+            messagingSenderId: "334851811921",
+            appId: "1:334851811921:web:804863c35baa17dd61a670"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let currentCustomer = null;
+        let allTransactions = [];
+        
+        // DOM Elements
+        const appContainer = document.getElementById('appContainer');
+        const toastMessage = document.getElementById('toastMessage');
+        
+        function showToast(msg) {
+            toastMessage.innerText = msg;
+            toastMessage.classList.add('show');
+            setTimeout(() => toastMessage.classList.remove('show'), 3000);
+        }
+        
+        // Load Store Settings
+        async function loadStoreSettings() {
+            try {
+                const settingsRef = doc(db, 'settings', 'store_settings');
+                const settingsSnap = await getDoc(settingsRef);
+                if (settingsSnap.exists()) {
+                    const data = settingsSnap.data();
+                    if (data.logoUrl) document.getElementById('storeLogo').src = data.logoUrl;
+                    if (data.storeName) document.getElementById('storeName').innerText = data.storeName;
+                    if (data.primaryColor) {
+                        document.documentElement.style.setProperty('--primary', data.primaryColor);
+                    }
+                }
+            } catch (e) { console.log(e); }
+        }
+        
+        // Find customer by phone
+        async function findCustomerByPhone(phone) {
+            const customersRef = collection(db, 'customers');
+            const q = query(customersRef, where('phone', '==', phone));
+            const snapshot = await getDocs(q);
+            
+            if (snapshot.empty) return null;
+            
+            let customer = null;
+            snapshot.forEach(doc => {
+                customer = { id: doc.id, ...doc.data() };
+            });
+            return customer;
+        }
+        
+        // Load customer transactions
+        async function loadCustomerTransactions(customerId) {
+            const ledgerRef = collection(db, 'ledger');
+            const snapshot = await getDocs(ledgerRef);
+            
+            const transactions = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.customerId === customerId) {
+                    let date = new Date();
+                    if (data.createdAt && data.createdAt.toDate) {
+                        date = data.createdAt.toDate();
+                    } else if (data.createdAt && data.createdAt.seconds) {
+                        date = new Date(data.createdAt.seconds * 1000);
+                    }
+                    
+                    transactions.push({
+                        id: doc.id,
+                        type: data.type,
+                        amount: data.amount || 0,
+                        note: data.note || '',
+                        date: date,
+                        dateStr: date.toISOString().slice(0,10),
+                        voucherNumber: data.voucherNumber || 'N/A'
+                    });
+                }
+            });
+            
+            transactions.sort((a, b) => b.date - a.date);
+            return transactions;
+        }
+        
+        // Render Customer Dashboard
+        function renderDashboard(customer, transactions, settings) {
+            const dueAmount = (customer.totalDue || 0);
+            const totalAdded = (customer.totalAdded || 0);
+            const totalPaid = (customer.totalPaid || 0);
+            
+            let html = `
+                <div class="customer-dashboard">
+                    <div class="dash-header">
+                        <button class="logout-icon" id="logoutBtn">🚪</button>
+                        <div class="name">👤 ${escapeHtml(customer.name || 'ग्राहक')}</div>
+                        <div class="phone">📞 ${customer.phone || ''}</div>
+                    </div>
+                    
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="label">कुल जोड़ा</div>
+                            <div class="value">₹${totalAdded.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">कुल भुगतान</div>
+                            <div class="value success">₹${totalPaid.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">बकाया</div>
+                            <div class="value danger">₹${dueAmount.toLocaleString()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <div class="action-btn" id="pdfBtn">
+                            <span>📄</span>
+                            <small>स्टेटमेंट</small>
+                        </div>
+                        <div class="action-btn" id="whatsappBtn">
+                            <span>💬</span>
+                            <small>सपोर्ट</small>
+                        </div>
+                    </div>
+            `;
+            
+            // QR Code Section
+            if (settings && settings.qrUrl) {
+                html += `
+                    <div class="qr-section">
+                        <div>📱 स्कैन करें और भुगतान करें</div>
+                        <div class="qr-image">
+                            <img src="${settings.qrUrl}" alt="Payment QR" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Ledger Section
+            html += `
+                    <div class="ledger-section">
+                        <div class="section-title">📋 लेनदेन इतिहास (${transactions.length})</div>
+                        <div class="transaction-list" id="transactionList">
+            `;
+            
+            if (transactions.length === 0) {
+                html += `<div class="empty-state">📭 कोई लेनदेन नहीं</div>`;
+            } else {
+                transactions.slice(0, 20).forEach(t => {
+                    const typeClass = t.type === 'credit' ? 'credit' : 'payment';
+                    const typeIcon = t.type === 'credit' ? '➕ क्रेडिट' : '💰 पेमेंट';
+                    const amountSign = t.type === 'credit' ? '+' : '-';
+                    const dateStr = t.date.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    
+                    html += `
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-type ${typeClass}">${typeIcon}</div>
+                                <div class="transaction-date">📅 ${dateStr}</div>
+                                ${t.note ? `<div style="font-size: 10px; color: #757575; margin-top: 2px;">📝 ${escapeHtml(t.note)}</div>` : ''}
+                            </div>
+                            <div class="transaction-amount ${typeClass}">
+                                ${amountSign} ₹${t.amount.toLocaleString()}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            appContainer.innerHTML = html;
+            
+            // Add event listeners
+            document.getElementById('logoutBtn')?.addEventListener('click', showLoginView);
+            document.getElementById('pdfBtn')?.addEventListener('click', () => generatePDF(customer, transactions, settings));
+            document.getElementById('whatsappBtn')?.addEventListener('click', () => {
+                const whatsappNumber = settings?.whatsappNumber || '';
+                if (whatsappNumber) {
+                    window.open(`https://wa.me/${whatsappNumber}?text=नमस्ते, मुझे सहायता चाहिए`, '_blank');
+                } else {
+                    showToast('सपोर्ट नंबर उपलब्ध नहीं है');
+                }
+            });
+        }
+        
+        // Generate PDF Statement
+        function generatePDF(customer, transactions, settings) {
+            if (transactions.length === 0) {
+                showToast('कोई लेनदेन नहीं है');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            const today = new Date().toLocaleDateString('hi-IN');
+            let totalCredit = 0;
+            let totalPayment = 0;
+            
+            transactions.forEach(t => {
+                if (t.type === 'credit') totalCredit += t.amount;
+                else totalPayment += t.amount;
+            });
+            
+            let html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Statement - ${customer.name}</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .store-name { font-size: 22px; font-weight: bold; color: #FF5722; }
+                        .title { font-size: 16px; margin-top: 10px; }
+                        .customer-details { margin: 20px 0; padding: 10px; background: #f5f5f5; border-radius: 8px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background: #FF5722; color: white; }
+                        .total-row { font-weight: bold; background: #f5f5f5; }
+                        .due { color: red; font-weight: bold; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 11px; color: gray; }
+                        @media print {
+                            body { padding: 0; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="store-name">${settings?.storeName || 'OK Mart'}</div>
+                        <div class="title">खाता स्टेटमेंट</div>
+                        <div>दिनांक: ${today}</div>
+                    </div>
+                    
+                    <div class="customer-details">
+                        <strong>ग्राहक नाम:</strong> ${customer.name}<br>
+                        <strong>मोबाइल:</strong> ${customer.phone}<br>
+                        <strong>पता:</strong> ${customer.address || 'N/A'}
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr><th>दिनांक</th><th>टाइप</th><th>रकम</th><th>नोट</th></tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            transactions.slice(0, 50).forEach(t => {
+                html += `
+                    <tr>
+                        <td>${t.date.toLocaleDateString('hi-IN')}</td>
+                        <td>${t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट'}</td>
+                        <td>${t.type === 'credit' ? '+' : '-'} ₹${t.amount.toLocaleString()}</td>
+                        <td>${escapeHtml(t.note) || '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            const balance = totalCredit - totalPayment;
+            
+            html += `
+                        <tr class="total-row">
+                            <td colspan="3"><strong>कुल क्रेडिट</strong></td>
+                            <td><strong>₹${totalCredit.toLocaleString()}</strong></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="3"><strong>कुल भुगतान</strong></td>
+                            <td><strong>₹${totalPayment.toLocaleString()}</strong></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="3"><strong>शेष बकाया</strong></td>
+                            <td class="due"><strong>₹${balance.toLocaleString()}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="footer">
+                    <p>यह एक कंप्यूटर जनरेटेड स्टेटमेंट है।</p>
+                    <p>${settings?.storeName || 'OK Mart'} - धन्यवाद!</p>
+                </div>
+                <div class="no-print" style="text-align: center; margin-top: 20px;">
+                    <button onclick="window.print()" style="padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
+                </div>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
+        
+        // Show Login View
+        function showLoginView() {
+            location.reload();
+        }
+        
+        // Escape HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // Login Handler
+        document.getElementById('loginBtn')?.addEventListener('click', async () => {
+            const phone = document.getElementById('phoneInput').value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            
+            if (!phone || phone.length < 10) {
+                errorText.innerText = 'सही मोबाइल नंबर डालें (10 अंक)';
+                errorDiv.style.display = 'block';
+                setTimeout(() => errorDiv.style.display = 'none', 3000);
+                return;
+            }
+            
+            // Remove country code if present
+            const cleanPhone = phone.replace(/^\+91|^91/, '');
+            
+            try {
+                const customer = await findCustomerByPhone(cleanPhone);
+                
+                if (!customer) {
+                    errorText.innerText = 'यह नंबर रजिस्टर्ड नहीं है। कृपया दुकान से संपर्क करें।';
+                    errorDiv.style.display = 'block';
+                    setTimeout(() => errorDiv.style.display = 'none', 3000);
+                    return;
+                }
+                
+                currentCustomer = customer;
+                const transactions = await loadCustomerTransactions(customer.id);
+                allTransactions = transactions;
+                
+                // Load settings
+                const settingsRef = doc(db, 'settings', 'store_settings');
+                const settingsSnap = await getDoc(settingsRef);
+                const settings = settingsSnap.exists() ? settingsSnap.data() : {};
+                
+                renderDashboard(customer, transactions, settings);
+                
+            } catch (error) {
+                console.error("Login error:", error);
+                errorText.innerText = 'कुछ गलत हो गया। कृपया बाद में प्रयास करें।';
+                errorDiv.style.display = 'block';
+                setTimeout(() => errorDiv.style.display = 'none', 3000);
+            }
+        });
+        
+        // Load settings on page load
+        loadStoreSettings();
+        
+        // Dark Mode
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+        
+        // Enter key press
+        document.getElementById('phoneInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('loginBtn')?.click();
+            }
+        });
+    </script>
+</body>
+</html>
