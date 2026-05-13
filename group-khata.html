@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ग्रुप खाता - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card,
+        body.dark-mode .group-card,
+        body.dark-mode .member-card,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .bottom-sheet .sheet-content,
+        body.dark-mode .header {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .header h1 {
+            font-size: 18px;
+            flex: 1;
+        }
+        .add-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .dark-mode-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin: 12px;
+        }
+        .stat-card {
+            flex: 1;
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .stat-card .value.danger {
+            color: var(--danger);
+        }
+
+        /* Group List */
+        .group-list {
+            margin: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .group-card {
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+        }
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .group-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .group-due {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--danger);
+        }
+        .member-count {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+        .member-avatars {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .member-avatar {
+            background: var(--light-gray);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+        .delete-group {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--gray);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            visibility: hidden;
+        }
+        .bottom-sheet.open {
+            visibility: visible;
+        }
+        .sheet-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bottom-sheet.open .sheet-overlay {
+            opacity: 1;
+        }
+        .sheet-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            border-radius: 16px 16px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .bottom-sheet.open .sheet-content {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+        .sheet-body {
+            padding: 20px;
+        }
+        .sheet-body h3 {
+            margin-bottom: 20px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-control, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--light);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        /* Member List in Sheet */
+        .member-list {
+            margin-bottom: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .member-name {
+            flex: 1;
+        }
+        .member-phone {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .remove-member {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--danger);
+        }
+        .add-member-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .add-member-row select {
+            flex: 1;
+        }
+
+        /* Group Detail View */
+        .group-detail {
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            margin: 12px;
+            overflow: hidden;
+        }
+        .detail-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 20px;
+            color: white;
+        }
+        .detail-header .group-name {
+            font-size: 22px;
+        }
+        .detail-header .group-due {
+            font-size: 28px;
+            margin-top: 8px;
+        }
+        .member-section {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .member-section h4 {
+            margin-bottom: 12px;
+        }
+        .member-detail-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--light-gray);
+            border-radius: var(--radius-md);
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .member-detail-card .member-due {
+            font-weight: bold;
+            color: var(--danger);
+        }
+        .back-to-list {
+            margin: 12px;
+        }
+        .back-to-list button {
+            width: 100%;
+            padding: 12px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+        }
+
+        /* Toast */
+        .toast-message {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast-message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item active" data-page="groups">
+        <span>👨‍👩‍👧‍👦</span>
+        <span class="nav-label">ग्रुप</span>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1 id="pageTitle">👨‍👩‍👧‍👦 ग्रुप खाता</h1>
+    <button class="add-btn" id="addGroupBtn">➕</button>
+    <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="label">कुल ग्रुप</div>
+        <div class="value" id="totalGroups">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">कुल सदस्य</div>
+        <div class="value" id="totalMembers">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">कुल ग्रुप बकाया</div>
+        <div class="value danger" id="totalGroupDue">₹0</div>
+    </div>
+</div>
+
+<!-- Group List -->
+<div class="group-list" id="groupList">
+    <div class="empty-state">लोड हो रहा है...</div>
+</div>
+
+<!-- Add/Edit Group Bottom Sheet -->
+<div class="bottom-sheet" id="groupSheet">
+    <div class="sheet-overlay"></div>
+    <div class="sheet-content">
+        <div class="sheet-handle"></div>
+        <div class="sheet-body">
+            <h3 id="sheetTitle">➕ नया ग्रुप</h3>
+            <input type="hidden" id="editGroupId">
+            
+            <div class="form-group">
+                <label>ग्रुप का नाम</label>
+                <input type="text" id="groupName" class="form-control" placeholder="जैसे: राज परिवार">
+            </div>
+            
+            <div class="form-group">
+                <label>सदस्य</label>
+                <div class="member-list" id="memberList"></div>
+                <div class="add-member-row">
+                    <select id="memberSelect" class="form-control">
+                        <option value="">-- सदस्य चुनें --</option>
+                    </select>
+                    <button class="btn-primary" id="addMemberBtn" style="width: auto; padding: 12px 20px; margin-top: 0;">➕</button>
+                </div>
+            </div>
+            
+            <button class="btn-primary" id="saveGroupBtn">💾 ग्रुप सेव करें</button>
+            <button class="btn-primary btn-danger" id="deleteGroupBtn" style="display:none; margin-top:8px;">🗑️ ग्रुप डिलीट करें</button>
+        </div>
+    </div>
+</div>
+
+<!-- Group Detail View (Hidden initially) -->
+<div id="groupDetailView" style="display: none;"></div>
+
+<div id="toastMessage" class="toast-message"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    let allGroups = [];
+    let allCustomers = [];
+    let showingDetail = false;
+    let currentGroup = null;
+    
+    const toastMessage = document.getElementById('toastMessage');
+    
+    function showToast(msg) {
+        toastMessage.innerText = msg;
+        toastMessage.classList.add('show');
+        setTimeout(() => toastMessage.classList.remove('show'), 3000);
+    }
+    
+    // Check Login
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        loadData();
+    });
+    
+    // Load all data
+    async function loadData() {
+        await loadCustomers();
+        await loadGroups();
+    }
+    
+    // Load Customers for dropdown
+    async function loadCustomers() {
+        try {
+            const snapshot = await getDocs(collection(db, 'customers'));
+            allCustomers = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allCustomers.push({
+                    id: doc.id,
+                    name: data.name,
+                    phone: data.phone,
+                    totalDue: data.totalDue || 0
+                });
+            });
+        } catch (error) {
+            console.error("Error loading customers:", error);
+        }
+    }
+    
+    // Load Groups
+    async function loadGroups() {
+        try {
+            const snapshot = await getDocs(collection(db, 'groups'));
+            allGroups = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allGroups.push({
+                    id: doc.id,
+                    groupName: data.groupName,
+                    members: data.members || [],
+                    totalGroupDue: data.totalGroupDue || 0,
+                    createdAt: data.createdAt
+                });
+            });
+            updateStats();
+            renderGroupList();
+        } catch (error) {
+            console.error("Error loading groups:", error);
+            document.getElementById('groupList').innerHTML = '<div class="empty-state">❌ लोड करने में एरर</div>';
+        }
+    }
+    
+    // Update Statistics
+    function updateStats() {
+        let totalMembers = 0;
+        let totalGroupDue = 0;
+        
+        allGroups.forEach(group => {
+            totalMembers += (group.members?.length || 0);
+            totalGroupDue += group.totalGroupDue || 0;
+        });
+        
+        document.getElementById('totalGroups').innerText = allGroups.length;
+        document.getElementById('totalMembers').innerText = totalMembers;
+        document.getElementById('totalGroupDue').innerHTML = '₹' + totalGroupDue.toLocaleString();
+    }
+    
+    // Get member details
+    function getMemberDetails(customerId) {
+        return allCustomers.find(c => c.id === customerId);
+    }
+    
+    // Calculate group due from members
+    function calculateGroupDue(members) {
+        let total = 0;
+        members.forEach(member => {
+            const customer = allCustomers.find(c => c.id === member.customerId);
+            if (customer) {
+                total += customer.totalDue || 0;
+            }
+        });
+        return total;
+    }
+    
+    // Render Group List
+    function renderGroupList() {
+        const container = document.getElementById('groupList');
+        
+        if (allGroups.length === 0) {
+            container.innerHTML = '<div class="empty-state">📭 कोई ग्रुप नहीं<br><br>➕ बटन से नया ग्रुप बनाएं</div>';
+            return;
+        }
+        
+        container.innerHTML = allGroups.map(group => {
+            const memberNames = (group.members || []).map(m => {
+                const cust = getMemberDetails(m.customerId);
+                return cust ? cust.name : 'Unknown';
+            }).join(', ');
+            
+            return `
+                <div class="group-card" data-id="${group.id}">
+                    <div class="group-header">
+                        <div class="group-name">👨‍👩‍👧‍👦 ${escapeHtml(group.groupName)}</div>
+                        <div class="group-due">₹${(group.totalGroupDue || 0).toLocaleString()}</div>
+                        <button class="delete-group" data-id="${group.id}">🗑️</button>
+                    </div>
+                    <div class="member-count">📋 ${group.members?.length || 0} सदस्य</div>
+                    <div class="member-avatars">
+                        ${(group.members || []).slice(0, 5).map(m => {
+                            const cust = getMemberDetails(m.customerId);
+                            return `<span class="member-avatar">${cust ? cust.name : '?'}</span>`;
+                        }).join('')}
+                        ${(group.members?.length || 0) > 5 ? `<span class="member-avatar">+${group.members.length - 5}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Add click handlers
+        document.querySelectorAll('.group-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('delete-group')) {
+                    const id = card.dataset.id;
+                    showGroupDetail(id);
+                }
+            });
+        });
+        
+        // Add delete handlers
+        document.querySelectorAll('.delete-group').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = btn.dataset.id;
+                if (confirm('क्या आप यह ग्रुप डिलीट करना चाहते हैं?')) {
+                    await deleteDoc(doc(db, 'groups', id));
+                    showToast('✅ ग्रुप डिलीट हो गया');
+                    loadGroups();
+                }
+            });
+        });
+    }
+    
+    // Show Group Detail
+    async function showGroupDetail(groupId) {
+        const group = allGroups.find(g => g.id === groupId);
+        if (!group) return;
+        
+        currentGroup = group;
+        showingDetail = true;
+        
+        // Calculate member dues
+        const membersWithDue = (group.members || []).map(member => {
+            const customer = allCustomers.find(c => c.id === member.customerId);
+            return {
+                id: member.customerId,
+                name: customer?.name || 'Unknown',
+                phone: customer?.phone || '',
+                due: customer?.totalDue || 0,
+                share: member.share || 0
+            };
+        }).sort((a, b) => b.due - a.due);
+        
+        const totalDue = membersWithDue.reduce((sum, m) => sum + m.due, 0);
+        
+        let html = `
+            <div class="group-detail">
+                <div class="detail-header">
+                    <div class="group-name">👨‍👩‍👧‍👦 ${escapeHtml(group.groupName)}</div>
+                    <div class="group-due">कुल बकाया: ₹${totalDue.toLocaleString()}</div>
+                </div>
+                <div class="member-section">
+                    <h4>📋 सदस्य (${membersWithDue.length})</h4>
+                    ${membersWithDue.map(m => `
+                        <div class="member-detail-card" onclick="window.location.href='customer-detail.html?id=${m.id}'">
+                            <div>
+                                <div>${escapeHtml(m.name)}</div>
+                                <div class="member-phone">📞 ${m.phone}</div>
+                            </div>
+                            <div class="member-due">₹${m.due.toLocaleString()}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="member-section">
+                    <h4>📊 ग्रुप स्टेटमेंट</h4>
+                    <button class="btn-primary" id="groupPdfBtn">📄 पीडीएफ डाउनलोड करें</button>
+                </div>
+            </div>
+            <div class="back-to-list">
+                <button id="backToListBtn">← वापस ग्रुप लिस्ट</button>
+            </div>
+        `;
+        
+        document.getElementById('groupDetailView').innerHTML = html;
+        document.getElementById('groupDetailView').style.display = 'block';
+        document.getElementById('groupList').style.display = 'none';
+        document.getElementById('statsRow').style.display = 'none';
+        document.getElementById('pageTitle').innerText = group.groupName;
+        
+        document.getElementById('backToListBtn')?.addEventListener('click', () => {
+            showingDetail = false;
+            document.getElementById('groupDetailView').style.display = 'none';
+            document.getElementById('groupList').style.display = 'block';
+            document.getElementById('statsRow').style.display = 'flex';
+            document.getElementById('pageTitle').innerText = '👨‍👩‍👧‍👦 ग्रुप खाता';
+        });
+        
+        document.getElementById('groupPdfBtn')?.addEventListener('click', () => generateGroupPDF(group, membersWithDue, totalDue));
+    }
+    
+    // Generate Group PDF
+    function generateGroupPDF(group, members, totalDue) {
+        const printWindow = window.open('', '_blank');
+        const today = new Date().toLocaleDateString('hi-IN');
+        
+        let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Group Statement - ${group.groupName}</title>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .store-name { font-size: 22px; font-weight: bold; color: #FF5722; }
+                    .title { font-size: 18px; margin-top: 10px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background: #FF5722; color: white; }
+                    .total-row { font-weight: bold; background: #f5f5f5; }
+                    .due { color: red; font-weight: bold; }
+                    .footer { margin-top: 30px; text-align: center; font-size: 11px; color: gray; }
+                    @media print {
+                        body { padding: 0; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="store-name">OK Mart</div>
+                    <div class="title">ग्रुप खाता स्टेटमेंट</div>
+                    <div>दिनांक: ${today}</div>
+                </div>
+                
+                <div class="customer-details">
+                    <strong>ग्रुप नाम:</strong> ${group.groupName}<br>
+                    <strong>कुल सदस्य:</strong> ${members.length}<br>
+                    <strong>कुल ग्रुप बकाया:</strong> ₹${totalDue.toLocaleString()}
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr><th>क्र.</th><th>सदस्य का नाम</th><th>मोबाइल</th><th>बकाया राशि</th></tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        members.forEach((m, index) => {
+            html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${escapeHtml(m.name)}</td>
+                    <td>${m.phone}</td>
+                    <td class="due">₹${m.due.toLocaleString()}</td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                        <tr class="total-row">
+                            <td colspan="3"><strong>कुल</strong></td>
+                            <td class="due"><strong>₹${totalDue.toLocaleString()}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="footer">
+                    <p>यह एक कंप्यूटर जनरेटेड स्टेटमेंट है।</p>
+                    <p>OK Mart - धन्यवाद!</p>
+                </div>
+                <div class="no-print" style="text-align: center; margin-top: 20px;">
+                    <button onclick="window.print()" style="padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        printWindow.document.write(html);
+        printWindow.document.close();
+    }
+    
+    // Open Add Group Sheet
+    function openAddSheet() {
+        document.getElementById('sheetTitle').innerHTML = '➕ नया ग्रुप';
+        document.getElementById('editGroupId').value = '';
+        document.getElementById('groupName').value = '';
+        document.getElementById('deleteGroupBtn').style.display = 'none';
+        updateMemberList([]);
+        updateCustomerDropdown();
+        document.getElementById('groupSheet').classList.add('open');
+    }
+    
+    // Update Member List UI
+    function updateMemberList(members) {
+        const container = document.getElementById('memberList');
+        if (!members || members.length === 0) {
+            container.innerHTML = '<div style="color: var(--gray); text-align: center; padding: 20px;">कोई सदस्य नहीं</div>';
+            return;
+        }
+        
+        container.innerHTML = members.map((member, index) => {
+            const customer = allCustomers.find(c => c.id === member.customerId);
+            return `
+                <div class="member-item">
+                    <div class="member-name">
+                        ${customer ? escapeHtml(customer.name) : 'Unknown'}
+                        <div class="member-phone">📞 ${customer ? customer.phone : ''}</div>
+                    </div>
+                    <button class="remove-member" data-index="${index}">🗑️</button>
+                </div>
+            `;
+        }).join('');
+        
+        document.querySelectorAll('.remove-member').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const index = parseInt(btn.dataset.index);
+                members.splice(index, 1);
+                updateMemberList(members);
+            });
+        });
+    }
+    
+    // Update Customer Dropdown
+    function updateCustomerDropdown() {
+        const select = document.getElementById('memberSelect');
+        const existingMembers = getCurrentMembers();
+        
+        const availableCustomers = allCustomers.filter(c => 
+            !existingMembers.some(m => m.customerId === c.id)
+        );
+        
+        select.innerHTML = '<option value="">-- सदस्य चुनें --</option>' + 
+            availableCustomers.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${c.phone})</option>`).join('');
+    }
+    
+    function getCurrentMembers() {
+        // Get current members from UI
+        const memberItems = document.querySelectorAll('#memberList .member-item');
+        const members = [];
+        memberItems.forEach(item => {
+            // Extract from data or store in hidden
+        });
+        return window.currentMembers || [];
+    }
+    
+    let currentMembers = [];
+    
+    function addMember() {
+        const select = document.getElementById('memberSelect');
+        const customerId = select.value;
+        
+        if (!customerId) {
+            showToast('कृपया सदस्य चुनें');
+            return;
+        }
+        
+        if (currentMembers.some(m => m.customerId === customerId)) {
+            showToast('यह सदस्य पहले से जुड़ा है');
+            return;
+        }
+        
+        currentMembers.push({ customerId: customerId });
+        updateMemberList(currentMembers);
+        updateCustomerDropdown();
+        select.value = '';
+    }
+    
+    // Save Group
+    async function saveGroup() {
+        const groupId = document.getElementById('editGroupId').value;
+        const groupName = document.getElementById('groupName').value.trim();
+        
+        if (!groupName) {
+            showToast('कृपया ग्रुप का नाम डालें');
+            return;
+        }
+        
+        if (currentMembers.length === 0) {
+            showToast('कृपया कम से कम एक सदस्य जोड़ें');
+            return;
+        }
+        
+        // Calculate total due from members
+        let totalGroupDue = 0;
+        currentMembers.forEach(member => {
+            const customer = allCustomers.find(c => c.id === member.customerId);
+            if (customer) {
+                totalGroupDue += customer.totalDue || 0;
+            }
+        });
+        
+        try {
+            if (groupId) {
+                // Update existing
+                await updateDoc(doc(db, 'groups', groupId), {
+                    groupName: groupName,
+                    members: currentMembers,
+                    totalGroupDue: totalGroupDue,
+                    updatedAt: new Date()
+                });
+                showToast('✅ ग्रुप अपडेट हो गया');
+            } else {
+                // Create new
+                await addDoc(collection(db, 'groups'), {
+                    groupName: groupName,
+                    members: currentMembers,
+                    totalGroupDue: totalGroupDue,
+                    createdAt: new Date()
+                });
+                showToast('✅ नया ग्रुप बन गया');
+            }
+            closeSheet();
+            loadGroups();
+        } catch (error) {
+            console.error("Save error:", error);
+            showToast('❌ एरर: ' + error.message);
+        }
+    }
+    
+    function closeSheet() {
+        document.getElementById('groupSheet').classList.remove('open');
+        currentMembers = [];
+    }
+    
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Event Listeners
+    document.getElementById('backBtn')?.addEventListener('click', () => {
+        if (showingDetail) {
+            document.getElementById('backToListBtn')?.click();
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
+    document.getElementById('addGroupBtn')?.addEventListener('click', openAddSheet);
+    document.getElementById('saveGroupBtn')?.addEventListener('click', saveGroup);
+    document.querySelector('.sheet-overlay')?.addEventListener('click', closeSheet);
+    document.getElementById('addMemberBtn')?.addEventListener('click', addMember);
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => {
+            const page = nav.dataset.page;
+            if (page === 'dashboard') location.href = 'index.html';
+            if (page === 'customers') location.href = 'customers.html';
+            if (page === 'add') location.href = 'index.html';
+            if (page === 'reports') location.href = 'reports.html';
+        });
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    });
+    
+    // Dark Mode
+    const darkBtn = document.getElementById('darkModeBtn');
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        darkBtn.innerText = '☀️';
+    }
+    darkBtn?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkBtn.innerText = isDark ? '☀️' : '🌙';
+    });
+</script>
+</body>
+</html>
