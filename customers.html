@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ग्राहक सूची - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card, 
+        body.dark-mode .customer-card,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .bottom-sheet .sheet-content,
+        body.dark-mode .search-bar,
+        body.dark-mode select,
+        body.dark-mode input {
+            background: #1e1e1e;
+            color: #fff;
+        }
+        body.dark-mode .customer-phone,
+        body.dark-mode .stat-label {
+            color: #aaa;
+        }
+        body.dark-mode .filter-btn {
+            background: #2d2d2d;
+            color: #fff;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        body.dark-mode .header {
+            background: #1e1e1e;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .header h1 {
+            font-size: 18px;
+        }
+        .add-customer-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+
+        /* Search and Filter */
+        .search-section {
+            padding: 12px 16px;
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+        }
+        body.dark-mode .search-section {
+            background: #1e1e1e;
+        }
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--light);
+        }
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--light-gray);
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+        }
+        body.dark-mode .stats-row {
+            background: #1e1e1e;
+        }
+        .stat-badge {
+            text-align: center;
+            flex: 1;
+        }
+        .stat-badge .label {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .stat-badge .value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Customer List */
+        .customer-list {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .customer-card {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .customer-card:active {
+            transform: scale(0.98);
+        }
+        .customer-info {
+            flex: 1;
+        }
+        .customer-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .rank-badge {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #FFD700;
+            color: #333;
+        }
+        .rank-badge.gold { background: #FFD700; }
+        .rank-badge.silver { background: #C0C0C0; }
+        .rank-badge.bronze { background: #CD7F32; color: white; }
+        .customer-phone {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 6px;
+        }
+        .customer-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .customer-due {
+            text-align: right;
+        }
+        .due-amount {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .due-amount.danger {
+            color: var(--danger);
+        }
+        .due-amount.success {
+            color: var(--success);
+        }
+        .due-percent {
+            font-size: 11px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            visibility: hidden;
+        }
+        .bottom-sheet.open {
+            visibility: visible;
+        }
+        .sheet-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bottom-sheet.open .sheet-overlay {
+            opacity: 1;
+        }
+        .sheet-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            border-radius: 16px 16px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .bottom-sheet.open .sheet-content {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+        .sheet-body {
+            padding: 16px;
+        }
+        .sheet-body h3 {
+            margin-bottom: 16px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-control, select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--light);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-danger {
+            background: var(--danger);
+        }
+        .btn-secondary {
+            background: var(--gray);
+        }
+        .row-2cols {
+            display: flex;
+            gap: 12px;
+        }
+        .row-2cols .form-group {
+            flex: 1;
+        }
+
+        /* Delete Confirm */
+        .delete-confirm {
+            text-align: center;
+            padding: 20px;
+        }
+        .delete-confirm p {
+            margin-bottom: 20px;
+            color: var(--danger);
+        }
+        .delete-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .delete-buttons button {
+            flex: 1;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item active" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add" id="fabNavBtn">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item" data-page="profile" id="logoutBtn">
+        <span>🚪</span>
+        <span class="nav-label">लॉगआउट</span>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1>ग्राहक सूची</h1>
+    <button class="add-customer-btn" id="addCustomerBtn">➕</button>
+</div>
+
+<!-- Search & Filter -->
+<div class="search-section">
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 नाम या फोन नंबर से खोजें..." autocomplete="off">
+    </div>
+    <div class="filter-row" id="filterRow">
+        <button class="filter-btn active" data-filter="all">सभी</button>
+        <button class="filter-btn" data-filter="due">बकाया</button>
+        <button class="filter-btn" data-filter="paid">भुगतान किया</button>
+        <button class="filter-btn" data-filter="partial">आंशिक</button>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+    <div class="stat-badge">
+        <div class="label">कुल ग्राहक</div>
+        <div class="value" id="totalCount">0</div>
+    </div>
+    <div class="stat-badge">
+        <div class="label">बकाया</div>
+        <div class="value" id="dueCount">0</div>
+    </div>
+    <div class="stat-badge">
+        <div class="label">कुल बकाया</div>
+        <div class="value" id="totalDueAmount">₹0</div>
+    </div>
+</div>
+
+<!-- Customer List -->
+<div class="customer-list" id="customerList">
+    <div class="loading">लोड हो रहा है...</div>
+</div>
+
+<!-- Add/Edit Customer Bottom Sheet -->
+<div class="bottom-sheet" id="customerSheet">
+    <div class="sheet-overlay"></div>
+    <div class="sheet-content">
+        <div class="sheet-handle"></div>
+        <div class="sheet-body">
+            <h3 id="sheetTitle">➕ नया ग्राहक</h3>
+            <input type="hidden" id="editCustomerId">
+            <div class="form-group">
+                <label>नाम *</label>
+                <input type="text" id="customerName" class="form-control" placeholder="जैसे: राज शर्मा">
+            </div>
+            <div class="form-group">
+                <label>मोबाइल नंबर *</label>
+                <input type="tel" id="customerPhone" class="form-control" placeholder="जैसे: 9876543210">
+            </div>
+            <div class="form-group">
+                <label>पता (वैकल्पिक)</label>
+                <input type="text" id="customerAddress" class="form-control" placeholder="पता">
+            </div>
+            <div class="row-2cols">
+                <div class="form-group">
+                    <label>टैग्स</label>
+                    <select id="customerTag" class="form-control">
+                        <option value="normal">Normal</option>
+                        <option value="vip">VIP</option>
+                        <option value="regular">Regular</option>
+                        <option value="new">New</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-primary" id="saveCustomerBtn">✅ ग्राहक सेव करें</button>
+            <button class="btn-primary btn-danger" id="deleteCustomerBtn" style="display:none; margin-top:8px;">🗑️ डिलीट करें</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // Firebase Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670",
+        measurementId: "G-GFM55V38D2"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    let allCustomers = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+    
+    // Check Login
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            loadCustomers();
+        }
+    });
+    
+    // Load Customers from Firestore
+    async function loadCustomers() {
+        try {
+            const q = query(collection(db, 'customers'), orderBy('createdAt', 'desc'));
+            const snapshot = await getDocs(q);
+            allCustomers = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Calculate status
+                let status = 'paid';
+                const due = data.totalDue || 0;
+                const added = data.totalAdded || 0;
+                if (due === 0) status = 'paid';
+                else if (due === added) status = 'due';
+                else status = 'partial';
+                
+                allCustomers.push({
+                    id: doc.id,
+                    name: data.name || 'N/A',
+                    phone: data.phone || '',
+                    address: data.address || '',
+                    totalAdded: data.totalAdded || 0,
+                    totalPaid: data.totalPaid || 0,
+                    totalDue: due,
+                    status: status,
+                    tag: data.tag || 'normal',
+                    createdAt: data.createdAt,
+                    lastPaymentDate: data.lastPaymentDate
+                });
+            });
+            renderCustomers();
+            updateStats();
+        } catch (error) {
+            console.error("Error loading customers:", error);
+            document.getElementById('customerList').innerHTML = '<div class="empty-state">❌ लोड करने में एरर</div>';
+        }
+    }
+    
+    // Filter and Search
+    function getFilteredCustomers() {
+        let filtered = [...allCustomers];
+        
+        // Apply filter
+        if (currentFilter !== 'all') {
+            filtered = filtered.filter(c => c.status === currentFilter);
+        }
+        
+        // Apply search
+        if (currentSearch) {
+            const searchLower = currentSearch.toLowerCase();
+            filtered = filtered.filter(c => 
+                c.name.toLowerCase().includes(searchLower) || 
+                c.phone.includes(searchLower)
+            );
+        }
+        
+        return filtered;
+    }
+    
+    // Render Customers
+    function renderCustomers() {
+        const filtered = getFilteredCustomers();
+        const container = document.getElementById('customerList');
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-state">📭 कोई ग्राहक नहीं</div>';
+            return;
+        }
+        
+        container.innerHTML = filtered.map(customer => {
+            const dueClass = customer.totalDue > 0 ? 'danger' : 'success';
+            const percent = customer.totalAdded > 0 ? (customer.totalDue / customer.totalAdded) * 100 : 0;
+            
+            // Rank badge
+            let rankBadge = '';
+            if (customer.tag === 'vip') rankBadge = '<span class="rank-badge gold">⭐ VIP</span>';
+            else if (customer.totalAdded > 20000) rankBadge = '<span class="rank-badge gold">🏆 Gold</span>';
+            else if (customer.totalAdded > 10000) rankBadge = '<span class="rank-badge silver">🥈 Silver</span>';
+            else if (customer.totalAdded > 5000) rankBadge = '<span class="rank-badge bronze">🥉 Bronze</span>';
+            
+            return `
+                <div class="customer-card" data-id="${customer.id}">
+                    <div class="customer-info">
+                        <div class="customer-name">
+                            ${escapeHtml(customer.name)}
+                            ${rankBadge}
+                        </div>
+                        <div class="customer-phone">📞 ${customer.phone}</div>
+                        <div class="customer-meta">
+                            <span>➕ ₹${customer.totalAdded.toLocaleString()}</span>
+                            <span>✅ ₹${customer.totalPaid.toLocaleString()}</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" data-id="${customer.id}" data-name="${escapeHtml(customer.name)}" data-phone="${customer.phone}" data-address="${escapeHtml(customer.address)}" data-tag="${customer.tag}">✏️</button>
+                            <button class="action-btn" onclick="event.stopPropagation(); window.location.href='customer-detail.html?id=${customer.id}'">📋</button>
+                        </div>
+                    </div>
+                    <div class="customer-due">
+                        <div class="due-amount ${dueClass}">₹${customer.totalDue.toLocaleString()}</div>
+                        <div class="due-percent">${Math.round(percent)}%</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Add click handlers for cards
+        document.querySelectorAll('.customer-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('action-btn') && !e.target.classList.contains('edit-btn')) {
+                    window.location.href = `customer-detail.html?id=${card.dataset.id}`;
+                }
+            });
+        });
+        
+        // Add edit handlers
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openEditSheet(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.address, btn.dataset.tag);
+            });
+        });
+    }
+    
+    // Update Statistics
+    function updateStats() {
+        let totalDueAmount = 0;
+        let dueCount = 0;
+        
+        allCustomers.forEach(c => {
+            totalDueAmount += c.totalDue;
+            if (c.totalDue > 0) dueCount++;
+        });
+        
+        document.getElementById('totalCount').innerText = allCustomers.length;
+        document.getElementById('dueCount').innerText = dueCount;
+        document.getElementById('totalDueAmount').innerHTML = '₹' + totalDueAmount.toLocaleString();
+    }
+    
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Open Add Sheet
+    function openAddSheet() {
+        document.getElementById('sheetTitle').innerText = '➕ नया ग्राहक';
+        document.getElementById('editCustomerId').value = '';
+        document.getElementById('customerName').value = '';
+        document.getElementById('customerPhone').value = '';
+        document.getElementById('customerAddress').value = '';
+        document.getElementById('customerTag').value = 'normal';
+        document.getElementById('deleteCustomerBtn').style.display = 'none';
+        document.getElementById('customerSheet').classList.add('open');
+    }
+    
+    // Open Edit Sheet
+    function openEditSheet(id, name, phone, address, tag) {
+        document.getElementById('sheetTitle').innerText = '✏️ ग्राहक संपादित करें';
+        document.getElementById('editCustomerId').value = id;
+        document.getElementById('customerName').value = name;
+        document.getElementById('customerPhone').value = phone;
+        document.getElementById('customerAddress').value = address || '';
+        document.getElementById('customerTag').value = tag || 'normal';
+        document.getElementById('deleteCustomerBtn').style.display = 'block';
+        document.getElementById('customerSheet').classList.add('open');
+    }
+    
+    // Save Customer (Add or Edit)
+    async function saveCustomer() {
+        const id = document.getElementById('editCustomerId').value;
+        const name = document.getElementById('customerName').value.trim();
+        const phone = document.getElementById('customerPhone').value.trim();
+        const address = document.getElementById('customerAddress').value.trim();
+        const tag = document.getElementById('customerTag').value;
+        
+        if (!name) { alert('कृपया नाम डालें'); return; }
+        if (!phone) { alert('कृपया फोन नंबर डालें'); return; }
+        
+        try {
+            if (id) {
+                // Update existing
+                const customerRef = doc(db, 'customers', id);
+                await updateDoc(customerRef, {
+                    name: name,
+                    phone: phone,
+                    address: address,
+                    tag: tag,
+                    updatedAt: new Date()
+                });
+                alert('✅ ग्राहक अपडेट हो गया');
+            } else {
+                // Add new
+                await addDoc(collection(db, 'customers'), {
+                    name: name,
+                    phone: phone,
+                    address: address,
+                    tag: tag,
+                    totalAdded: 0,
+                    totalPaid: 0,
+                    totalDue: 0,
+                    createdAt: new Date(),
+                    status: 'active'
+                });
+                alert('✅ नया ग्राहक जुड़ गया');
+            }
+            closeSheet();
+            loadCustomers();
+        } catch (error) {
+            console.error("Save error:", error);
+            alert('❌ एरर: ' + error.message);
+        }
+    }
+    
+    // Delete Customer
+    async function deleteCustomer() {
+        const id = document.getElementById('editCustomerId').value;
+        if (!id) return;
+        
+        if (confirm('क्या आप इस ग्राहक को डिलीट करना चाहते हैं? (खाता हट जाएगा)')) {
+            try {
+                await deleteDoc(doc(db, 'customers', id));
+                alert('✅ ग्राहक डिलीट हो गया');
+                closeSheet();
+                loadCustomers();
+            } catch (error) {
+                console.error("Delete error:", error);
+                alert('❌ एरर: ' + error.message);
+            }
+        }
+    }
+    
+    function closeSheet() {
+        document.getElementById('customerSheet').classList.remove('open');
+    }
+    
+    // Logout
+    async function logout() {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    }
+    
+    // Event Listeners
+    document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'index.html');
+    document.getElementById('addCustomerBtn')?.addEventListener('click', openAddSheet);
+    document.getElementById('saveCustomerBtn')?.addEventListener('click', saveCustomer);
+    document.getElementById('deleteCustomerBtn')?.addEventListener('click', deleteCustomer);
+    document.querySelector('.sheet-overlay')?.addEventListener('click', closeSheet);
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    
+    // Search
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        renderCustomers();
+    });
+    
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderCustomers();
+        });
+    });
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => {
+            const page = nav.dataset.page;
+            if (page === 'dashboard') location.href = 'index.html';
+            if (page === 'reports') location.href = 'reports.html';
+        });
+    });
+    
+    // Dark Mode
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+    
+    // FAB Navigation
+    document.getElementById('fabNavBtn')?.addEventListener('click', openAddSheet);
+</script>
+</body>
+</html>
