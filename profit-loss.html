@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Profit & Loss - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card,
+        body.dark-mode .stat-card,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .header,
+        body.dark-mode .filter-bar,
+        body.dark-mode .report-card {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .header h1 {
+            font-size: 18px;
+            flex: 1;
+        }
+        .dark-mode-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+
+        /* Period Selector */
+        .period-selector {
+            display: flex;
+            gap: 8px;
+            margin: 12px;
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 4px;
+        }
+        .period-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .period-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Date Range Picker */
+        .date-range {
+            display: flex;
+            gap: 12px;
+            margin: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .date-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            background: var(--light);
+        }
+        .apply-btn {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin: 12px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            flex: 1;
+            min-width: 120px;
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .stat-card .value {
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .stat-card .value.success {
+            color: var(--success);
+        }
+        .stat-card .value.danger {
+            color: var(--danger);
+        }
+        .stat-card .value.primary {
+            color: var(--primary);
+        }
+
+        /* Main Profit Card */
+        .profit-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            margin: 12px;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            color: white;
+        }
+        .profit-card .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .profit-card .value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .profit-card .positive {
+            color: #fff;
+        }
+        .profit-card .negative {
+            color: #ffcccc;
+        }
+
+        /* Report Sections */
+        .report-card {
+            background: var(--light);
+            margin: 12px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .report-header {
+            padding: 14px 16px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+        .report-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .report-row:last-child {
+            border-bottom: none;
+        }
+        .report-label {
+            font-size: 14px;
+        }
+        .report-amount {
+            font-weight: bold;
+        }
+        .total-row {
+            background: var(--light-gray);
+            font-weight: bold;
+        }
+        body.dark-mode .total-row {
+            background: #2d2d2d;
+        }
+
+        /* Category List */
+        .category-list {
+            padding: 8px 0;
+        }
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .category-name {
+            font-size: 13px;
+        }
+        .category-amount {
+            font-weight: bold;
+            color: var(--danger);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            padding: 16px;
+        }
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bar-label {
+            width: 70px;
+            font-size: 11px;
+        }
+        .bar {
+            flex: 1;
+            background: var(--light-gray);
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .bar-fill.collection {
+            background: var(--success);
+        }
+        .bar-fill.expense {
+            background: var(--danger);
+        }
+
+        /* Export Buttons */
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 12px;
+        }
+        .export-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .export-btn:active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        /* Toast */
+        .toast-message {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast-message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item active" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item" data-page="loyalty">
+        <span>⭐</span>
+        <span class="nav-label">पॉइंट्स</span>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1>📈 Profit & Loss</h1>
+    <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
+</div>
+
+<!-- Period Selector -->
+<div class="period-selector">
+    <button class="period-btn active" data-period="daily">दैनिक</button>
+    <button class="period-btn" data-period="weekly">साप्ताहिक</button>
+    <button class="period-btn" data-period="monthly">मासिक</button>
+    <button class="period-btn" data-period="yearly">वार्षिक</button>
+    <button class="period-btn" data-period="custom">कस्टम</button>
+</div>
+
+<!-- Custom Date Range (Hidden by default) -->
+<div id="customDateRange" class="date-range" style="display: none;">
+    <input type="date" id="startDate" class="date-input">
+    <input type="date" id="endDate" class="date-input">
+    <button class="apply-btn" id="applyDateBtn">लागू करें</button>
+</div>
+
+<!-- Main Profit Card -->
+<div class="profit-card" id="profitCard">
+    <div class="label">📊 नेट प्रॉफिट / लॉस</div>
+    <div class="value" id="netProfit">₹0</div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="label">💰 कुल कलेक्शन</div>
+        <div class="value success" id="totalCollection">₹0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">📝 कुल खर्चा</div>
+        <div class="value danger" id="totalExpense">₹0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">⭐ प्रॉफिट मार्जिन</div>
+        <div class="value primary" id="profitMargin">0%</div>
+    </div>
+</div>
+
+<!-- Income Section -->
+<div class="report-card">
+    <div class="report-header">💰 आय (Income)</div>
+    <div class="report-row">
+        <span class="report-label">कुल कलेक्शन (भुगतान)</span>
+        <span class="report-amount success" id="incomeCollection">₹0</span>
+    </div>
+    <div class="report-row total-row">
+        <span class="report-label">कुल आय</span>
+        <span class="report-amount success" id="totalIncome">₹0</span>
+    </div>
+</div>
+
+<!-- Expense Section -->
+<div class="report-card">
+    <div class="report-header">📝 खर्चे (Expenses)</div>
+    <div id="expenseCategoryList">
+        <div class="loading">लोड हो रहा है...</div>
+    </div>
+    <div class="report-row total-row">
+        <span class="report-label">कुल खर्चा</span>
+        <span class="report-amount danger" id="totalExpenseAmount">₹0</span>
+    </div>
+</div>
+
+<!-- Monthly Trend Chart -->
+<div class="report-card">
+    <div class="report-header">📊 मासिक ट्रेंड</div>
+    <div class="chart-container" id="trendChart">
+        <div class="loading">लोड हो रहा है...</div>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="export-buttons">
+    <div class="export-btn" id="exportPDFBtn">📑 पीडीएफ डाउनलोड करें</div>
+</div>
+
+<div id="toastMessage" class="toast-message"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    let allPayments = [];
+    let allExpenses = [];
+    let currentPeriod = 'daily';
+    let customStartDate = '';
+    let customEndDate = '';
+    
+    const toastMessage = document.getElementById('toastMessage');
+    
+    function showToast(msg) {
+        toastMessage.innerText = msg;
+        toastMessage.classList.add('show');
+        setTimeout(() => toastMessage.classList.remove('show'), 3000);
+    }
+    
+    // Check Login
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        await loadData();
+    });
+    
+    // Load all data
+    async function loadData() {
+        try {
+            // Load payments from ledger
+            const ledgerSnap = await getDocs(collection(db, 'ledger'));
+            allPayments = [];
+            ledgerSnap.forEach(doc => {
+                const data = doc.data();
+                if (data.type === 'payment') {
+                    let date = new Date();
+                    if (data.createdAt && data.createdAt.toDate) {
+                        date = data.createdAt.toDate();
+                    } else if (data.createdAt && data.createdAt.seconds) {
+                        date = new Date(data.createdAt.seconds * 1000);
+                    } else if (data.date) {
+                        date = new Date(data.date);
+                    }
+                    allPayments.push({
+                        amount: data.amount || 0,
+                        date: date,
+                        dateStr: date.toISOString().slice(0,10),
+                        note: data.note || ''
+                    });
+                }
+            });
+            
+            // Load expenses
+            const expenseSnap = await getDocs(collection(db, 'expenses'));
+            allExpenses = [];
+            expenseSnap.forEach(doc => {
+                const data = doc.data();
+                let date = new Date(data.date);
+                if (isNaN(date.getTime())) {
+                    date = new Date();
+                }
+                allExpenses.push({
+                    amount: data.amount || 0,
+                    category: data.category || 'other',
+                    note: data.note || '',
+                    date: date,
+                    dateStr: date.toISOString().slice(0,10)
+                });
+            });
+            
+            updateReport();
+            
+        } catch (error) {
+            console.error("Error loading data:", error);
+            showToast('❌ डाटा लोड करने में एरर');
+        }
+    }
+    
+    // Filter data by date range
+    function filterByDateRange(payments, expenses, startDate, endDate) {
+        let filteredPayments = payments;
+        let filteredExpenses = expenses;
+        
+        if (startDate) {
+            filteredPayments = filteredPayments.filter(p => p.dateStr >= startDate);
+            filteredExpenses = filteredExpenses.filter(e => e.dateStr >= startDate);
+        }
+        if (endDate) {
+            filteredPayments = filteredPayments.filter(p => p.dateStr <= endDate);
+            filteredExpenses = filteredExpenses.filter(e => e.dateStr <= endDate);
+        }
+        
+        return { payments: filteredPayments, expenses: filteredExpenses };
+    }
+    
+    // Get date range based on period
+    function getDateRange(period) {
+        const now = new Date();
+        const today = now.toISOString().slice(0,10);
+        
+        switch(period) {
+            case 'daily':
+                return { startDate: today, endDate: today };
+            case 'weekly':
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
+                return { startDate: weekStart.toISOString().slice(0,10), endDate: today };
+            case 'monthly':
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                return { startDate: monthStart.toISOString().slice(0,10), endDate: today };
+            case 'yearly':
+                const yearStart = new Date(now.getFullYear(), 0, 1);
+                return { startDate: yearStart.toISOString().slice(0,10), endDate: today };
+            default:
+                return { startDate: '', endDate: '' };
+        }
+    }
+    
+    // Update report based on period
+    function updateReport() {
+        let startDate = '';
+        let endDate = '';
+        
+        if (currentPeriod === 'custom') {
+            startDate = customStartDate;
+            endDate = customEndDate;
+        } else {
+            const range = getDateRange(currentPeriod);
+            startDate = range.startDate;
+            endDate = range.endDate;
+        }
+        
+        const { payments, expenses } = filterByDateRange(allPayments, allExpenses, startDate, endDate);
+        
+        // Calculate totals
+        const totalCollection = payments.reduce((sum, p) => sum + p.amount, 0);
+        const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
+        const netProfit = totalCollection - totalExpense;
+        const profitMargin = totalCollection > 0 ? ((netProfit / totalCollection) * 100).toFixed(1) : 0;
+        
+        // Update UI
+        document.getElementById('totalCollection').innerHTML = '₹' + totalCollection.toLocaleString();
+        document.getElementById('totalExpense').innerHTML = '₹' + totalExpense.toLocaleString();
+        document.getElementById('profitMargin').innerHTML = profitMargin + '%';
+        document.getElementById('incomeCollection').innerHTML = '₹' + totalCollection.toLocaleString();
+        document.getElementById('totalIncome').innerHTML = '₹' + totalCollection.toLocaleString();
+        document.getElementById('totalExpenseAmount').innerHTML = '₹' + totalExpense.toLocaleString();
+        
+        const netProfitEl = document.getElementById('netProfit');
+        netProfitEl.innerHTML = (netProfit >= 0 ? '+ ' : '- ') + '₹' + Math.abs(netProfit).toLocaleString();
+        netProfitEl.style.color = netProfit >= 0 ? '#4CAF50' : '#ffcccc';
+        
+        // Update expense categories
+        updateExpenseCategories(expenses);
+        
+        // Update trend chart
+        updateTrendChart();
+    }
+    
+    // Update expense categories breakdown
+    function updateExpenseCategories(expenses) {
+        const categoryMap = new Map();
+        const categoryNames = {
+            'rent': '🏠 किराया',
+            'salary': '👨‍💼 सैलरी',
+            'electricity': '💡 बिजली',
+            'water': '💧 पानी',
+            'groceries': '🛒 किराना',
+            'maintenance': '🔧 मेंटेनेंस',
+            'other': '📦 अन्य'
+        };
+        
+        expenses.forEach(exp => {
+            const cat = exp.category;
+            const current = categoryMap.get(cat) || 0;
+            categoryMap.set(cat, current + exp.amount);
+        });
+        
+        const container = document.getElementById('expenseCategoryList');
+        
+        if (categoryMap.size === 0) {
+            container.innerHTML = '<div class="category-item"><span class="category-name">कोई खर्चा नहीं</span><span class="category-amount">₹0</span></div>';
+            return;
+        }
+        
+        let html = '';
+        for (let [cat, amount] of categoryMap) {
+            html += `
+                <div class="category-item">
+                    <span class="category-name">${categoryNames[cat] || cat}</span>
+                    <span class="category-amount">₹${amount.toLocaleString()}</span>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+    
+    // Update trend chart
+    function updateTrendChart() {
+        // Group by month for last 6 months
+        const monthMap = new Map();
+        const now = new Date();
+        
+        // Get last 6 months
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthKey = d.toISOString().slice(0,7);
+            monthMap.set(monthKey, { collection: 0, expense: 0, month: d.toLocaleString('hi-IN', { month: 'short' }) });
+        }
+        
+        // Add payment data
+        allPayments.forEach(p => {
+            const monthKey = p.dateStr.slice(0,7);
+            if (monthMap.has(monthKey)) {
+                monthMap.get(monthKey).collection += p.amount;
+            }
+        });
+        
+        // Add expense data
+        allExpenses.forEach(e => {
+            const monthKey = e.dateStr.slice(0,7);
+            if (monthMap.has(monthKey)) {
+                monthMap.get(monthKey).expense += e.amount;
+            }
+        });
+        
+        const chartData = Array.from(monthMap.entries()).map(([key, data]) => ({
+            month: data.month,
+            collection: data.collection,
+            expense: data.expense
+        }));
+        
+        const maxValue = Math.max(...chartData.map(d => Math.max(d.collection, d.expense)), 1);
+        
+        const container = document.getElementById('trendChart');
+        
+        if (chartData.length === 0 || chartData.every(d => d.collection === 0 && d.expense === 0)) {
+            container.innerHTML = '<div class="empty-state" style="text-align:center;padding:40px;">📊 कोई डेटा नहीं</div>';
+            return;
+        }
+        
+        let html = '<div class="bar-chart">';
+        chartData.forEach(data => {
+            const collectionPercent = (data.collection / maxValue) * 100;
+            const expensePercent = (data.expense / maxValue) * 100;
+            html += `
+                <div class="bar-item">
+                    <div class="bar-label">${data.month}</div>
+                    <div style="flex: 1;">
+                        <div class="bar">
+                            <div class="bar-fill collection" style="width: ${collectionPercent}%;">₹${data.collection.toLocaleString()}</div>
+                        </div>
+                        <div class="bar" style="margin-top: 4px;">
+                            <div class="bar-fill expense" style="width: ${expensePercent}%;">₹${data.expense.toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    // Generate PDF
+    function generatePDF() {
+        const printWindow = window.open('', '_blank');
+        const today = new Date().toLocaleDateString('hi-IN');
+        let startDate = '', endDate = '';
+        
+        if (currentPeriod === 'custom') {
+            startDate = customStartDate;
+            endDate = customEndDate;
+        } else {
+            const range = getDateRange(currentPeriod);
+            startDate = range.startDate;
+            endDate = range.endDate;
+        }
+        
+        const { payments, expenses } = filterByDateRange(allPayments, allExpenses, startDate, endDate);
+        const totalCollection = payments.reduce((sum, p) => sum + p.amount, 0);
+        const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
+        const netProfit = totalCollection - totalExpense;
+        const profitMargin = totalCollection > 0 ? ((netProfit / totalCollection) * 100).toFixed(1) : 0;
+        
+        // Group expenses by category
+        const categoryMap = new Map();
+        const categoryNames = {
+            'rent': 'किराया', 'salary': 'सैलरी', 'electricity': 'बिजली',
+            'water': 'पानी', 'groceries': 'किराना', 'maintenance': 'मेंटेनेंस', 'other': 'अन्य'
+        };
+        expenses.forEach(exp => {
+            const cat = categoryNames[exp.category] || exp.category;
+            categoryMap.set(cat, (categoryMap.get(cat) || 0) + exp.amount);
+        });
+        
+        let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Profit & Loss Report</title>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .title { font-size: 24px; font-weight: bold; color: #FF5722; }
+                    .date-range { margin: 10px 0; color: gray; }
+                    .profit-box { text-align: center; background: #FF5722; color: white; padding: 20px; border-radius: 12px; margin: 20px 0; }
+                    .profit-box .value { font-size: 32px; font-weight: bold; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background: #FF5722; color: white; }
+                    .total-row { font-weight: bold; background: #f5f5f5; }
+                    .success { color: green; }
+                    .danger { color: red; }
+                    .footer { margin-top: 30px; text-align: center; font-size: 11px; color: gray; }
+                    @media print { body { padding: 0; } .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="title">OK Mart - Profit & Loss Report</div>
+                    <div class="date-range">दिनांक: ${today}</div>
+                    <div class="date-range">अवधि: ${startDate || 'शुरू'} से ${endDate || 'अंत'} तक</div>
+                </div>
+                
+                <div class="profit-box">
+                    <div>📊 नेट प्रॉफिट / लॉस</div>
+                    <div class="value ${netProfit >= 0 ? 'success' : 'danger'}">${netProfit >= 0 ? '+ ' : '- '}₹${Math.abs(netProfit).toLocaleString()}</div>
+                    <div>प्रॉफिट मार्जिन: ${profitMargin}%</div>
+                </div>
+                
+                <table>
+                    <tr><th colspan="2">💰 आय (Income)</th></tr>
+                    <tr><td>कुल कलेक्शन</td><td class="success">₹${totalCollection.toLocaleString()}</td></tr>
+                    <tr class="total-row"><td>कुल आय</td><td class="success">₹${totalCollection.toLocaleString()}</td></tr>
+                </table>
+                
+                <table>
+                    <tr><th colspan="2">📝 खर्चे (Expenses)</th></tr>
+        `;
+        
+        for (let [cat, amount] of categoryMap) {
+            html += `<tr><td>${cat}</td><td class="danger">₹${amount.toLocaleString()}</td></tr>`;
+        }
+        html += `<tr class="total-row"><td>कुल खर्चा</td><td class="danger">₹${totalExpense.toLocaleString()}</td></tr>`;
+        
+        html += `
+                 </table>
+                
+                <div class="footer">
+                    <p>यह एक कंप्यूटर जनरेटेड रिपोर्ट है।</p>
+                    <p>OK Mart Khata System</p>
+                </div>
+                <div class="no-print" style="text-align: center; margin-top: 20px;">
+                    <button onclick="window.print()" style="padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        printWindow.document.write(html);
+        printWindow.document.close();
+    }
+    
+    // Period change handler
+    function setPeriod(period) {
+        currentPeriod = period;
+        document.getElementById('customDateRange').style.display = period === 'custom' ? 'flex' : 'none';
+        
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            if (btn.dataset.period === period) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        
+        updateReport();
+    }
+    
+    // Apply custom date
+    function applyCustomDate() {
+        customStartDate = document.getElementById('startDate').value;
+        customEndDate = document.getElementById('endDate').value;
+        updateReport();
+    }
+    
+    // Event Listeners
+    document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.addEventListener('click', () => setPeriod(btn.dataset.period));
+    });
+    
+    document.getElementById('applyDateBtn')?.addEventListener('click', applyCustomDate);
+    document.getElementById('exportPDFBtn')?.addEventListener('click', generatePDF);
+    document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'reports.html');
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => {
+            const page = nav.dataset.page;
+            if (page === 'dashboard') location.href = 'index.html';
+            if (page === 'customers') location.href = 'customers.html';
+            if (page === 'add') location.href = 'index.html';
+            if (page === 'reports') location.href = 'reports.html';
+            if (page === 'loyalty') location.href = 'loyalty-points.html';
+        });
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    });
+    
+    // Dark Mode
+    const darkBtn = document.getElementById('darkModeBtn');
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        darkBtn.innerText = '☀️';
+    }
+    darkBtn?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkBtn.innerText = isDark ? '☀️' : '🌙';
+    });
+    
+    // Set default custom dates
+    const today = new Date().toISOString().slice(0,10);
+    const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0,10);
+    document.getElementById('startDate').value = firstDayOfMonth;
+    document.getElementById('endDate').value = today;
+</script>
+</body>
+</html>
