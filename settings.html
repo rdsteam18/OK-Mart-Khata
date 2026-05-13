@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>सेटिंग्स - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card,
+        body.dark-mode .settings-section,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .header {
+            background: #1e1e1e;
+            color: #fff;
+        }
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: #2d2d2d;
+            color: #fff;
+            border-color: #404040;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .header h1 {
+            font-size: 18px;
+            flex: 1;
+        }
+        .dark-mode-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+
+        /* Settings Sections */
+        .settings-container {
+            padding: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .settings-section {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .section-header {
+            padding: 14px 16px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .section-body {
+            padding: 16px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            background: var(--light);
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .help-text {
+            font-size: 11px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .btn-danger {
+            background: var(--danger);
+        }
+        .btn-success {
+            background: var(--success);
+        }
+        .row-2cols {
+            display: flex;
+            gap: 12px;
+        }
+        .row-2cols .form-group {
+            flex: 1;
+        }
+        .color-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .color-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        input[type="color"] {
+            width: 60px;
+            height: 40px;
+            padding: 2px;
+            cursor: pointer;
+        }
+        .logo-preview, .qr-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .logo-preview img, .qr-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+        .setting-label {
+            font-size: 14px;
+        }
+        .setting-value {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .toast-message {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast-message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item active" data-page="settings">
+        <span>⚙️</span>
+        <span class="nav-label">सेटिंग्स</span>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1>⚙️ सेटिंग्स</h1>
+    <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
+</div>
+
+<div class="settings-container">
+    <!-- Store Information Section -->
+    <div class="settings-section">
+        <div class="section-header">🏪 स्टोर जानकारी</div>
+        <div class="section-body">
+            <div class="form-group">
+                <label>स्टोर का नाम</label>
+                <input type="text" id="storeName" class="form-control" placeholder="OK Mart">
+            </div>
+            <div class="form-group">
+                <label>लोगो URL (Image Link)</label>
+                <input type="text" id="logoUrl" class="form-control" placeholder="https://...">
+                <div class="help-text">Blogger, Imgur, या किसी image hosting की link डालें</div>
+                <div class="logo-preview" id="logoPreview">
+                    <img id="logoPreviewImg" src="" alt="Logo Preview" style="display: none;">
+                    <span id="logoPlaceholder">📷 No Logo</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>QR Code URL (Payment QR)</label>
+                <input type="text" id="qrUrl" class="form-control" placeholder="https://...">
+                <div class="help-text">UPI QR code की image link डालें</div>
+                <div class="qr-preview" id="qrPreview">
+                    <img id="qrPreviewImg" src="" alt="QR Preview" style="display: none;">
+                    <span id="qrPlaceholder">📷 No QR</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>व्हाट्सएप नंबर</label>
+                <input type="tel" id="whatsappNumber" class="form-control" placeholder="919876543210">
+                <div class="help-text">देश कोड के साथ (बिना + के)</div>
+            </div>
+            <div class="form-group">
+                <label>स्टोर का पता</label>
+                <textarea id="storeAddress" class="form-control" rows="2" placeholder="पता लिखें..."></textarea>
+            </div>
+            <button class="btn-primary" id="saveStoreBtn">💾 स्टोर सेव करें</button>
+        </div>
+    </div>
+
+    <!-- Theme Settings Section -->
+    <div class="settings-section">
+        <div class="section-header">🎨 थीम सेटिंग्स</div>
+        <div class="section-body">
+            <div class="form-group">
+                <label>प्राइमरी कलर</label>
+                <div class="color-preview">
+                    <input type="color" id="primaryColor" value="#FF5722">
+                    <div class="color-box" id="colorPreviewBox" style="background: #FF5722;"></div>
+                    <span id="colorValue">#FF5722</span>
+                </div>
+                <div class="help-text">ऐप का मुख्य रंग बदलें</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interest Settings Section -->
+    <div class="settings-section">
+        <div class="section-header">💰 ब्याज सेटिंग्स</div>
+        <div class="section-body">
+            <div class="setting-row">
+                <span class="setting-label">लेट पेमेंट ब्याज सक्षम करें</span>
+                <label class="switch">
+                    <input type="checkbox" id="interestEnabled">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>ब्याज दर (%) प्रति माह</label>
+                <input type="number" id="interestRate" class="form-control" placeholder="2" step="0.5">
+            </div>
+            <div class="form-group">
+                <label>ग्रेस पीरियड (दिन)</label>
+                <input type="number" id="graceDays" class="form-control" placeholder="15">
+            </div>
+            <div class="help-text">जितने दिन बाद ब्याज लगना शुरू होगा</div>
+        </div>
+    </div>
+
+    <!-- Loyalty Points Settings Section -->
+    <div class="settings-section">
+        <div class="section-header">⭐ लॉयल्टी पॉइंट्स</div>
+        <div class="section-body">
+            <div class="setting-row">
+                <span class="setting-label">लॉयल्टी पॉइंट्स सक्षम करें</span>
+                <label class="switch">
+                    <input type="checkbox" id="pointsEnabled">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>पॉइंट्स रेट</label>
+                <div class="row-2cols">
+                    <div class="form-group">
+                        <input type="number" id="pointsRate" class="form-control" placeholder="100">
+                        <div class="help-text">रुपये</div>
+                    </div>
+                    <div class="form-group">
+                        <div style="padding: 12px; text-align: center;">= 1 पॉइंट</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>1 पॉइंट का मूल्य (रुपये में)</label>
+                <input type="number" id="pointValue" class="form-control" placeholder="1" step="0.5">
+            </div>
+            <div class="form-group">
+                <label>अधिकतम रिडीम प्रति बिल (रुपये)</label>
+                <input type="number" id="maxRedeem" class="form-control" placeholder="500">
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Management Section -->
+    <div class="settings-section">
+        <div class="section-header">🗄️ डेटा मैनेजमेंट</div>
+        <div class="section-body">
+            <button class="btn-primary btn-success" id="backupBtn" style="margin-bottom: 10px;">📥 बैकअप लें (JSON)</button>
+            <button class="btn-primary btn-danger" id="clearDataBtn">⚠️ सारा डेटा डिलीट करें</button>
+            <div class="help-text" style="margin-top: 10px;">⚠️ डिलीट करने से पहले बैकअप जरूर लें</div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Message -->
+<div id="toastMessage" class="toast-message"></div>
+
+<script type="module">
+    // Firebase Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    // Check Login
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        loadSettings();
+    });
+    
+    // Load settings from Firestore
+    async function loadSettings() {
+        try {
+            const settingsRef = doc(db, 'settings', 'store_settings');
+            const settingsSnap = await getDoc(settingsRef);
+            
+            if (settingsSnap.exists()) {
+                const data = settingsSnap.data();
+                
+                document.getElementById('storeName').value = data.storeName || '';
+                document.getElementById('logoUrl').value = data.logoUrl || '';
+                document.getElementById('qrUrl').value = data.qrUrl || '';
+                document.getElementById('whatsappNumber').value = data.whatsappNumber || '';
+                document.getElementById('storeAddress').value = data.address || '';
+                
+                document.getElementById('primaryColor').value = data.primaryColor || '#FF5722';
+                document.getElementById('colorPreviewBox').style.background = data.primaryColor || '#FF5722';
+                document.getElementById('colorValue').innerText = data.primaryColor || '#FF5722';
+                document.documentElement.style.setProperty('--primary', data.primaryColor || '#FF5722');
+                
+                document.getElementById('interestEnabled').checked = data.interestEnabled || false;
+                document.getElementById('interestRate').value = data.interestRate || 2;
+                document.getElementById('graceDays').value = data.graceDays || 15;
+                
+                document.getElementById('pointsEnabled').checked = data.pointsEnabled || false;
+                document.getElementById('pointsRate').value = data.pointsRate || 100;
+                document.getElementById('pointValue').value = data.pointValue || 1;
+                document.getElementById('maxRedeem').value = data.maxRedeem || 500;
+                
+                // Preview images
+                if (data.logoUrl) {
+                    document.getElementById('logoPreviewImg').src = data.logoUrl;
+                    document.getElementById('logoPreviewImg').style.display = 'block';
+                    document.getElementById('logoPlaceholder').style.display = 'none';
+                }
+                if (data.qrUrl) {
+                    document.getElementById('qrPreviewImg').src = data.qrUrl;
+                    document.getElementById('qrPreviewImg').style.display = 'block';
+                    document.getElementById('qrPlaceholder').style.display = 'none';
+                }
+            }
+        } catch (error) {
+            console.error("Error loading settings:", error);
+        }
+    }
+    
+    // Save settings
+    async function saveStoreSettings() {
+        const settingsData = {
+            storeName: document.getElementById('storeName').value,
+            logoUrl: document.getElementById('logoUrl').value,
+            qrUrl: document.getElementById('qrUrl').value,
+            whatsappNumber: document.getElementById('whatsappNumber').value,
+            address: document.getElementById('storeAddress').value,
+            primaryColor: document.getElementById('primaryColor').value,
+            interestEnabled: document.getElementById('interestEnabled').checked,
+            interestRate: parseFloat(document.getElementById('interestRate').value) || 0,
+            graceDays: parseInt(document.getElementById('graceDays').value) || 0,
+            pointsEnabled: document.getElementById('pointsEnabled').checked,
+            pointsRate: parseFloat(document.getElementById('pointsRate').value) || 100,
+            pointValue: parseFloat(document.getElementById('pointValue').value) || 1,
+            maxRedeem: parseFloat(document.getElementById('maxRedeem').value) || 500,
+            updatedAt: new Date()
+        };
+        
+        try {
+            const settingsRef = doc(db, 'settings', 'store_settings');
+            await setDoc(settingsRef, settingsData);
+            
+            // Apply primary color immediately
+            document.documentElement.style.setProperty('--primary', settingsData.primaryColor);
+            
+            showToast('✅ सेटिंग्स सेव हो गईं');
+        } catch (error) {
+            console.error("Error saving settings:", error);
+            showToast('❌ एरर: ' + error.message);
+        }
+    }
+    
+    // Color preview
+    const colorPicker = document.getElementById('primaryColor');
+    colorPicker?.addEventListener('input', (e) => {
+        const color = e.target.value;
+        document.getElementById('colorPreviewBox').style.background = color;
+        document.getElementById('colorValue').innerText = color;
+    });
+    
+    // Logo URL preview
+    const logoUrlInput = document.getElementById('logoUrl');
+    logoUrlInput?.addEventListener('input', (e) => {
+        const url = e.target.value;
+        if (url) {
+            document.getElementById('logoPreviewImg').src = url;
+            document.getElementById('logoPreviewImg').style.display = 'block';
+            document.getElementById('logoPlaceholder').style.display = 'none';
+        } else {
+            document.getElementById('logoPreviewImg').style.display = 'none';
+            document.getElementById('logoPlaceholder').style.display = 'block';
+        }
+    });
+    
+    // QR URL preview
+    const qrUrlInput = document.getElementById('qrUrl');
+    qrUrlInput?.addEventListener('input', (e) => {
+        const url = e.target.value;
+        if (url) {
+            document.getElementById('qrPreviewImg').src = url;
+            document.getElementById('qrPreviewImg').style.display = 'block';
+            document.getElementById('qrPlaceholder').style.display = 'none';
+        } else {
+            document.getElementById('qrPreviewImg').style.display = 'none';
+            document.getElementById('qrPlaceholder').style.display = 'block';
+        }
+    });
+    
+    // Backup data
+    async function backupData() {
+        try {
+            showToast('📥 बैकअप लिया जा रहा है...');
+            
+            const customersSnap = await getDocs(collection(db, 'customers'));
+            const ledgerSnap = await getDocs(collection(db, 'ledger'));
+            
+            const customers = [];
+            customersSnap.forEach(doc => customers.push({ id: doc.id, ...doc.data() }));
+            
+            const ledger = [];
+            ledgerSnap.forEach(doc => ledger.push({ id: doc.id, ...doc.data() }));
+            
+            const backupData = {
+                exportDate: new Date().toISOString(),
+                customers: customers,
+                ledger: ledger,
+                totalCustomers: customers.length,
+                totalTransactions: ledger.length
+            };
+            
+            const jsonStr = JSON.stringify(backupData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `okmart_backup_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('✅ बैकअप डाउनलोड हो गया');
+        } catch (error) {
+            console.error("Backup error:", error);
+            showToast('❌ बैकअप एरर: ' + error.message);
+        }
+    }
+    
+    // Clear all data (dangerous)
+    async function clearAllData() {
+        const confirmMsg = '⚠️ क्या आप सच में सारा डेटा डिलीट करना चाहते हैं?\n\nयह क्रिया वापस नहीं ली जा सकती!\n\nपहले बैकअप जरूर लें।';
+        
+        if (!confirm(confirmMsg)) return;
+        
+        const doubleConfirm = confirm('एक बार और पुष्टि करें: सारा डेटा डिलीट हो जाएगा!');
+        if (!doubleConfirm) return;
+        
+        try {
+            showToast('🗑️ डेटा डिलीट हो रहा है...');
+            
+            // Delete all customers
+            const customersSnap = await getDocs(collection(db, 'customers'));
+            for (const docSnap of customersSnap.docs) {
+                await deleteDoc(doc(db, 'customers', docSnap.id));
+            }
+            
+            // Delete all ledger entries
+            const ledgerSnap = await getDocs(collection(db, 'ledger'));
+            for (const docSnap of ledgerSnap.docs) {
+                await deleteDoc(doc(db, 'ledger', docSnap.id));
+            }
+            
+            showToast('✅ सारा डेटा डिलीट हो गया');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+            
+        } catch (error) {
+            console.error("Clear data error:", error);
+            showToast('❌ एरर: ' + error.message);
+        }
+    }
+    
+    // Show toast message
+    function showToast(message) {
+        const toast = document.getElementById('toastMessage');
+        toast.innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    
+    // Event Listeners
+    document.getElementById('saveStoreBtn')?.addEventListener('click', saveStoreSettings);
+    document.getElementById('backupBtn')?.addEventListener('click', backupData);
+    document.getElementById('clearDataBtn')?.addEventListener('click', clearAllData);
+    document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'index.html');
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => {
+            const page = nav.dataset.page;
+            if (page === 'dashboard') location.href = 'index.html';
+            if (page === 'customers') location.href = 'customers.html';
+            if (page === 'add') location.href = 'index.html';
+            if (page === 'reports') location.href = 'reports.html';
+        });
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    });
+    
+    // Dark Mode
+    const darkBtn = document.getElementById('darkModeBtn');
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        darkBtn.innerText = '☀️';
+    }
+    darkBtn?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkBtn.innerText = isDark ? '☀️' : '🌙';
+    });
+</script>
+</body>
+</html>
