@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>OK Mart Khata - डैशबोर्ड</title>
+  <meta name="theme-color" content="#FF5722">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="OK Khata">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/khata.css">
+  <link rel="stylesheet" href="/css/mobile.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dark-mode.css">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- ========== HEADER ========== -->
+    <header class="app-header">
+      <div class="header-left">
+        <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+        <h1 class="app-title">OK Mart Khata</h1>
+      </div>
+      <div class="header-right">
+        <button class="notif-btn" id="notifBtn" aria-label="Notifications">🔔</button>
+        <button class="profile-btn" id="profileBtn" aria-label="Profile">👤</button>
+      </div>
+    </header>
+    
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-content">
+      
+      <!-- Stats Cards Row -->
+      <div class="stats-grid">
+        <div class="stat-card" onclick="showDetail('due')">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <span class="stat-label">कुल बकाया</span>
+            <span class="stat-value" id="totalDue">₹0</span>
+          </div>
+        </div>
+        <div class="stat-card" onclick="showDetail('today')">
+          <div class="stat-icon">📥</div>
+          <div class="stat-info">
+            <span class="stat-label">आज की जमा</span>
+            <span class="stat-value" id="todayCollection">₹0</span>
+          </div>
+        </div>
+        <div class="stat-card" onclick="showDetail('customers')">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-label">कुल ग्राहक</span>
+            <span class="stat-value" id="totalCustomers">0</span>
+          </div>
+        </div>
+        <div class="stat-card" onclick="showDetail('overdue')">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-info">
+            <span class="stat-label">बकायेदार</span>
+            <span class="stat-value" id="overdueCustomers">0</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Second Row Stats -->
+      <div class="stats-grid small">
+        <div class="stat-card-mini">
+          <span>इस हफ्ते</span>
+          <strong id="weeklyCollection">₹0</strong>
+        </div>
+        <div class="stat-card-mini">
+          <span>इस महीने</span>
+          <strong id="monthlyCollection">₹0</strong>
+        </div>
+        <div class="stat-card-mini">
+          <span>औसत बकाया</span>
+          <strong id="avgDue">₹0</strong>
+        </div>
+      </div>
+      
+      <!-- Top Due Customers -->
+      <section class="section">
+        <div class="section-header">
+          <h2>📊 सबसे ज्यादा बकाया</h2>
+          <a href="/customers.html" class="view-all">सभी देखें →</a>
+        </div>
+        <div class="customer-list" id="topDueList">
+          <div class="loading-state">लोड हो रहा है...</div>
+        </div>
+      </section>
+      
+      <!-- Recent Transactions -->
+      <section class="section">
+        <div class="section-header">
+          <h2>📝 हाल के लेन-देन</h2>
+          <a href="/reports.html" class="view-all">सभी देखें →</a>
+        </div>
+        <div class="transaction-list" id="recentTransactions">
+          <div class="loading-state">लोड हो रहा है...</div>
+        </div>
+      </section>
+      
+      <!-- Expense Summary -->
+      <section class="section">
+        <div class="section-header">
+          <h2>💸 दुकान के खर्चे</h2>
+          <a href="/expenses.html" class="view-all">प्रबंधित करें →</a>
+        </div>
+        <div class="expense-summary" id="expenseSummary">
+          <div class="expense-item">
+            <span>आज का खर्च</span>
+            <strong id="todayExpense">₹0</strong>
+          </div>
+          <div class="expense-item">
+            <span>इस महीने</span>
+            <strong id="monthlyExpense">₹0</strong>
+          </div>
+          <div class="expense-item">
+            <span>शुद्ध लाभ</span>
+            <strong id="netProfit" class="profit">₹0</strong>
+          </div>
+        </div>
+      </section>
+      
+    </main>
+    
+    <!-- ========== BOTTOM NAVIGATION (MOBILE) ========== -->
+    <nav class="bottom-nav">
+      <a href="/index.html" class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">होम</span>
+      </a>
+      <a href="/customers.html" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">ग्राहक</span>
+      </a>
+      <button class="nav-item fab-center" id="fabAddBtn">
+        <span class="nav-icon">➕</span>
+        <span class="nav-label">एंट्री</span>
+      </button>
+      <a href="/reports.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+      </a>
+      <a href="/settings.html" class="nav-item">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">सेटिंग</span>
+      </a>
+    </nav>
+    
+    <!-- ========== ADD ENTRY BOTTOM SHEET ========== -->
+    <div class="bottom-sheet" id="addEntrySheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-content">
+        <div class="sheet-header">
+          <h3>➕ नई एंट्री</h3>
+          <button class="sheet-close" id="closeSheetBtn">✕</button>
+        </div>
+        
+        <div class="form-group">
+          <label>ग्राहक चुनें *</label>
+          <select id="sheetCustomerId" class="form-select">
+            <option value="">-- ग्राहक चुनें --</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>एंट्री प्रकार *</label>
+          <div class="type-buttons">
+            <button type="button" class="type-btn active" data-type="credit">
+              ➕ जमा (Customer ने लिया)
+            </button>
+            <button type="button" class="type-btn" data-type="debit">
+              💰 भुगतान (Customer ने दिया)
+            </button>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>रकम *</label>
+          <div class="amount-keypad">
+            <input type="number" id="sheetAmount" class="amount-input" placeholder="₹0" inputmode="decimal">
+            <div class="quick-amounts">
+              <button type="button" class="quick-amt">+100</button>
+              <button type="button" class="quick-amt">+200</button>
+              <button type="button" class="quick-amt">+500</button>
+              <button type="button" class="quick-amt">+1000</button>
+              <button type="button" class="quick-amt">+2000</button>
+              <button type="button" class="quick-amt">+5000</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>नोट (वैकल्पिक)</label>
+          <input type="text" id="sheetNote" class="form-input" placeholder="जैसे: किराना सामान, नकद भुगतान...">
+        </div>
+        
+        <div class="form-group">
+          <label>भुगतान का तरीका</label>
+          <div class="payment-modes">
+            <button type="button" class="mode-btn" data-mode="cash">💵 कैश</button>
+            <button type="button" class="mode-btn" data-mode="upi">📱 UPI</button>
+            <button type="button" class="mode-btn" data-mode="card">💳 कार्ड</button>
+            <button type="button" class="mode-btn" data-mode="bank">🏦 बैंक</button>
+          </div>
+        </div>
+        
+        <div class="split-payment-ui" id="splitPaymentUI" style="display: none;">
+          <label>स्प्लिट पेमेंट</label>
+          <div class="split-inputs">
+            <input type="number" placeholder="कैश" id="splitCash" class="split-input">
+            <input type="number" placeholder="UPI" id="splitUpi" class="split-input">
+            <input type="number" placeholder="कार्ड" id="splitCard" class="split-input">
+          </div>
+          <div class="split-remaining">
+            शेष: ₹<span id="splitRemaining">0</span>
+          </div>
+        </div>
+        
+        <button class="btn-primary" id="saveEntryBtn">
+          💾 एंट्री सेव करें
+        </button>
+      </div>
+    </div>
+    
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Toast -->
+    <div class="toast-message" id="toast"></div>
+    
+  </div>
+  
+  <script src="/js/firebase-config.js"></script>
+  <script src="/js/firebase-service.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/dark-mode.js"></script>
+  <script src="/js/offline-sync.js"></script>
+  <script src="/js/notifications.js"></script>
+  
+  <script>
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => console.log('✅ SW registered:', reg.scope))
+        .catch(err => console.error('❌ SW error:', err));
+    }
+  </script>
+</body>
+</html>
