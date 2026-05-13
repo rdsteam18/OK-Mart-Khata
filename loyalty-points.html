@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>लॉयल्टी पॉइंट्स - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+            
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card,
+        body.dark-mode .customer-points-card,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .bottom-sheet .sheet-content,
+        body.dark-mode .header,
+        body.dark-mode .settings-card {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .header h1 {
+            font-size: 18px;
+            flex: 1;
+        }
+        .dark-mode-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin: 12px;
+        }
+        .stat-card {
+            flex: 1;
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .stat-card .value.gold {
+            color: var(--gold);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin: 12px;
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 4px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: none;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            margin: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--light);
+        }
+
+        /* Customer Points List */
+        .points-list {
+            margin: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .customer-points-card {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+        }
+        .customer-points-info {
+            flex: 1;
+        }
+        .customer-points-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .rank-icon {
+            font-size: 14px;
+        }
+        .rank-icon.gold { color: var(--gold); }
+        .rank-icon.silver { color: var(--silver); }
+        .rank-icon.bronze { color: var(--bronze); }
+        .customer-points-phone {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .points-value {
+            text-align: right;
+        }
+        .points-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .points-label {
+            font-size: 10px;
+            color: var(--gray);
+        }
+
+        /* Leaderboard */
+        .leaderboard-list {
+            margin: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .leaderboard-item {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .rank-number {
+            width: 40px;
+            height: 40px;
+            background: var(--light-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .rank-number.top1 { background: var(--gold); color: #333; }
+        .rank-number.top2 { background: var(--silver); color: #333; }
+        .rank-number.top3 { background: var(--bronze); color: white; }
+        .leaderboard-info {
+            flex: 1;
+        }
+        .leaderboard-name {
+            font-weight: 600;
+        }
+        .leaderboard-points {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* Settings Card */
+        .settings-card {
+            background: var(--light);
+            margin: 12px;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+        .settings-card h4 {
+            margin-bottom: 16px;
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+        .setting-label {
+            font-size: 14px;
+        }
+        .setting-value {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .edit-settings {
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+        }
+
+        /* Adjust Points Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            visibility: hidden;
+        }
+        .bottom-sheet.open {
+            visibility: visible;
+        }
+        .sheet-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bottom-sheet.open .sheet-overlay {
+            opacity: 1;
+        }
+        .sheet-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            border-radius: 16px 16px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .bottom-sheet.open .sheet-content {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+        .sheet-body {
+            padding: 20px;
+        }
+        .sheet-body h3 {
+            margin-bottom: 20px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--light);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-success {
+            background: var(--success);
+        }
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        /* History */
+        .history-list {
+            margin: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .history-item {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .history-info {
+            flex: 1;
+        }
+        .history-type {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .history-type.earned {
+            color: var(--success);
+        }
+        .history-type.redeemed {
+            color: var(--danger);
+        }
+        .history-date {
+            font-size: 10px;
+            color: var(--gray);
+        }
+        .history-points {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .history-points.earned {
+            color: var(--success);
+        }
+        .history-points.redeemed {
+            color: var(--danger);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        /* Toast */
+        .toast-message {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast-message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item active" data-page="loyalty">
+        <span>⭐</span>
+        <span class="nav-label">पॉइंट्स</span>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1>⭐ लॉयल्टी पॉइंट्स</h1>
+    <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="label">कुल पॉइंट्स</div>
+        <div class="value gold" id="totalPoints">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">सक्रिय सदस्य</div>
+        <div class="value" id="activeMembers">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">टॉप रैंक</div>
+        <div class="value" id="topRank">-</div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <button class="tab active" data-tab="customers">📋 ग्राहक</button>
+    <button class="tab" data-tab="leaderboard">🏆 लीडरबोर्ड</button>
+    <button class="tab" data-tab="settings">⚙️ सेटिंग्स</button>
+</div>
+
+<!-- Search Bar (Customers Tab) -->
+<div id="searchSection" class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍 नाम या फोन नंबर से खोजें...">
+</div>
+
+<!-- Customers Tab -->
+<div id="customersTab" class="points-list" id="pointsList">
+    <div class="empty-state">लोड हो रहा है...</div>
+</div>
+
+<!-- Leaderboard Tab -->
+<div id="leaderboardTab" style="display: none;">
+    <div class="leaderboard-list" id="leaderboardList">
+        <div class="empty-state">लोड हो रहा है...</div>
+    </div>
+</div>
+
+<!-- Settings Tab -->
+<div id="settingsTab" style="display: none;">
+    <div class="settings-card">
+        <h4>⚙️ पॉइंट्स सेटिंग्स</h4>
+        <div class="setting-row">
+            <span class="setting-label">पॉइंट्स सक्षम</span>
+            <span class="setting-value" id="pointsEnabled">हाँ</span>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">पॉइंट्स रेट</span>
+            <span class="setting-value" id="pointsRate">₹100 = 1 पॉइंट</span>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">1 पॉइंट का मूल्य</span>
+            <span class="setting-value" id="pointValue">₹1</span>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">अधिकतम रिडीम</span>
+            <span class="setting-value" id="maxRedeem">₹500</span>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">पॉइंट्स एक्सपायरी</span>
+            <span class="setting-value" id="expiryDays">365 दिन</span>
+        </div>
+        <button class="edit-settings" id="editSettingsBtn">✏️ सेटिंग्स एडिट करें</button>
+    </div>
+</div>
+
+<!-- Adjust Points Bottom Sheet -->
+<div class="bottom-sheet" id="pointsSheet">
+    <div class="sheet-overlay"></div>
+    <div class="sheet-content">
+        <div class="sheet-handle"></div>
+        <div class="sheet-body">
+            <h3 id="sheetTitle">⭐ पॉइंट्स एडजस्ट करें</h3>
+            <input type="hidden" id="pointsCustomerId">
+            <input type="hidden" id="pointsCustomerName">
+            
+            <div class="form-group">
+                <label>ग्राहक</label>
+                <div id="selectedCustomerName" style="padding: 12px; background: var(--light-gray); border-radius: 8px;"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>वर्तमान पॉइंट्स</label>
+                <div id="currentPoints" style="font-size: 24px; font-weight: bold; color: var(--primary);"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>एडजस्टमेंट टाइप</label>
+                <select id="adjustType" class="form-control">
+                    <option value="add">➕ पॉइंट्स जोड़ें</option>
+                    <option value="remove">➖ पॉइंट्स घटाएं</option>
+                    <option value="set">📝 सीधे सेट करें</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>पॉइंट्स</label>
+                <input type="number" id="adjustPoints" class="form-control" placeholder="पॉइंट्स डालें">
+            </div>
+            
+            <div class="form-group">
+                <label>कारण</label>
+                <input type="text" id="adjustReason" class="form-control" placeholder="जैसे: बोनस, कैशबैक, एडजस्टमेंट">
+            </div>
+            
+            <button class="btn-primary" id="savePointsBtn">✅ पॉइंट्स सेव करें</button>
+            <button class="btn-primary btn-danger" id="closeSheetBtn" style="margin-top: 8px;">❌ कैंसल</button>
+        </div>
+    </div>
+</div>
+
+<!-- History Bottom Sheet -->
+<div class="bottom-sheet" id="historySheet">
+    <div class="sheet-overlay"></div>
+    <div class="sheet-content">
+        <div class="sheet-handle"></div>
+        <div class="sheet-body">
+            <h3>📜 पॉइंट्स हिस्ट्री</h3>
+            <div id="historyCustomerName" style="margin-bottom: 16px;"></div>
+            <div class="history-list" id="historyList"></div>
+            <button class="btn-primary" id="closeHistoryBtn">❌ बंद करें</button>
+        </div>
+    </div>
+</div>
+
+<div id="toastMessage" class="toast-message"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, setDoc, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    let allPointsData = [];
+    let allCustomers = [];
+    let pointsSettings = {
+        enabled: true,
+        rate: 100,
+        pointValue: 1,
+        maxRedeem: 500,
+        expiryDays: 365
+    };
+    
+    let currentTab = 'customers';
+    let searchQuery = '';
+    
+    const toastMessage = document.getElementById('toastMessage');
+    
+    function showToast(msg) {
+        toastMessage.innerText = msg;
+        toastMessage.classList.add('show');
+        setTimeout(() => toastMessage.classList.remove('show'), 3000);
+    }
+    
+    // Check Login
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        await loadSettings();
+        await loadCustomers();
+        await loadPoints();
+    });
+    
+    // Load Points Settings
+    async function loadSettings() {
+        try {
+            const settingsRef = doc(db, 'settings', 'store_settings');
+            const settingsSnap = await getDoc(settingsRef);
+            if (settingsSnap.exists()) {
+                const data = settingsSnap.data();
+                if (data.pointsEnabled !== undefined) pointsSettings.enabled = data.pointsEnabled;
+                if (data.pointsRate) pointsSettings.rate = data.pointsRate;
+                if (data.pointValue) pointsSettings.pointValue = data.pointValue;
+                if (data.maxRedeem) pointsSettings.maxRedeem = data.maxRedeem;
+                if (data.expiryDays) pointsSettings.expiryDays = data.expiryDays;
+                if (data.primaryColor) {
+                    document.documentElement.style.setProperty('--primary', data.primaryColor);
+                }
+            }
+            updateSettingsUI();
+        } catch (e) { console.log(e); }
+    }
+    
+    // Load Customers
+    async function loadCustomers() {
+        try {
+            const snapshot = await getDocs(collection(db, 'customers'));
+            allCustomers = [];
+            snapshot.forEach(doc => {
+                allCustomers.push({
+                    id: doc.id,
+                    name: doc.data().name || 'N/A',
+                    phone: doc.data().phone || '',
+                    totalDue: doc.data().totalDue || 0,
+                    totalAdded: doc.data().totalAdded || 0
+                });
+            });
+        } catch (error) {
+            console.error("Error loading customers:", error);
+        }
+    }
+    
+    // Load Points Data
+    async function loadPoints() {
+        try {
+            const snapshot = await getDocs(collection(db, 'loyalty_points'));
+            allPointsData = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allPointsData.push({
+                    customerId: doc.id,
+                    totalPoints: data.totalPoints || 0,
+                    redeemedPoints: data.redeemedPoints || 0,
+                    availablePoints: data.availablePoints || 0,
+                    pointsHistory: data.pointsHistory || []
+                });
+            });
+            
+            // Create points data for customers without points
+            allCustomers.forEach(customer => {
+                if (!allPointsData.find(p => p.customerId === customer.id)) {
+                    allPointsData.push({
+                        customerId: customer.id,
+                        totalPoints: 0,
+                        redeemedPoints: 0,
+                        availablePoints: 0,
+                        pointsHistory: []
+                    });
+                }
+            });
+            
+            updateStats();
+            renderCustomersTab();
+            renderLeaderboard();
+            
+        } catch (error) {
+            console.error("Error loading points:", error);
+        }
+    }
+    
+    // Update Statistics
+    function updateStats() {
+        let totalPoints = 0;
+        let activeMembers = 0;
+        let topPoints = 0;
+        let topCustomer = '';
+        
+        allPointsData.forEach(p => {
+            totalPoints += p.totalPoints || 0;
+            if ((p.totalPoints || 0) > 0) activeMembers++;
+            if ((p.totalPoints || 0) > topPoints) {
+                topPoints = p.totalPoints;
+                const customer = allCustomers.find(c => c.id === p.customerId);
+                topCustomer = customer ? customer.name : '';
+            }
+        });
+        
+        document.getElementById('totalPoints').innerText = totalPoints.toLocaleString();
+        document.getElementById('activeMembers').innerText = activeMembers;
+        document.getElementById('topRank').innerHTML = topPoints > 0 ? `${topCustomer} (${topPoints})` : '-';
+    }
+    
+    // Render Customers Tab
+    function renderCustomersTab() {
+        const filtered = allPointsData.filter(p => {
+            const customer = allCustomers.find(c => c.id === p.customerId);
+            if (!customer) return false;
+            if (searchQuery) {
+                return customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                       customer.phone.includes(searchQuery);
+            }
+            return true;
+        }).sort((a, b) => b.availablePoints - a.availablePoints);
+        
+        const container = document.getElementById('customersTab');
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-state">📭 कोई ग्राहक नहीं</div>';
+            return;
+        }
+        
+        container.innerHTML = filtered.map(p => {
+            const customer = allCustomers.find(c => c.id === p.customerId);
+            const rank = getRank(p.availablePoints);
+            return `
+                <div class="customer-points-card" data-id="${p.customerId}">
+                    <div class="customer-points-info">
+                        <div class="customer-points-name">
+                            ${escapeHtml(customer?.name || 'N/A')}
+                            <span class="rank-icon ${rank.class}">${rank.icon}</span>
+                        </div>
+                        <div class="customer-points-phone">📞 ${customer?.phone || ''}</div>
+                    </div>
+                    <div class="points-value">
+                        <div class="points-number">${p.availablePoints.toLocaleString()}</div>
+                        <div class="points-label">पॉइंट्स</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Add click handlers
+        document.querySelectorAll('.customer-points-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.dataset.id;
+                const pointsData = allPointsData.find(p => p.customerId === id);
+                const customer = allCustomers.find(c => c.id === id);
+                if (pointsData && customer) {
+                    showPointsSheet(customer, pointsData);
+                }
+            });
+        });
+    }
+    
+    // Get rank based on points
+    function getRank(points) {
+        if (points >= 1000) return { class: 'gold', icon: '🏆' };
+        if (points >= 500) return { class: 'silver', icon: '🥈' };
+        if (points >= 100) return { class: 'bronze', icon: '🥉' };
+        return { class: '', icon: '⭐' };
+    }
+    
+    // Render Leaderboard
+    function renderLeaderboard() {
+        const sorted = [...allPointsData]
+            .filter(p => p.availablePoints > 0)
+            .sort((a, b) => b.availablePoints - a.availablePoints)
+            .slice(0, 20);
+        
+        const container = document.getElementById('leaderboardList');
+        
+        if (sorted.length === 0) {
+            container.innerHTML = '<div class="empty-state">🏆 कोई टॉप ग्राहक नहीं</div>';
+            return;
+        }
+        
+        container.innerHTML = sorted.map((p, index) => {
+            const customer = allCustomers.find(c => c.id === p.customerId);
+            let rankClass = '';
+            if (index === 0) rankClass = 'top1';
+            else if (index === 1) rankClass = 'top2';
+            else if (index === 2) rankClass = 'top3';
+            
+            return `
+                <div class="leaderboard-item">
+                    <div class="rank-number ${rankClass}">${index + 1}</div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${escapeHtml(customer?.name || 'N/A')}</div>
+                        <div class="leaderboard-phone">📞 ${customer?.phone || ''}</div>
+                    </div>
+                    <div class="leaderboard-points">${p.availablePoints} pts</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Update Settings UI
+    function updateSettingsUI() {
+        document.getElementById('pointsEnabled').innerText = pointsSettings.enabled ? 'हाँ' : 'नहीं';
+        document.getElementById('pointsRate').innerHTML = `₹${pointsSettings.rate} = 1 पॉइंट`;
+        document.getElementById('pointValue').innerHTML = `₹${pointsSettings.pointValue}`;
+        document.getElementById('maxRedeem').innerHTML = `₹${pointsSettings.maxRedeem.toLocaleString()}`;
+        document.getElementById('expiryDays').innerHTML = `${pointsSettings.expiryDays} दिन`;
+    }
+    
+    // Show Points Adjustment Sheet
+    let currentCustomerForPoints = null;
+    let currentPointsData = null;
+    
+    function showPointsSheet(customer, pointsData) {
+        currentCustomerForPoints = customer;
+        currentPointsData = pointsData;
+        
+        document.getElementById('selectedCustomerName').innerHTML = `<strong>${escapeHtml(customer.name)}</strong><br>📞 ${customer.phone}`;
+        document.getElementById('currentPoints').innerText = (pointsData.availablePoints || 0).toLocaleString();
+        document.getElementById('adjustPoints').value = '';
+        document.getElementById('adjustReason').value = '';
+        document.getElementById('adjustType').value = 'add';
+        document.getElementById('pointsSheet').classList.add('open');
+    }
+    
+    // Save Points Adjustment
+    async function savePointsAdjustment() {
+        if (!currentCustomerForPoints || !currentPointsData) return;
+        
+        const adjustType = document.getElementById('adjustType').value;
+        let points = parseInt(document.getElementById('adjustPoints').value);
+        const reason = document.getElementById('adjustReason').value || 'Admin adjustment';
+        
+        if (isNaN(points) || points <= 0) {
+            showToast('कृपया सही पॉइंट्स डालें');
+            return;
+        }
+        
+        let newTotalPoints = currentPointsData.totalPoints || 0;
+        let newRedeemedPoints = currentPointsData.redeemedPoints || 0;
+        let newAvailablePoints = currentPointsData.availablePoints || 0;
+        let historyEntry = null;
+        
+        if (adjustType === 'add') {
+            newTotalPoints += points;
+            newAvailablePoints += points;
+            historyEntry = {
+                type: 'earned',
+                points: points,
+                reason: reason,
+                date: new Date(),
+                adminNote: 'Admin added points'
+            };
+        } else if (adjustType === 'remove') {
+            if (points > newAvailablePoints) {
+                showToast('इतने पॉइंट्स नहीं हैं');
+                return;
+            }
+            newTotalPoints -= points;
+            newAvailablePoints -= points;
+            historyEntry = {
+                type: 'redeemed',
+                points: points,
+                reason: reason,
+                date: new Date(),
+                adminNote: 'Admin removed points'
+            };
+        } else if (adjustType === 'set') {
+            const oldPoints = newAvailablePoints;
+            newAvailablePoints = points;
+            if (points > oldPoints) {
+                newTotalPoints += (points - oldPoints);
+                historyEntry = {
+                    type: 'earned',
+                    points: points - oldPoints,
+                    reason: reason,
+                    date: new Date(),
+                    adminNote: 'Admin set points'
+                };
+            } else {
+                newTotalPoints -= (oldPoints - points);
+                historyEntry = {
+                    type: 'redeemed',
+                    points: oldPoints - points,
+                    reason: reason,
+                    date: new Date(),
+                    adminNote: 'Admin set points'
+                };
+            }
+        }
+        
+        try {
+            const pointsRef = doc(db, 'loyalty_points', currentCustomerForPoints.id);
+            const newHistory = [...(currentPointsData.pointsHistory || []), historyEntry];
+            
+            await setDoc(pointsRef, {
+                customerId: currentCustomerForPoints.id,
+                totalPoints: newTotalPoints,
+                redeemedPoints: newRedeemedPoints,
+                availablePoints: newAvailablePoints,
+                pointsHistory: newHistory,
+                updatedAt: new Date()
+            });
+            
+            showToast('✅ पॉइंट्स अपडेट हो गए');
+            closePointsSheet();
+            await loadPoints();
+            
+        } catch (error) {
+            console.error("Error saving points:", error);
+            showToast('❌ एरर: ' + error.message);
+        }
+    }
+    
+    function closePointsSheet() {
+        document.getElementById('pointsSheet').classList.remove('open');
+    }
+    
+    // Tab switching
+    function switchTab(tab) {
+        currentTab = tab;
+        
+        document.getElementById('customersTab').style.display = tab === 'customers' ? 'block' : 'none';
+        document.getElementById('leaderboardTab').style.display = tab === 'leaderboard' ? 'block' : 'none';
+        document.getElementById('settingsTab').style.display = tab === 'settings' ? 'block' : 'none';
+        document.getElementById('searchSection').style.display = tab === 'customers' ? 'flex' : 'none';
+        
+        document.querySelectorAll('.tab').forEach(t => {
+            if (t.dataset.tab === tab) t.classList.add('active');
+            else t.classList.remove('active');
+        });
+    }
+    
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Search
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderCustomersTab();
+    });
+    
+    // Event Listeners
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+    
+    document.getElementById('editSettingsBtn')?.addEventListener('click', () => {
+        window.location.href = 'settings.html';
+    });
+    
+    document.getElementById('savePointsBtn')?.addEventListener('click', savePointsAdjustment);
+    document.getElementById('closeSheetBtn')?.addEventListener('click', closePointsSheet);
+    document.querySelector('.sheet-overlay')?.addEventListener('click', closePointsSheet);
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => {
+            const page = nav.dataset.page;
+            if (page === 'dashboard') location.href = 'index.html';
+            if (page === 'customers') location.href = 'customers.html';
+            if (page === 'add') location.href = 'index.html';
+            if (page === 'reports') location.href = 'reports.html';
+        });
+    });
+    
+    // Back button
+    document.getElementById('backBtn')?.addEventListener('click', () => {
+        window.location.href = 'index.html';
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    });
+    
+    // Dark Mode
+    const darkBtn = document.getElementById('darkModeBtn');
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        darkBtn.innerText = '☀️';
+    }
+    darkBtn?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkBtn.innerText = isDark ? '☀️' : '🌙';
+    });
+</script>
+</body>
+</html>
