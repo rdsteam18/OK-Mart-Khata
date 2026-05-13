@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>खर्चे - OK Mart Khata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #FF5722;
+            --primary-dark: #E64A19;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --border: #e0e0e0;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-gray);
+            padding-bottom: 70px;
+        }
+
+        body.dark-mode {
+            background: #121212;
+        }
+        body.dark-mode .card,
+        body.dark-mode .expense-card,
+        body.dark-mode .mobile-bottom-nav,
+        body.dark-mode .bottom-sheet .sheet-content,
+        body.dark-mode .header,
+        body.dark-mode .filter-bar {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            min-width: 44px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .header h1 {
+            font-size: 18px;
+            flex: 1;
+        }
+        .add-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+        .dark-mode-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            min-width: 44px;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin: 12px;
+        }
+        .stat-card {
+            flex: 1;
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .stat-card .value.danger {
+            color: var(--danger);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--light);
+            padding: 12px;
+            margin: 0 12px 12px;
+            border-radius: var(--radius-md);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .date-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            background: var(--light);
+        }
+        .filter-btn {
+            padding: 10px 16px;
+            background: var(--light-gray);
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Expense List */
+        .expense-list {
+            margin: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .expense-card {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .expense-info {
+            flex: 1;
+        }
+        .expense-category {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .expense-category span {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: var(--light-gray);
+        }
+        .expense-date {
+            font-size: 10px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        .expense-note {
+            font-size: 11px;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+        .expense-amount {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--danger);
+        }
+        .delete-expense {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            margin-left: 8px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            visibility: hidden;
+        }
+        .bottom-sheet.open {
+            visibility: visible;
+        }
+        .sheet-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bottom-sheet.open .sheet-overlay {
+            opacity: 1;
+        }
+        .sheet-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--light);
+            border-radius: 16px 16px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .bottom-sheet.open .sheet-content {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+        .sheet-body {
+            padding: 20px;
+        }
+        .sheet-body h3 {
+            margin-bottom: 20px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-control, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--light);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        /* Category Chips */
+        .category-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .category-chip {
+            padding: 8px 16px;
+            background: var(--light-gray);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .category-chip.active {
+            background: var(--primary);
+            color: white;
+        }
+        body.dark-mode .category-chip {
+            background: #2d2d2d;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        /* Toast */
+        .toast-message {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast-message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bottom Navigation -->
+<div class="mobile-bottom-nav">
+    <div class="nav-item" data-page="dashboard">
+        <span>🏠</span>
+        <span class="nav-label">डैशबोर्ड</span>
+    </div>
+    <div class="nav-item" data-page="customers">
+        <span>👥</span>
+        <span class="nav-label">ग्राहक</span>
+    </div>
+    <div class="nav-item" data-page="add">
+        <span>➕</span>
+        <span class="nav-label">एड</span>
+    </div>
+    <div class="nav-item" data-page="reports">
+        <span>📊</span>
+        <span class="nav-label">रिपोर्ट</span>
+    </div>
+    <div class="nav-item active" data-page="expenses">
+        <span>💰</span>
+        <span class="nav-label">खर्चे</span>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+    <button class="back-btn" id="backBtn">←</button>
+    <h1>💰 खर्चे</h1>
+    <button class="add-btn" id="addExpenseBtn">➕</button>
+    <button class="dark-mode-btn" id="darkModeBtn">🌙</button>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="label">कुल खर्चा</div>
+        <div class="value danger" id="totalExpense">₹0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">इस महीने</div>
+        <div class="value danger" id="monthlyExpense">₹0</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">आज का</div>
+        <div class="value danger" id="todayExpense">₹0</div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <input type="date" id="startDate" class="date-input" placeholder="शुरू तारीख">
+    <input type="date" id="endDate" class="date-input" placeholder="अंत तारीख">
+    <button class="filter-btn" id="applyFilter">लागू करें</button>
+    <button class="filter-btn" id="clearFilter">साफ़ करें</button>
+</div>
+
+<!-- Expense List -->
+<div class="expense-list" id="expenseList">
+    <div class="loading">लोड हो रहा है...</div>
+</div>
+
+<!-- Add Expense Bottom Sheet -->
+<div class="bottom-sheet" id="expenseSheet">
+    <div class="sheet-overlay"></div>
+    <div class="sheet-content">
+        <div class="sheet-handle"></div>
+        <div class="sheet-body">
+            <h3 id="sheetTitle">➕ नया खर्चा</h3>
+            <input type="hidden" id="editExpenseId">
+            
+            <div class="form-group">
+                <label>कैटेगरी</label>
+                <div class="category-chips" id="categoryChips">
+                    <div class="category-chip active" data-cat="rent">🏠 किराया</div>
+                    <div class="category-chip" data-cat="salary">👨‍💼 सैलरी</div>
+                    <div class="category-chip" data-cat="electricity">💡 बिजली</div>
+                    <div class="category-chip" data-cat="water">💧 पानी</div>
+                    <div class="category-chip" data-cat="groceries">🛒 किराना</div>
+                    <div class="category-chip" data-cat="maintenance">🔧 मेंटेनेंस</div>
+                    <div class="category-chip" data-cat="other">📦 अन्य</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>रकम (₹)</label>
+                <input type="number" id="expenseAmount" class="form-control" placeholder="0" inputmode="decimal">
+            </div>
+            
+            <div class="form-group">
+                <label>नोट (वैकल्पिक)</label>
+                <input type="text" id="expenseNote" class="form-control" placeholder="जैसे: महीने का किराया">
+            </div>
+            
+            <div class="form-group">
+                <label>तारीख</label>
+                <input type="date" id="expenseDate" class="form-control">
+            </div>
+            
+            <button class="btn-primary" id="saveExpenseBtn">💾 खर्चा सेव करें</button>
+            <button class="btn-primary btn-danger" id="deleteExpenseBtn" style="display:none; margin-top:8px;">🗑️ डिलीट करें</button>
+        </div>
+    </div>
+</div>
+
+<div id="toastMessage" class="toast-message"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
+        authDomain: "ok-mart-khata.firebaseapp.com",
+        projectId: "ok-mart-khata",
+        storageBucket: "ok-mart-khata.firebasestorage.app",
+        messagingSenderId: "334851811921",
+        appId: "1:334851811921:web:804863c35baa17dd61a670"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    let allExpenses = [];
+    let startDate = '';
+    let endDate = '';
+    let selectedCategory = 'rent';
+    
+    const toastMessage = document.getElementById('toastMessage');
+    
+    function showToast(msg) {
+        toastMessage.innerText = msg;
+        toastMessage.classList.add('show');
+        setTimeout(() => toastMessage.classList.remove('show'), 3000);
+    }
+    
+    // Check Login
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        loadExpenses();
+    });
+    
+    // Load Expenses
+    async function loadExpenses() {
+        try {
+            const expensesRef = collection(db, 'expenses');
+            const q = query(expensesRef, orderBy('date', 'desc'));
+            const snapshot = await getDocs(q);
+            
+            allExpenses = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allExpenses.push({
+                    id: doc.id,
+                    category: data.category,
+                    amount: data.amount || 0,
+                    note: data.note || '',
+                    date: data.date,
+                    createdAt: data.createdAt
+                });
+            });
+            
+            updateStats();
+            renderExpenses();
+            
+        } catch (error) {
+            console.error("Error loading expenses:", error);
+            document.getElementById('expenseList').innerHTML = '<div class="empty-state">❌ लोड करने में एरर</div>';
+        }
+    }
+    
+    // Update Statistics
+    function updateStats() {
+        let totalExpense = 0;
+        let monthlyExpense = 0;
+        let todayExpense = 0;
+        
+        const today = new Date().toISOString().slice(0,10);
+        const currentMonth = new Date().toISOString().slice(0,7);
+        
+        allExpenses.forEach(exp => {
+            totalExpense += exp.amount;
+            if (exp.date && exp.date.startsWith(currentMonth)) {
+                monthlyExpense += exp.amount;
+            }
+            if (exp.date === today) {
+                todayExpense += exp.amount;
+            }
+        });
+        
+        document.getElementById('totalExpense').innerHTML = '₹' + totalExpense.toLocaleString();
+        document.getElementById('monthlyExpense').innerHTML = '₹' + monthlyExpense.toLocaleString();
+        document.getElementById('todayExpense').innerHTML = '₹' + todayExpense.toLocaleString();
+    }
+    
+    // Get Category Display Name
+    function getCategoryName(cat) {
+        const categories = {
+            'rent': '🏠 किराया',
+            'salary': '👨‍💼 सैलरी',
+            'electricity': '💡 बिजली',
+            'water': '💧 पानी',
+            'groceries': '🛒 किराना',
+            'maintenance': '🔧 मेंटेनेंस',
+            'other': '📦 अन्य'
+        };
+        return categories[cat] || cat;
+    }
+    
+    // Get Category Icon
+    function getCategoryIcon(cat) {
+        const icons = {
+            'rent': '🏠',
+            'salary': '👨‍💼',
+            'electricity': '💡',
+            'water': '💧',
+            'groceries': '🛒',
+            'maintenance': '🔧',
+            'other': '📦'
+        };
+        return icons[cat] || '💰';
+    }
+    
+    // Render Expenses with Filter
+    function renderExpenses() {
+        let filtered = [...allExpenses];
+        
+        if (startDate) {
+            filtered = filtered.filter(e => e.date >= startDate);
+        }
+        if (endDate) {
+            filtered = filtered.filter(e => e.date <= endDate);
+        }
+        
+        const container = document.getElementById('expenseList');
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-state">📭 कोई खर्चा नहीं</div>';
+            return;
+        }
+        
+        container.innerHTML = filtered.map(exp => {
+            const dateStr = new Date(exp.date).toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            return `
+                <div class="expense-card" data-id="${exp.id}">
+                    <div class="expense-info">
+                        <div class="expense-category">
+                            <span>${getCategoryIcon(exp.category)} ${getCategoryName(exp.category)}</span>
+                        </div>
+                        <div class="expense-date">📅 ${dateStr}</div>
+                        ${exp.note ? `<div class="expense-note">📝 ${escapeHtml(exp.note)}</div>` : ''}
+                    </div>
+                    <div class="expense-amount">-₹${exp.amount.toLocaleString()}</div>
+                    <button class="delete-expense" data-id="${exp.id}">🗑️</button>
+                </div>
+            `;
+        }).join('');
+        
+        // Add delete handlers
+        document.querySelectorAll('.delete-expense').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = btn.dataset.id;
+                if (confirm('क्या आप यह खर्चा डिलीट करना चाहते हैं?')) {
+                    await deleteDoc(doc(db, 'expenses', id));
+                    showToast('✅ खर्चा डिलीट हो गया');
+                    loadExpenses();
+                }
+            });
+        });
+    }
+    
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Open Add Sheet
+    function openAddSheet() {
+        document.getElementById('sheetTitle').innerHTML = '➕ नया खर्चा';
+        document.getElementById('editExpenseId').value = '';
+        document.getElementById('expenseAmount').value = '';
+        document.getElementById('expenseNote').value = '';
+        document.getElementById('expenseDate').value = new Date().toISOString().slice(0,10);
+        document.getElementById('deleteExpenseBtn').style.display = 'none';
+        
+        // Reset category chips
+        document.querySelectorAll('.category-chip').forEach(chip => {
+            chip.classList.remove('active');
+            if (chip.dataset.cat === 'rent') chip.classList.add('active');
+        });
+        selectedCategory = 'rent';
+        
+        document.getElementById('expenseSheet').classList.add('open');
+    }
+    
+    function closeSheet() {
+        document.getElementById('expenseSheet').classList.remove('open');
+    }
+    
+    // Save Expense
+    async function saveExpense() {
+        const amount = parseFloat(document.getElementById('expenseAmount').value);
+        const note = document.getElementById('expenseNote').value;
+        const date = document.getElementById('expenseDate').value;
+        
+        if (!amount || amount <= 0) {
+            showToast('कृपया सही रकम डालें');
+            return;
+        }
+        
+        if (!date) {
+            showToast('कृपया तारीख डालें');
+            return;
+        }
+        
+        try {
+            await addDoc(collection(db, 'expenses'), {
+                category: selectedCategory,
+                amount: amount,
+                note: note,
+                date: date,
+                createdAt: new Date()
+            });
+            
+            showToast('✅ खर्चा सेव हो गया');
+            closeSheet();
+            loadExpenses();
+            
+        } catch (error) {
+            console.error("Error saving expense:", error);
+            showToast('❌ एरर: ' + error.message);
+        }
+    }
+    
+    // Apply Date Filter
+    function applyFilter() {
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+        renderExpenses();
+    }
+    
+    function clearFilter() {
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        startDate = '';
+        endDate = '';
+        renderExpenses();
+    }
+    
+    // Event Listeners
+    document.getElementById('backBtn')?.addEventListener('click', () => window.location.href = 'index.html');
+    document.getElementById('addExpenseBtn')?.addEventListener('click', openAddSheet);
+    document.getElementById('saveExpenseBtn')?.addEventListener('click', saveExpense);
+    document.querySelector('.sheet-overlay')?.addEventListener('click', closeSheet);
+    document.getElementById('applyFilter')?.addEventListener('click', applyFilter);
+    document.getElementById('clearFilter')?.addEventListener('click', clearFilter);
+    
+    // Category chips
+    document.querySelectorAll('.category-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            selectedCategory = chip.dataset.cat;
+        });
+    });
+    
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => {
+            const page = nav.dataset.page;
+            if (page === 'dashboard') location.href = 'index.html';
+            if (page === 'customers') location.href = 'customers.html';
+            if (page === 'add') location.href = 'index.html';
+            if (page === 'reports') location.href = 'reports.html';
+        });
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'login.html';
+    });
+    
+    // Dark Mode
+    const darkBtn = document.getElementById('darkModeBtn');
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        darkBtn.innerText = '☀️';
+    }
+    darkBtn?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkBtn.innerText = isDark ? '☀️' : '🌙';
+    });
+    
+    // Set default date
+    document.getElementById('expenseDate').value = new Date().toISOString().slice(0,10);
+</script>
+</body>
+</html>
