@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Login - OK Mart Khata</title>
+    <link rel="stylesheet" href="css/khata.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+    <meta name="theme-color" content="#FF5722">
+    <style>
+        /* Login page specific styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        
+        .login-card {
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        body.dark-mode .login-card {
+            background: #1e1e1e;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+        
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--space-md);
+            display: block;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .login-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .login-subtitle {
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .input-icon {
+            position: relative;
+        }
+        
+        .input-icon .icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+        
+        .input-icon input {
+            padding-left: 42px;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: var(--space-md);
+        }
+        
+        .btn-login:active {
+            transform: scale(0.98);
+            background: var(--primary-dark);
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+        
+        .error-message {
+            background: #FFEBEE;
+            color: var(--danger);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+            font-size: 14px;
+            display: none;
+            border-left: 3px solid var(--danger);
+        }
+        
+        body.dark-mode .error-message {
+            background: #2d2d2d;
+        }
+        
+        .forgot-link {
+            text-align: center;
+            margin-top: var(--space-lg);
+        }
+        
+        .forgot-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .demo-credentials {
+            background: var(--light-gray);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-top: var(--space-lg);
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        body.dark-mode .demo-credentials {
+            background: #2d2d2d;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <img src="assets/images/logo-placeholder.png" alt="OK Mart" class="login-logo" id="storeLogo">
+                <h1 class="login-title">OK Mart Khata</h1>
+                <p class="login-subtitle">Admin Login</p>
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                ⚠️ <span id="errorText">Invalid credentials</span>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-icon">
+                        <span class="icon">📧</span>
+                        <input type="email" id="email" class="form-control" placeholder="admin@okmart.com" required autocomplete="email">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-wrapper">
+                        <div class="input-icon">
+                            <span class="icon">🔒</span>
+                            <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                        </div>
+                        <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-login" id="loginBtn">
+                    🔐 Login
+                </button>
+            </form>
+            
+            <div class="demo-credentials">
+                <strong>📝 Demo Credentials (Firebase me pehle user banao):</strong><br>
+                Email: admin@okmart.com<br>
+                Password: Admin@123
+            </div>
+            
+            <div class="forgot-link">
+                <a href="customer-view.html">📱 Customer Login ?</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+        
+        // 🔴🔴🔴 YAHAN APNA FIREBASE CONFIG DALO 🔴🔴🔴
+        const firebaseConfig = {
+            apiKey: "AIzaSyB...",  // 🔴 Firebase Console se copy karo
+            authDomain: "ok-mart-khata.firebaseapp.com",
+            projectId: "ok-mart-khata",
+            storageBucket: "ok-mart-khata.firebasestorage.app",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abc123"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Set persistence to LOCAL (stay logged in)
+        setPersistence(auth, browserLocalPersistence);
+        
+        // DOM Elements
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginForm = document.getElementById('loginForm');
+        const errorMessageDiv = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        
+        // Load store settings for logo
+        async function loadStoreSettings() {
+            try {
+                const settingsRef = doc(db, 'settings', 'store_settings');
+                const settingsSnap = await getDoc(settingsRef);
+                if (settingsSnap.exists()) {
+                    const data = settingsSnap.data();
+                    if (data.logoUrl) {
+                        const logoImg = document.getElementById('storeLogo');
+                        logoImg.src = data.logoUrl;
+                        logoImg.onerror = () => { logoImg.src = 'assets/images/logo-placeholder.png'; };
+                    }
+                    if (data.storeName) {
+                        document.querySelector('.login-title').innerText = data.storeName;
+                    }
+                    if (data.primaryColor) {
+                        document.documentElement.style.setProperty('--primary', data.primaryColor);
+                    }
+                }
+            } catch (error) {
+                console.log("Settings load error:", error);
+            }
+        }
+        
+        // Show error message
+        function showError(message) {
+            errorText.innerText = message;
+            errorMessageDiv.style.display = 'block';
+            setTimeout(() => {
+                errorMessageDiv.style.display = 'none';
+            }, 4000);
+        }
+        
+        // Show loading state
+        function setLoading(isLoading) {
+            if (isLoading) {
+                loginBtn.innerHTML = '<span class="spinner"></span> Logging in...';
+                loginBtn.disabled = true;
+            } else {
+                loginBtn.innerHTML = '🔐 Login';
+                loginBtn.disabled = false;
+            }
+        }
+        
+        // Toggle password visibility
+        togglePasswordBtn.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            togglePasswordBtn.innerHTML = type === 'password' ? '👁️' : '🙈';
+        });
+        
+        // Login form submit
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!email || !password) {
+                showError('Please enter email and password');
+                return;
+            }
+            
+            setLoading(true);
+            
+            try {
+                // Sign in with Firebase
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                console.log("Login successful:", user.email);
+                
+                // Store user info in localStorage
+                localStorage.setItem('adminLoggedIn', 'true');
+                localStorage.setItem('adminEmail', user.email);
+                
+                // Redirect to dashboard
+                window.location.href = 'index.html';
+                
+            } catch (error) {
+                console.error("Login error:", error);
+                
+                // Handle specific error codes
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        showError('❌ Invalid email format');
+                        break;
+                    case 'auth/user-disabled':
+                        showError('❌ This account has been disabled');
+                        break;
+                    case 'auth/user-not-found':
+                        showError('❌ No account found with this email');
+                        break;
+                    case 'auth/wrong-password':
+                        showError('❌ Wrong password. Please try again');
+                        break;
+                    case 'auth/too-many-requests':
+                        showError('⚠️ Too many failed attempts. Try again later');
+                        break;
+                    default:
+                        showError('❌ Login failed: ' + error.message);
+                }
+            } finally {
+                setLoading(false);
+            }
+        });
+        
+        // Check if already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Already logged in, redirect to dashboard
+                console.log("Already logged in as:", user.email);
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // Auto-fill demo credentials (for testing)
+        // emailInput.value = 'admin@okmart.com';
+        // passwordInput.value = 'Admin@123';
+        
+        // Load settings
+        loadStoreSettings();
+        
+        // Dark mode check
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>
