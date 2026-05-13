@@ -25,12 +25,6 @@
             --light-gray: #f5f5f5;
             --border: #e0e0e0;
             
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
@@ -51,7 +45,6 @@
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
         }
 
-        /* Container */
         .container {
             min-height: 100vh;
             display: flex;
@@ -60,7 +53,6 @@
             padding: 20px;
         }
 
-        /* Login Card */
         .login-card {
             background: var(--light);
             border-radius: var(--radius-lg);
@@ -73,8 +65,7 @@
 
         body.dark-mode .login-card,
         body.dark-mode .customer-dashboard,
-        body.dark-mode .transaction-item,
-        body.dark-mode .bottom-sheet .sheet-content {
+        body.dark-mode .transaction-item {
             background: #1e1e1e;
             color: #fff;
         }
@@ -90,7 +81,6 @@
             }
         }
 
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 24px;
@@ -113,7 +103,6 @@
             color: var(--gray);
         }
 
-        /* Form */
         .form-group {
             margin-bottom: 20px;
         }
@@ -143,7 +132,6 @@
             border-color: var(--primary);
         }
 
-        /* Button */
         .btn-primary {
             width: 100%;
             padding: 14px;
@@ -160,7 +148,6 @@
             transform: scale(0.98);
         }
 
-        /* Error Message */
         .error-message {
             background: #FFEBEE;
             color: var(--danger);
@@ -175,7 +162,6 @@
             background: #2d2d2d;
         }
 
-        /* Customer Dashboard */
         .customer-dashboard {
             background: var(--light);
             border-radius: var(--radius-lg);
@@ -186,7 +172,6 @@
             overflow: hidden;
         }
 
-        /* Dashboard Header */
         .dash-header {
             background: var(--primary);
             padding: 20px;
@@ -216,7 +201,6 @@
             color: white;
         }
 
-        /* Stats */
         .stats-row {
             display: flex;
             padding: 20px;
@@ -249,7 +233,6 @@
             color: var(--success);
         }
 
-        /* Quick Actions */
         .quick-actions {
             display: flex;
             gap: 12px;
@@ -276,7 +259,6 @@
             color: var(--gray);
         }
 
-        /* QR Section */
         .qr-section {
             text-align: center;
             padding: 16px;
@@ -299,7 +281,6 @@
             max-height: 100%;
         }
 
-        /* Ledger Section */
         .ledger-section {
             padding: 16px;
             max-height: 400px;
@@ -356,14 +337,6 @@
             color: var(--gray);
         }
 
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--gray);
-        }
-
-        /* Toast */
         .toast-message {
             position: fixed;
             bottom: 30px;
@@ -383,7 +356,6 @@
             opacity: 1;
         }
 
-        /* Demo Numbers Hint */
         .demo-hint {
             background: var(--light-gray);
             padding: 10px;
@@ -395,41 +367,21 @@
         body.dark-mode .demo-hint {
             background: #2d2d2d;
         }
+
+        /* Debug Panel */
+        .debug-panel {
+            background: #333;
+            color: #0f0;
+            padding: 10px;
+            margin: 10px;
+            font-size: 11px;
+            border-radius: 8px;
+            font-family: monospace;
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <!-- Add this right after <body> tag -->
-<div style="background: red; color: white; padding: 10px; margin: 10px; font-size: 12px; display: block;" id="debugPanel">
-    <strong>🔧 DEBUG MODE</strong><br>
-    <button id="debugBtn" style="background: white; color: red; border: none; padding: 5px 10px;">Check Database</button>
-    <pre id="debugOutput" style="background: black; color: lime; padding: 10px; overflow-x: auto; font-size: 10px; display: none;"></pre>
-</div>
-
-<script>
-    document.getElementById('debugBtn')?.addEventListener('click', async () => {
-        const output = document.getElementById('debugOutput');
-        output.style.display = 'block';
-        output.innerText = 'Loading...';
-        
-        try {
-            const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
-            const customersSnap = await getDocs(collection(db, 'customers'));
-            
-            let text = '📋 ALL CUSTOMERS IN DATABASE:\n\n';
-            customersSnap.forEach(doc => {
-                const data = doc.data();
-                text += `ID: ${doc.id}\n`;
-                text += `Name: ${data.name}\n`;
-                text += `Phone RAW: "${data.phone}"\n`;
-                text += `Phone Type: ${typeof data.phone}\n`;
-                text += `---\n`;
-            });
-            output.innerText = text;
-        } catch(e) {
-            output.innerText = 'Error: ' + e.message;
-        }
-    });
-</script>
     <div class="container" id="appContainer">
         <!-- Login View -->
         <div id="loginView" class="login-card">
@@ -452,7 +404,7 @@
             <button class="btn-primary" id="loginBtn">🔓 लॉगिन करें</button>
 
             <div class="demo-hint">
-                💡 टेस्ट करने के लिए: <strong>8530986425</strong> या <strong>9982239821</strong>
+                💡 टेस्ट करने के लिए नंबर डालें: <strong>9982239821</strong> या <strong>8530986425</strong>
             </div>
 
             <div style="text-align: center; margin-top: 16px;">
@@ -461,11 +413,11 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="toastMessage" class="toast-message"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { getFirestore, collection, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         
         const firebaseConfig = {
@@ -478,12 +430,12 @@
         };
         
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
         
         let currentCustomer = null;
         let allTransactions = [];
         
-        // DOM Elements
         const appContainer = document.getElementById('appContainer');
         const toastMessage = document.getElementById('toastMessage');
         
@@ -493,7 +445,6 @@
             setTimeout(() => toastMessage.classList.remove('show'), 3000);
         }
         
-        // Load Store Settings
         async function loadStoreSettings() {
             try {
                 const settingsRef = doc(db, 'settings', 'store_settings');
@@ -509,43 +460,43 @@
             } catch (e) { console.log(e); }
         }
         
-        // Normalize phone number (remove +91, spaces, special chars)
-        function normalizePhone(phone) {
-            if (!phone) return '';
-            // Remove all non-digits
-            let cleaned = phone.toString().replace(/[^0-9]/g, '');
-            // Remove leading 91 or 0
-            if (cleaned.startsWith('91')) cleaned = cleaned.substring(2);
-            if (cleaned.startsWith('0')) cleaned = cleaned.substring(1);
-            // Take last 10 digits
-            if (cleaned.length > 10) cleaned = cleaned.slice(-10);
-            return cleaned;
-        }
-        
-        // Find customer by phone - NORMALIZED SEARCH
+        // SIMPLE SEARCH - Direct string comparison with multiple formats
         async function findCustomerByPhone(inputPhone) {
-            const normalizedInput = normalizePhone(inputPhone);
-            console.log("Searching for phone:", normalizedInput);
+            // Clean input phone (remove spaces, +91, 91 prefix)
+            let cleanInput = inputPhone.toString().trim();
+            cleanInput = cleanInput.replace(/[^0-9]/g, '');
+            if (cleanInput.startsWith('91')) cleanInput = cleanInput.substring(2);
+            if (cleanInput.startsWith('0')) cleanInput = cleanInput.substring(1);
+            
+            console.log("Searching for:", cleanInput);
             
             const customersRef = collection(db, 'customers');
             const snapshot = await getDocs(customersRef);
             
             let matchedCustomer = null;
+            
             snapshot.forEach(doc => {
                 const data = doc.data();
-                const customerPhone = normalizePhone(data.phone || '');
-                console.log("Comparing with:", customerPhone);
+                const dbPhone = data.phone || '';
+                console.log("Checking DB phone:", dbPhone);
                 
-                if (customerPhone === normalizedInput) {
+                // Clean DB phone for comparison
+                let cleanDbPhone = dbPhone.toString().trim();
+                cleanDbPhone = cleanDbPhone.replace(/[^0-9]/g, '');
+                if (cleanDbPhone.startsWith('91')) cleanDbPhone = cleanDbPhone.substring(2);
+                if (cleanDbPhone.startsWith('0')) cleanDbPhone = cleanDbPhone.substring(1);
+                
+                console.log("Comparing:", cleanDbPhone, "vs", cleanInput);
+                
+                if (cleanDbPhone === cleanInput || cleanDbPhone === cleanInput.slice(-10)) {
                     matchedCustomer = { id: doc.id, ...data };
-                    console.log("Match found!");
+                    console.log("MATCH FOUND!");
                 }
             });
             
             return matchedCustomer;
         }
         
-        // Load customer transactions
         async function loadCustomerTransactions(customerId) {
             const ledgerRef = collection(db, 'ledger');
             const snapshot = await getDocs(ledgerRef);
@@ -577,7 +528,6 @@
             return transactions;
         }
         
-        // Render Customer Dashboard
         function renderDashboard(customer, transactions, settings) {
             const dueAmount = (customer.totalDue || 0);
             const totalAdded = (customer.totalAdded || 0);
@@ -618,7 +568,6 @@
                     </div>
             `;
             
-            // QR Code Section
             if (settings && settings.qrUrl) {
                 html += `
                     <div class="qr-section">
@@ -630,7 +579,6 @@
                 `;
             }
             
-            // Ledger Section
             html += `
                     <div class="ledger-section">
                         <div class="section-title">📋 लेनदेन इतिहास (${transactions.length})</div>
@@ -669,7 +617,6 @@
             
             appContainer.innerHTML = html;
             
-            // Add event listeners
             document.getElementById('logoutBtn')?.addEventListener('click', () => location.reload());
             document.getElementById('pdfBtn')?.addEventListener('click', () => generatePDF(customer, transactions, settings));
             document.getElementById('whatsappBtn')?.addEventListener('click', () => {
@@ -682,7 +629,6 @@
             });
         }
         
-        // Generate PDF Statement
         function generatePDF(customer, transactions, settings) {
             if (transactions.length === 0) {
                 showToast('कोई लेनदेन नहीं है');
@@ -787,7 +733,6 @@
             printWindow.document.close();
         }
         
-        // Escape HTML
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/[&<>]/g, function(m) {
@@ -811,6 +756,8 @@
                 return;
             }
             
+            errorDiv.style.display = 'none';
+            
             try {
                 const customer = await findCustomerByPhone(phone);
                 
@@ -825,7 +772,6 @@
                 const transactions = await loadCustomerTransactions(customer.id);
                 allTransactions = transactions;
                 
-                // Load settings
                 const settingsRef = doc(db, 'settings', 'store_settings');
                 const settingsSnap = await getDoc(settingsRef);
                 const settings = settingsSnap.exists() ? settingsSnap.data() : {};
@@ -840,18 +786,22 @@
             }
         });
         
-        // Load settings on page load
         loadStoreSettings();
         
-        // Dark Mode
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
         }
         
-        // Enter key press
         document.getElementById('phoneInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 document.getElementById('loginBtn')?.click();
+            }
+        });
+        
+        // Check if admin is logged in (optional - just for debugging)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Admin logged in:", user.email);
             }
         });
     </script>
