@@ -4,41 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ग्राहक खाता - OK Mart Khata</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/khata.css">
+    <!-- html2pdf.js: real PDF download / share for the invoice (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
 
-        :root {
-            --primary: #FF5722;
-            --primary-dark: #E64A19;
-            --success: #4CAF50;
-            --danger: #F44336;
-            --warning: #FFC107;
-            --info: #2196F3;
-            --dark: #1a1a1a;
-            --light: #ffffff;
-            --gray: #757575;
-            --light-gray: #f5f5f5;
-            --border: #e0e0e0;
-            
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--light-gray);
@@ -477,8 +449,24 @@
             color: white;
         }
     </style>
+    <style>
+        /* Invoice printing: only the invoice sheet prints (body.printing-invoice is set by printInvoice()) */
+        @media print {
+            body.printing-invoice * { visibility: hidden; }
+            body.printing-invoice #invoiceModal, body.printing-invoice #invoiceModal * { visibility: visible; }
+            body.printing-invoice #invoiceModal { position: absolute; inset: 0; background: #fff; padding: 0; overflow: visible; display: block; }
+            body.printing-invoice .invoice-actions { display: none; }
+            body.printing-invoice .invoice-sheet { box-shadow: none; max-width: 100%; margin: 0; }
+        }
+    </style>
 </head>
 <body>
+<!-- Shared brand bar — OK Mart Khata (admin) -->
+<div class="ok-brandbar">
+    <img src="assets/images/okmart-logo.png" alt="OK Mart" class="brand-logo" onerror="this.onerror=null;this.src='https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw'">
+    <div><div class="brand-name">OK Mart Khata</div><div class="brand-sub">उधारी खाता &bull; Admin</div></div>
+</div>
+
 
 <!-- Bottom Navigation -->
 <div class="mobile-bottom-nav">
@@ -498,7 +486,7 @@
         <span>📊</span>
         <span class="nav-label">रिपोर्ट</span>
     </div>
-    <div class="nav-item" data-page="profile" id="logoutBtn">
+    <div class="nav-item" data-page="logout" id="logoutBtn">
         <span>🚪</span>
         <span class="nav-label">लॉगआउट</span>
     </div>
@@ -549,11 +537,18 @@
         <span>📄</span>
         <small>पीडीएफ</small>
     </div>
+    <div class="action-btn" id="invoiceBtn">
+        <span>🧾</span>
+        <small>इनवॉइस</small>
+    </div>
     <div class="action-btn" id="reminderBtn">
         <span>📲</span>
         <small>रिमाइंडर</small>
     </div>
 </div>
+
+<!-- Reminder status: shows honestly what happened after sending (opened / blocked / no phone) -->
+<div id="reminderStatus" class="sheet-msg"></div>
 
 <!-- Filter Bar -->
 <div class="filter-bar">
@@ -609,29 +604,40 @@
                 <label>नोट (वैकल्पिक)</label>
                 <input type="text" id="entryNote" class="form-control" placeholder="जैसे: किराना सामान">
             </div>
+            <div class="sheet-msg" id="sheetMsg"></div>
             <button class="btn-primary" id="saveEntryBtn">✅ एंट्री सेव करें</button>
         </div>
     </div>
 </div>
 
+
+<!-- Invoice / Statement modal — proper invoice template with Download / Share / Print -->
+<div class="invoice-modal" id="invoiceModal">
+    <div class="invoice-sheet" id="invoiceSheet">
+        <div class="invoice-head">
+            <img src="assets/images/okmart-logo.png" alt="OK Mart" onerror="this.onerror=null;this.src='https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw'">
+            <div><div class="inv-store">OK Mart</div><div class="inv-title">खाता इनवॉइस / स्टेटमेंट</div></div>
+        </div>
+        <div class="invoice-meta" id="invoiceMeta"></div>
+        <div id="invoiceBody"></div>
+        <div class="invoice-totals" id="invoiceTotals"></div>
+        <div class="invoice-foot">यह एक कंप्यूटर जनरेटेड स्टेटमेंट है। हस्ताक्षर की आवश्यकता नहीं है।<br>OK Mart Khata System — धन्यवाद!</div>
+    </div>
+    <div class="invoice-actions">
+        <button class="btn" id="invoiceDownloadBtn">⬇️ Download PDF</button>
+        <button class="btn btn-secondary" id="invoiceShareBtn">📤 Share</button>
+        <button class="btn btn-secondary" id="invoicePrintBtn">🖨️ Print</button>
+        <button class="btn btn-ghost" id="invoiceCloseBtn">✕ बंद करें</button>
+    </div>
+</div>
+
 <script type="module">
     // Firebase Imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { collection, getDocs, getDoc, addDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { auth, db } from './js/firebase.js';
     
-    const firebaseConfig = {
-        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
-        authDomain: "ok-mart-khata.firebaseapp.com",
-        projectId: "ok-mart-khata",
-        storageBucket: "ok-mart-khata.firebasestorage.app",
-        messagingSenderId: "334851811921",
-        appId: "1:334851811921:web:804863c35baa17dd61a670"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+
     
     let customerId = null;
     let customerData = null;
@@ -688,6 +694,14 @@
     }
     
     // Load Transactions - Manual filter (no index needed)
+    // Local date string (YYYY-MM-DD) — toISOString() is UTC and shifts the date after ~5:30pm IST
+    function localDateStr(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
     async function loadTransactions() {
         try {
             const ledgerRef = collection(db, 'ledger');
@@ -714,7 +728,7 @@
                         amount: data.amount || 0,
                         note: data.note || '',
                         date: date,
-                        dateStr: date.toISOString().slice(0,10),
+                        dateStr: localDateStr(date),
                         voucherNumber: data.voucherNumber || generateVoucherNumber(date)
                     });
                 }
@@ -737,7 +751,7 @@
     // Generate Voucher Number
     function generateVoucherNumber(date) {
         const d = new Date(date);
-        const dateStr = d.toISOString().slice(0,10).replace(/-/g, '');
+        const dateStr = localDateStr(d).replace(/-/g, '');
         const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         return `OKMART-${dateStr}-${random}`;
     }
@@ -785,25 +799,35 @@
     }
     
     // Escape HTML
+    // Escape user-entered text before innerHTML (also escapes quotes for attribute contexts)
     function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/[&<>"']/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
         });
     }
     
+    // Inline sheet feedback (success / error) — replaces alert() in the entry flow
+    function showSheetMsg(text, ok) {
+        const el = document.getElementById('sheetMsg');
+        if (!el) return;
+        el.textContent = text;
+        el.className = 'sheet-msg show ' + (ok ? 'success' : 'error');
+    }
+    function hideSheetMsg() {
+        const el = document.getElementById('sheetMsg');
+        if (el) el.className = 'sheet-msg';
+    }
+
     // Add Entry (Credit or Payment)
     async function addEntry(type, amount, note) {
         if (!amount || amount <= 0) {
-            alert('कृपया सही रकम डालें');
+            showSheetMsg('कृपया सही रकम डालें (0 से ज़्यादा)', false);
             return false;
         }
         
         try {
-            const today = new Date().toISOString().slice(0,10);
+            const today = localDateStr(new Date());
             const voucherNumber = `OKMART-${today.replace(/-/g, '')}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
             
             await addDoc(collection(db, 'ledger'), {
@@ -812,7 +836,7 @@
                 type: type,
                 amount: amount,
                 note: note || '',
-                createdAt: new Date(),
+                createdAt: serverTimestamp(),
                 date: today,
                 voucherNumber: voucherNumber
             });
@@ -851,30 +875,40 @@
             
         } catch (error) {
             console.error("Error adding entry:", error);
-            alert('❌ एरर: ' + error.message);
+            showSheetMsg('❌ एरर: ' + error.message, false);
             return false;
         }
     }
     
-    // Send WhatsApp Reminder
+    // Send WhatsApp Reminder — reports honestly what happened.
+    // 'opened' means the wa.me chat opened; the owner must still press Send in WhatsApp.
+    // Nothing is logged as 'sent' — delivery cannot be confirmed from here.
     function sendReminder() {
         const dueAmount = customerData?.totalDue || 0;
         const name = customerData?.name || 'ग्राहक';
-        const phone = customerData?.phone || '';
-        
-        if (!phone) {
-            alert('ग्राहक का फोन नंबर नहीं है');
+        const phone = (customerData?.phone || '').replace(/[^0-9]/g, '');
+        const statusEl = document.getElementById('reminderStatus');
+        function showStatus(text, ok) {
+            if (!statusEl) return;
+            statusEl.textContent = text;
+            statusEl.className = 'sheet-msg show ' + (ok ? 'success' : 'error');
+        }
+        if (!phone || phone.length < 10) {
+            showStatus('❌ ग्राहक का सही फोन नंबर नहीं है — रिमाइंडर नहीं भेजा गया।', false);
             return;
         }
-        
         let message = `नमस्ते ${name},%0A%0A`;
         message += `आपका बकाया रुपये ${dueAmount.toLocaleString()} है।%0A`;
         message += `कृपया जल्द से जल्द भुगतान करें।%0A%0A`;
         message += `धन्यवाद,%0A`;
         message += `OK Mart`;
-        
-        const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${message}`;
-        window.open(whatsappUrl, '_blank');
+        const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
+        const win = window.open(whatsappUrl, '_blank');
+        if (win) {
+            showStatus('✓ WhatsApp खुल गया — रिमाइंडर भेजने के लिए WhatsApp में Send दबाएँ।', true);
+        } else {
+            showStatus('⚠️ ब्राउज़र ने WhatsApp विंडो ब्लॉक कर दी — पॉप-अप Allow करें और फिर से कोशिश करें।', false);
+        }
     }
     
     // Make Call
@@ -905,17 +939,17 @@
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Statement - ${customerData?.name}</title>
+                <title>Statement - ${escapeHtml(customerData?.name)}</title>
                 <meta charset="UTF-8">
                 <style>
                     body { font-family: Arial, sans-serif; padding: 20px; }
                     .header { text-align: center; margin-bottom: 30px; }
-                    .store-name { font-size: 24px; font-weight: bold; color: #FF5722; }
+                    .store-name { font-size: 24px; font-weight: bold; color: #006d37; }
                     .title { font-size: 18px; margin-top: 10px; }
                     .customer-details { margin: 20px 0; padding: 10px; background: #f5f5f5; border-radius: 8px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background: #FF5722; color: white; }
+                    th { background: #006d37; color: white; }
                     .total-row { font-weight: bold; background: #f5f5f5; }
                     .due { color: red; font-weight: bold; }
                     .paid { color: green; }
@@ -934,9 +968,9 @@
                 </div>
                 
                 <div class="customer-details">
-                    <strong>ग्राहक नाम:</strong> ${customerData?.name}<br>
-                    <strong>मोबाइल:</strong> ${customerData?.phone}<br>
-                    <strong>पता:</strong> ${customerData?.address || 'N/A'}<br>
+                    <strong>ग्राहक नाम:</strong> ${escapeHtml(customerData?.name)}<br>
+                    <strong>मोबाइल:</strong> ${escapeHtml(customerData?.phone)}<br>
+                    <strong>पता:</strong> ${escapeHtml(customerData?.address) || 'N/A'}<br>
                     <strong>तारीख सीमा:</strong> ${startDate || 'शुरू'} से ${endDate || 'अंत'} तक
                 </div>
                 
@@ -987,7 +1021,7 @@
                 <p>OK Mart Khata System</p>
             </div>
             <div class="no-print" style="text-align: center; margin-top: 20px;">
-                <button onclick="window.print()" style="padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
+                <button onclick="window.print()" style="padding: 10px 20px; background: #006d37; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
             </div>
             </body>
             </html>
@@ -997,8 +1031,85 @@
         printWindow.document.close();
     }
     
+
+    // ---- Invoice / Statement (per-customer, from the ledger) ----
+    function invoiceFileName() {
+        const d = localDateStr(new Date()).replace(/-/g, '');
+        const safe = (customerData?.name || 'customer').replace(/[^a-zA-Z0-9\u0900-\u097F]+/g, '-');
+        return `OKMart-Invoice-${safe}-${d}.pdf`;
+    }
+    function invoicePdfOptions() {
+        return { margin: 10, filename: invoiceFileName(), image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+    }
+    function buildInvoice() {
+        // Chronological (oldest first) with a running balance
+        const rows = [...allTransactions].sort((a, b) => a.date - b.date);
+        const today = new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('invoiceMeta').innerHTML = `
+            <div><b>ग्राहक:</b> ${escapeHtml(customerData?.name || '-')}</div>
+            <div><b>मोबाइल:</b> ${escapeHtml(customerData?.phone || '-')}</div>
+            <div><b>दिनांक:</b> ${today}</div>
+            <div><b>इनवॉइस नं.:</b> INV-${localDateStr(new Date()).replace(/-/g, '')}-${String(customerId || '').slice(-4).toUpperCase()}</div>`;
+        let balance = 0, totalCredit = 0, totalPayment = 0;
+        let body = `<table class="invoice-table"><thead><tr><th>दिनांक</th><th>विवरण</th><th class="num">उधार (₹)</th><th class="num">जमा (₹)</th><th class="num">शेष (₹)</th></tr></thead><tbody>`;
+        if (rows.length === 0) {
+            body += `<tr><td colspan="5" style="text-align:center">कोई लेनदेन नहीं</td></tr>`;
+        }
+        rows.forEach(t => {
+            const d = t.date.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            const note = escapeHtml(t.note) || (t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट');
+            if (t.type === 'credit') { totalCredit += t.amount; balance += t.amount; }
+            else { totalPayment += t.amount; balance -= t.amount; }
+            body += `<tr><td>${d}</td><td>${note}</td><td class="num debit">${t.type === 'credit' ? '₹' + t.amount.toLocaleString() : '—'}</td><td class="num credit">${t.type === 'payment' ? '₹' + t.amount.toLocaleString() : '—'}</td><td class="num">₹${balance.toLocaleString()}</td></tr>`;
+        });
+        body += `</tbody></table>`;
+        document.getElementById('invoiceBody').innerHTML = body;
+        document.getElementById('invoiceTotals').innerHTML = `
+            <div class="trow"><span>कुल उधार (क्रेडिट):</span><span>₹${totalCredit.toLocaleString()}</span></div>
+            <div class="trow"><span>कुल प्राप्त (पेमेंट):</span><span>₹${totalPayment.toLocaleString()}</span></div>
+            <div class="trow due"><span>शेष बकाया:</span><span>₹${balance.toLocaleString()}</span></div>`;
+    }
+    function openInvoice() {
+        buildInvoice();
+        document.getElementById('invoiceModal').classList.add('open');
+    }
+    function closeInvoice() {
+        document.getElementById('invoiceModal').classList.remove('open');
+    }
+    function downloadInvoice() {
+        if (typeof html2pdf === 'undefined') { alert('PDF लाइब्रेरी लोड नहीं हुई — इंटरनेट चेक करें और फिर से कोशिश करें।'); return; }
+        html2pdf().set(invoicePdfOptions()).from(document.getElementById('invoiceSheet')).save();
+    }
+    async function shareInvoice() {
+        if (typeof html2pdf === 'undefined') { alert('PDF लाइब्रेरी लोड नहीं हुई — इंटरनेट चेक करें।'); return; }
+        try {
+            const pdf = await html2pdf().set(invoicePdfOptions()).from(document.getElementById('invoiceSheet')).toPdf().get('pdf');
+            const blob = pdf.output('blob');
+            const file = new File([blob], invoiceFileName(), { type: 'application/pdf' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({ files: [file], title: 'OK Mart Invoice', text: `OK Mart — ${customerData?.name || ''} का खाता स्टेटमेंट` });
+            } else {
+                // Share API (files) not supported here — fall back to downloading the same PDF
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = invoiceFileName(); a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }
+        } catch (err) {
+            console.error('Share failed:', err);
+            alert('शेयर नहीं हो पाया — Download PDF से सेव करके शेयर करें।');
+        }
+    }
+    function printInvoice() {
+        document.body.classList.add('printing-invoice');
+        window.addEventListener('afterprint', () => document.body.classList.remove('printing-invoice'), { once: true });
+        window.print();
+        setTimeout(() => document.body.classList.remove('printing-invoice'), 1000);
+    }
+
     // Bottom Sheet Functions
     function openEntrySheet(type) {
+        hideSheetMsg();
         document.getElementById('sheetTitle').innerHTML = type === 'credit' ? '➕ क्रेडिट जोड़ें' : '💰 पेमेंट जोड़ें';
         document.getElementById('entryAmount').value = '';
         document.getElementById('entryNote').value = '';
@@ -1019,10 +1130,13 @@
         const amount = parseFloat(document.getElementById('entryAmount').value);
         const note = document.getElementById('entryNote').value;
         const type = document.querySelector('.segment.active')?.dataset.type || 'credit';
-        
+        const btn = document.getElementById('saveEntryBtn');
+        btn.disabled = true;
         const success = await addEntry(type, amount, note);
+        btn.disabled = false;
         if (success) {
-            closeSheet();
+            showSheetMsg('✓ एंट्री सेव हो गई', true);
+            setTimeout(closeSheet, 900);
         }
     }
     
@@ -1049,6 +1163,12 @@
     document.getElementById('callBtn')?.addEventListener('click', makeCall);
     document.getElementById('whatsappBtn')?.addEventListener('click', sendReminder);
     document.getElementById('pdfBtn')?.addEventListener('click', generatePDF);
+    document.getElementById('invoiceBtn')?.addEventListener('click', openInvoice);
+    document.getElementById('invoiceCloseBtn')?.addEventListener('click', closeInvoice);
+    document.getElementById('invoiceDownloadBtn')?.addEventListener('click', downloadInvoice);
+    document.getElementById('invoiceShareBtn')?.addEventListener('click', shareInvoice);
+    document.getElementById('invoicePrintBtn')?.addEventListener('click', printInvoice);
+    document.getElementById('invoiceModal')?.addEventListener('click', (e) => { if (e.target.id === 'invoiceModal') closeInvoice(); });
     document.getElementById('downloadStatementBtn')?.addEventListener('click', generatePDF);
     document.getElementById('saveEntryBtn')?.addEventListener('click', saveEntryFromSheet);
     document.querySelector('.sheet-overlay')?.addEventListener('click', closeSheet);
@@ -1093,6 +1213,16 @@
     
     // FAB Navigation
     document.getElementById('fabNavBtn')?.addEventListener('click', () => openEntrySheet('credit'));
+</script>
+<script>
+// Service worker registration (2026-11-13): offline cache for the khata PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js').catch(function(e) {
+            console.warn('Service worker registration failed:', e);
+        });
+    });
+}
 </script>
 </body>
 </html>

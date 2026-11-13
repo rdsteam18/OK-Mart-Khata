@@ -1,8 +1,14 @@
-/* Mobile First CSS - OK Mart Khata System */
+/* OK Mart Khata — shared stylesheet (2026-11-13 rebuild)
+   ONE stylesheet for all admin pages. OKmart green theme (#006d37).
+   Linked BEFORE each page's inline <style>, so page rules win on conflict. */
 
 :root {
-    --primary: #FF5722;
-    --primary-dark: #E64A19;
+    --primary: #006d37;
+    --primary-dark: #004d29;
+    --primary-light: #E8F5E9;
+    --gold: #FFD700;
+    --silver: #C0C0C0;
+    --bronze: #CD7F32;
     --success: #4CAF50;
     --danger: #F44336;
     --warning: #FFC107;
@@ -540,3 +546,122 @@ body.dark-mode .quick-amount {
         max-width: 1200px;
     }
 }
+
+/* ============ Shared components (added 2026-11-13) ============ */
+
+/* Brand bar — consistent header on every admin page: OKmart logo + app name */
+.ok-brandbar {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--primary); color: #fff;
+    padding: 10px 16px; margin: 0 0 16px;
+    position: sticky; top: 0; z-index: 60;
+    box-shadow: var(--shadow-md);
+}
+.ok-brandbar .brand-logo {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #fff; object-fit: cover; flex-shrink: 0;
+}
+.ok-brandbar .brand-name { font-size: 18px; font-weight: 700; line-height: 1.2; }
+.ok-brandbar .brand-sub { font-size: 12px; opacity: .85; line-height: 1.2; }
+body.dark-mode .ok-brandbar { background: #004d29; }
+
+/* Buttons — big, touch-friendly, consistent */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 48px; padding: 12px 20px;
+    background: var(--primary); color: #fff; border: none;
+    border-radius: var(--radius-md); font-size: 16px; font-weight: 600;
+    cursor: pointer; transition: background .2s, transform .1s;
+}
+.btn:active { background: var(--primary-dark); transform: scale(.98); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn-secondary { background: var(--light-gray); color: var(--dark); border: 1px solid var(--border); }
+.btn-secondary:active { background: var(--border); }
+.btn-danger { background: var(--danger); }
+.btn-danger:active { background: #d32f2f; }
+.btn-ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+.btn-block { width: 100%; }
+body.dark-mode .btn-secondary { background: #2d2d2d; color: #fff; border-color: #404040; }
+
+/* Clean tables */
+.ok-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ok-table th, .ok-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+.ok-table th { background: var(--primary); color: #fff; font-weight: 600; }
+.ok-table tr:last-child td { border-bottom: none; }
+.ok-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+body.dark-mode .ok-table th { background: #004d29; }
+
+/* Inline form feedback (replaces alert() in sheets) */
+.sheet-msg {
+    display: none; margin: 12px 0; padding: 12px 14px;
+    border-radius: var(--radius-sm); font-size: 14px; font-weight: 500;
+}
+.sheet-msg.show { display: block; }
+.sheet-msg.success { background: #E8F5E9; color: #1B5E20; border: 1px solid #A5D6A7; }
+.sheet-msg.error { background: #FDECEA; color: #B71C1C; border: 1px solid #EF9A9A; }
+body.dark-mode .sheet-msg.success { background: #1B5E20; color: #C8E6C9; }
+body.dark-mode .sheet-msg.error { background: #4A1414; color: #FFCDD2; }
+
+/* Reminder send results */
+.send-results { margin-top: 16px; display: none; }
+.send-results.show { display: block; }
+.send-results h4 { font-size: 15px; margin-bottom: 8px; }
+.send-result-row {
+    display: flex; justify-content: space-between; gap: 8px;
+    padding: 10px 12px; background: var(--light); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); margin-bottom: 6px; font-size: 14px;
+}
+.send-result-row .st-opened { color: var(--success); font-weight: 600; }
+.send-result-row .st-blocked { color: var(--danger); font-weight: 600; }
+.send-result-row .st-invalid { color: var(--warning); font-weight: 600; }
+body.dark-mode .send-result-row { background: #1e1e1e; }
+
+/* Toast (shared fallback — pages keep their own if defined) */
+.toast-message {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--dark); color: #fff; padding: 12px 20px; border-radius: 24px;
+    font-size: 14px; z-index: 300; opacity: 0; pointer-events: none;
+    transition: opacity .3s, transform .3s; max-width: 90vw; text-align: center;
+}
+.toast-message.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ============ Invoice / statement sheet (customer-detail.html) ============ */
+.invoice-modal {
+    position: fixed; inset: 0; z-index: 400; display: none;
+    background: rgba(0,0,0,.55); overflow-y: auto; padding: 16px 12px 90px;
+}
+.invoice-modal.open { display: block; }
+.invoice-sheet {
+    background: #fff; color: #1a1a1a; max-width: 640px; margin: 0 auto;
+    border-radius: var(--radius-md); padding: 20px 18px;
+    box-shadow: var(--shadow-lg);
+}
+.invoice-head { display: flex; align-items: center; gap: 12px; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 12px; }
+.invoice-head img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+.invoice-head .inv-store { font-size: 20px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+.invoice-head .inv-title { font-size: 13px; color: var(--gray); }
+.invoice-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 14px; margin-bottom: 14px; }
+.invoice-meta b { font-weight: 600; }
+.invoice-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 12px; }
+.invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 7px 6px; text-align: left; }
+.invoice-table th { background: var(--primary); color: #fff; }
+.invoice-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.invoice-table .debit { color: #C62828; }
+.invoice-table .credit { color: #2E7D32; }
+.invoice-totals { font-size: 14px; border-top: 2px solid var(--primary); padding-top: 10px; }
+.invoice-totals .trow { display: flex; justify-content: space-between; padding: 3px 0; }
+.invoice-totals .due { font-weight: 700; font-size: 16px; color: #C62828; }
+.invoice-foot { margin-top: 14px; font-size: 11px; color: var(--gray); text-align: center; border-top: 1px dashed var(--border); padding-top: 10px; }
+.invoice-actions {
+    position: sticky; bottom: 0; max-width: 640px; margin: 12px auto 0;
+    display: flex; gap: 8px; flex-wrap: wrap;
+}
+.invoice-actions .btn { flex: 1 1 30%; min-width: 100px; }
+@media (max-width: 480px) {
+    .invoice-meta { grid-template-columns: 1fr; }
+    .invoice-table { font-size: 12px; }
+    .invoice-actions .btn { flex: 1 1 44%; }
+}
+
+/* Inputs: 16px base stops iOS auto-zoom; class rules on pages still win */
+input, select, textarea { font-size: 16px; }

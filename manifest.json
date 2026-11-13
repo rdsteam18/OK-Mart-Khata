@@ -2,10 +2,10 @@
   "name": "OK Mart Khata",
   "short_name": "OK Khata",
   "description": "OK Mart Customer Khata System",
-  "start_url": "/customer-view.html",
+  "start_url": "/index.html",
   "display": "standalone",
-  "theme_color": "#FF5722",
-  "background_color": "#FF5722",
+  "theme_color": "#006d37",
+  "background_color": "#006d37",
   "orientation": "portrait",
   "icons": [
     {
@@ -24,27 +24,27 @@
       "type": "image/png"
     },
     {
-      "src": "assets/icons/icon-144.png",
+      "src": "https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw",
       "sizes": "144x144",
       "type": "image/png"
     },
     {
-      "src": "assets/icons/icon-152.png",
+      "src": "https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw",
       "sizes": "152x152",
       "type": "image/png"
     },
     {
-      "src": "assets/icons/icon-192.png",
+      "src": "https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "assets/icons/icon-384.png",
+      "src": "https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw",
       "sizes": "384x384",
       "type": "image/png"
     },
     {
-      "src": "assets/icons/icon-512.png",
+      "src": "https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw",
       "sizes": "512x512",
       "type": "image/png"
     }

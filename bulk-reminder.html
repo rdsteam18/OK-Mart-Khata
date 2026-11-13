@@ -4,39 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>बल्क रिमाइंडर - OK Mart Khata</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/khata.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
 
-        :root {
-            --primary: #FF5722;
-            --primary-dark: #E64A19;
-            --success: #4CAF50;
-            --danger: #F44336;
-            --warning: #FFC107;
-            --info: #2196F3;
-            --dark: #1a1a1a;
-            --light: #ffffff;
-            --gray: #757575;
-            --light-gray: #f5f5f5;
-            --border: #e0e0e0;
-            
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--light-gray);
@@ -357,6 +329,12 @@
     </style>
 </head>
 <body>
+<!-- Shared brand bar — OK Mart Khata (admin) -->
+<div class="ok-brandbar">
+    <img src="assets/images/okmart-logo.png" alt="OK Mart" class="brand-logo" onerror="this.onerror=null;this.src='https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw'">
+    <div><div class="brand-name">OK Mart Khata</div><div class="brand-sub">उधारी खाता &bull; Admin</div></div>
+</div>
+
 
 <!-- Bottom Navigation -->
 <div class="mobile-bottom-nav">
@@ -440,6 +418,13 @@
     <div class="progress-text" id="progressText">भेजा जा रहा है...</div>
 </div>
 
+<!-- Per-customer send results (honest status per customer) -->
+<div class="send-results" id="sendResults">
+    <h4>📋 नतीजा — हर ग्राहक का स्टेटस</h4>
+    <div id="sendResultsList"></div>
+    <p style="font-size:12px;color:var(--gray);margin-top:8px">नोट: "WhatsApp खुला" का मतलब है चैट खुल गई — मैसेज तभी जाएगा जब आप WhatsApp में Send दबाएँगे।</p>
+</div>
+
 <!-- Message Preview -->
 <div class="message-preview">
     <h4>✏️ मैसेज प्रीव्यू</h4>
@@ -455,22 +440,11 @@
 <div id="toastMessage" class="toast-message"></div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { auth, db } from './js/firebase.js';
     
-    const firebaseConfig = {
-        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
-        authDomain: "ok-mart-khata.firebaseapp.com",
-        projectId: "ok-mart-khata",
-        storageBucket: "ok-mart-khata.firebasestorage.app",
-        messagingSenderId: "334851811921",
-        appId: "1:334851811921:web:804863c35baa17dd61a670"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+
     
     let allCustomers = [];
     let selectedCustomers = new Set();
@@ -581,7 +555,7 @@
                 <input type="checkbox" class="customer-checkbox" data-id="${customer.id}" ${selectedCustomers.has(customer.id) ? 'checked' : ''}>
                 <div class="customer-info">
                     <div class="customer-name">${escapeHtml(customer.name)}</div>
-                    <div class="customer-phone">📞 ${customer.phone}</div>
+                    <div class="customer-phone">📞 ${escapeHtml(customer.phone)}</div>
                 </div>
                 <div class="customer-due">₹${customer.due.toLocaleString()}</div>
             </div>
@@ -667,86 +641,91 @@
     }
     
     // Send bulk WhatsApp messages
+    // Send bulk reminders — logs the TRUE outcome per customer.
+    // 'opened' = the wa.me chat opened (the owner must still press Send in WhatsApp);
+    // 'blocked' = the browser blocked the popup; 'invalid-phone' = bad number.
+    // Nothing is marked 'sent' — WhatsApp delivery cannot be confirmed from here.
     async function sendBulkMessages() {
         if (selectedCustomers.size === 0) {
             showToast('कृपया कम से कम एक ग्राहक चुनें');
             return;
         }
-        
+
         const selectedCustomerData = allCustomers.filter(c => selectedCustomers.has(c.id));
-        
-        const confirmMsg = `📲 ${selectedCustomers.size} ग्राहकों को WhatsApp पर मैसेज भेजना है।\n\nक्या आप जारी रखना चाहते हैं?`;
+
+        const confirmMsg = `📲 ${selectedCustomers.size} ग्राहकों के लिए WhatsApp खुलेगा (एक-एक करके)।\n\nहर ग्राहक के लिए WhatsApp में Send खुद दबाना होगा।\n\nक्या आप जारी रखना चाहते हैं?`;
         if (!confirm(confirmMsg)) return;
-        
+
         const progressContainer = document.getElementById('progressContainer');
         const progressFill = document.getElementById('progressFill');
         const progressText = document.getElementById('progressText');
+        const resultsEl = document.getElementById('sendResults');
+        const resultsList = document.getElementById('sendResultsList');
         const sendBtn = document.getElementById('sendBtn');
-        
+
         progressContainer.style.display = 'block';
+        resultsEl.classList.add('show');
+        resultsList.innerHTML = '';
         sendBtn.disabled = true;
-        
-        let sent = 0;
-        let failed = 0;
-        
+
+        let opened = 0, blocked = 0, invalid = 0;
+
         for (let i = 0; i < selectedCustomerData.length; i++) {
             const customer = selectedCustomerData[i];
-            const phone = customer.phone.replace(/[^0-9]/g, '').replace(/^91/, '').replace(/^0/, '');
-            
+            const phone = (customer.phone || '').replace(/[^0-9]/g, '').replace(/^91/, '').replace(/^0/, '');
+            let status = 'invalid-phone', statusText = 'गलत नंबर';
+            let logMessage = '';
+
             if (phone && phone.length >= 10) {
                 const message = getMessage(customer, currentMessageType);
+                logMessage = message;
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
-                
-                // Log reminder to Firestore
-                try {
-                    await addDoc(collection(db, 'reminders'), {
-                        customerId: customer.id,
-                        customerName: customer.name,
-                        phone: phone,
-                        message: message,
-                        type: currentMessageType,
-                        sentAt: new Date(),
-                        status: 'sent'
-                    });
-                } catch(e) { console.log(e); }
-                
-                // Open WhatsApp in new tab (will open multiple tabs)
-                window.open(whatsappUrl, '_blank');
-                sent++;
+
+                // Open FIRST, then log what actually happened
+                const win = window.open(whatsappUrl, '_blank');
+                if (win) { status = 'opened'; statusText = 'WhatsApp खुला — Send दबाएँ'; opened++; }
+                else { status = 'blocked'; statusText = 'पॉप-अप ब्लॉक हुआ'; blocked++; }
             } else {
-                failed++;
-                console.log("Invalid phone:", customer.phone);
+                invalid++;
             }
-            
+
+            try {
+                await addDoc(collection(db, 'reminders'), {
+                    customerId: customer.id,
+                    customerName: customer.name,
+                    phone: phone || customer.phone || '',
+                    message: logMessage,
+                    type: currentMessageType,
+                    sentAt: serverTimestamp(),
+                    status: status
+                });
+            } catch(e) { console.log(e); }
+
+            const statusClass = status === 'opened' ? 'opened' : status === 'blocked' ? 'blocked' : 'invalid';
+            resultsList.innerHTML += `<div class="send-result-row"><span>${escapeHtml(customer.name)} — ${escapeHtml(customer.phone || '')}</span><span class="st-${statusClass}">${statusText}</span></div>`;
+
             // Update progress
             const percent = ((i + 1) / selectedCustomerData.length) * 100;
             progressFill.style.width = percent + '%';
-            progressText.innerText = `भेजा जा रहा है... ${i + 1}/${selectedCustomerData.length}`;
-            
+            progressText.innerText = `प्रोसेस हो रहा है... ${i + 1}/${selectedCustomerData.length}`;
+
             // Delay to avoid overwhelming browser
             await new Promise(r => setTimeout(r, 500));
         }
-        
-        progressText.innerText = `✅ पूरा हुआ! ${sent} भेजे, ${failed} असफल`;
+
+        progressText.innerText = `✅ पूरा हुआ! ${opened} WhatsApp खुले, ${blocked} ब्लॉक हुए, ${invalid} गलत नंबर — हर खुले चैट में Send खुद दबाएँ।`;
         sendBtn.disabled = false;
-        
-        showToast(`✅ ${sent} ग्राहकों को मैसेज भेजा गया`);
-        
-        // Reset after 3 seconds
-        setTimeout(() => {
-            progressContainer.style.display = 'none';
-        }, 3000);
+
+        showToast(`WhatsApp खुले: ${opened}, ब्लॉक: ${blocked}, गलत नंबर: ${invalid}`);
     }
     
     // Escape HTML
+    // Escape user-entered text before innerHTML (also escapes quotes for attribute contexts)
     function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/[&<>"']/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
         });
     }
     
@@ -818,6 +797,16 @@
         localStorage.setItem('darkMode', isDark);
         darkBtn.innerText = isDark ? '☀️' : '🌙';
     });
+</script>
+<script>
+// Service worker registration (2026-11-13): offline cache for the khata PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js').catch(function(e) {
+            console.warn('Service worker registration failed:', e);
+        });
+    });
+}
 </script>
 </body>
 </html>

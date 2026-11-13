@@ -4,39 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ग्रुप खाता - OK Mart Khata</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/khata.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
 
-        :root {
-            --primary: #FF5722;
-            --primary-dark: #E64A19;
-            --success: #4CAF50;
-            --danger: #F44336;
-            --warning: #FFC107;
-            --info: #2196F3;
-            --dark: #1a1a1a;
-            --light: #ffffff;
-            --gray: #757575;
-            --light-gray: #f5f5f5;
-            --border: #e0e0e0;
-            
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--light-gray);
@@ -412,6 +384,12 @@
     </style>
 </head>
 <body>
+<!-- Shared brand bar — OK Mart Khata (admin) -->
+<div class="ok-brandbar">
+    <img src="assets/images/okmart-logo.png" alt="OK Mart" class="brand-logo" onerror="this.onerror=null;this.src='https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw'">
+    <div><div class="brand-name">OK Mart Khata</div><div class="brand-sub">उधारी खाता &bull; Admin</div></div>
+</div>
+
 
 <!-- Bottom Navigation -->
 <div class="mobile-bottom-nav">
@@ -503,22 +481,11 @@
 <div id="toastMessage" class="toast-message"></div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { auth, db } from './js/firebase.js';
     
-    const firebaseConfig = {
-        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
-        authDomain: "ok-mart-khata.firebaseapp.com",
-        projectId: "ok-mart-khata",
-        storageBucket: "ok-mart-khata.firebasestorage.app",
-        messagingSenderId: "334851811921",
-        appId: "1:334851811921:web:804863c35baa17dd61a670"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+
     
     let allGroups = [];
     let allCustomers = [];
@@ -648,7 +615,7 @@
                     <div class="member-avatars">
                         ${(group.members || []).slice(0, 5).map(m => {
                             const cust = getMemberDetails(m.customerId);
-                            return `<span class="member-avatar">${cust ? cust.name : '?'}</span>`;
+                            return `<span class="member-avatar">${cust ? escapeHtml(cust.name) : '?'}</span>`;
                         }).join('')}
                         ${(group.members?.length || 0) > 5 ? `<span class="member-avatar">+${group.members.length - 5}</span>` : ''}
                     </div>
@@ -714,7 +681,7 @@
                         <div class="member-detail-card" onclick="window.location.href='customer-detail.html?id=${m.id}'">
                             <div>
                                 <div>${escapeHtml(m.name)}</div>
-                                <div class="member-phone">📞 ${m.phone}</div>
+                                <div class="member-phone">📞 ${escapeHtml(m.phone)}</div>
                             </div>
                             <div class="member-due">₹${m.due.toLocaleString()}</div>
                         </div>
@@ -756,16 +723,16 @@
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Group Statement - ${group.groupName}</title>
+                <title>Group Statement - ${escapeHtml(group.groupName)}</title>
                 <meta charset="UTF-8">
                 <style>
                     body { font-family: Arial, sans-serif; padding: 20px; }
                     .header { text-align: center; margin-bottom: 30px; }
-                    .store-name { font-size: 22px; font-weight: bold; color: #FF5722; }
+                    .store-name { font-size: 22px; font-weight: bold; color: #006d37; }
                     .title { font-size: 18px; margin-top: 10px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background: #FF5722; color: white; }
+                    th { background: #006d37; color: white; }
                     .total-row { font-weight: bold; background: #f5f5f5; }
                     .due { color: red; font-weight: bold; }
                     .footer { margin-top: 30px; text-align: center; font-size: 11px; color: gray; }
@@ -783,7 +750,7 @@
                 </div>
                 
                 <div class="customer-details">
-                    <strong>ग्रुप नाम:</strong> ${group.groupName}<br>
+                    <strong>ग्रुप नाम:</strong> ${escapeHtml(group.groupName)}<br>
                     <strong>कुल सदस्य:</strong> ${members.length}<br>
                     <strong>कुल ग्रुप बकाया:</strong> ₹${totalDue.toLocaleString()}
                 </div>
@@ -800,7 +767,7 @@
                 <tr>
                     <td>${index + 1}</td>
                     <td>${escapeHtml(m.name)}</td>
-                    <td>${m.phone}</td>
+                    <td>${escapeHtml(m.phone)}</td>
                     <td class="due">₹${m.due.toLocaleString()}</td>
                 </tr>
             `;
@@ -819,7 +786,7 @@
                     <p>OK Mart - धन्यवाद!</p>
                 </div>
                 <div class="no-print" style="text-align: center; margin-top: 20px;">
-                    <button onclick="window.print()" style="padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
+                    <button onclick="window.print()" style="padding: 10px 20px; background: #006d37; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
                 </div>
             </body>
             </html>
@@ -854,7 +821,7 @@
                 <div class="member-item">
                     <div class="member-name">
                         ${customer ? escapeHtml(customer.name) : 'Unknown'}
-                        <div class="member-phone">📞 ${customer ? customer.phone : ''}</div>
+                        <div class="member-phone">📞 ${customer ? escapeHtml(customer.phone) : ''}</div>
                     </div>
                     <button class="remove-member" data-index="${index}">🗑️</button>
                 </div>
@@ -955,7 +922,7 @@
                     groupName: groupName,
                     members: currentMembers,
                     totalGroupDue: totalGroupDue,
-                    createdAt: new Date()
+                    createdAt: serverTimestamp()
                 });
                 showToast('✅ नया ग्रुप बन गया');
             }
@@ -973,13 +940,11 @@
     }
     
     // Escape HTML
+    // Escape user-entered text before innerHTML (also escapes quotes for attribute contexts)
     function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/[&<>"']/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
         });
     }
     
@@ -1025,6 +990,16 @@
         localStorage.setItem('darkMode', isDark);
         darkBtn.innerText = isDark ? '☀️' : '🌙';
     });
+</script>
+<script>
+// Service worker registration (2026-11-13): offline cache for the khata PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js').catch(function(e) {
+            console.warn('Service worker registration failed:', e);
+        });
+    });
+}
 </script>
 </body>
 </html>

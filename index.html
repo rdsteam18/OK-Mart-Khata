@@ -5,47 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>OK Mart Khata - Dashboard</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/khata.css">
    <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/a/AVvXsEjqUODVL4iyLalUMIzsfwPSpjOSA_8OEz7zn7WiCOxVySl8TqcLxulYNt7tBT9C85tto_EoafNkIMbgV1AMPkOJjkeZ52VLY5PR02z06GFwwFPb9WQBAun4WHcd3JB2Heky3Q2WdDGPy8DGZn7suo0_8RdY7Wd7i7wTMA4osYIiL6NZ1CbuPJHGzmeX">
   <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/a/AVvXsEjqUODVL4iyLalUMIzsfwPSpjOSA_8OEz7zn7WiCOxVySl8TqcLxulYNt7tBT9C85tto_EoafNkIMbgV1AMPkOJjkeZ52VLY5PR02z06GFwwFPb9WQBAun4WHcd3JB2Heky3Q2WdDGPy8DGZn7suo0_8RdY7Wd7i7wTMA4osYIiL6NZ1CbuPJHGzmeX">
-    <meta name="theme-color" content="#FF5722">
+    <meta name="theme-color" content="#006d37">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
 
-        :root {
-            --primary: #FF5722;
-            --primary-dark: #E64A19;
-            --primary-light: #FF8A65;
-            --success: #4CAF50;
-            --danger: #F44336;
-            --warning: #FFC107;
-            --info: #2196F3;
-            --dark: #1a1a1a;
-            --light: #ffffff;
-            --gray: #757575;
-            --light-gray: #f5f5f5;
-            --border: #e0e0e0;
-            
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-            
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
-        }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--light-gray);
@@ -456,7 +422,7 @@
         </div>
         <div class="sidebar-item" data-page="profit-loss">
             <span>📈</span>
-            <span>Profit & Loss</span>
+            <span>Net Collection</span>
         </div>
         <div class="sidebar-item" data-page="bulk-reminder">
             <span>📲</span>
@@ -483,7 +449,7 @@
     <div class="header">
         <div class="logo-area">
             <button class="icon-btn" id="menuToggle" style="display: none;">☰</button>
-            <img src="assets/images/logo-placeholder.png" alt="Logo" class="logo" id="mobileLogo" onerror="this.style.display='none'">
+            <img src="assets/images/okmart-logo.png" alt="OK Mart" class="logo" id="mobileLogo" onerror="this.onerror=null;this.src='https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw'">
             <span class="store-name" id="mobileStoreName">OK Mart</span>
         </div>
         <div class="header-actions">
@@ -510,9 +476,9 @@
             <span>📊</span>
             <span class="nav-label">रिपोर्ट</span>
         </div>
-        <div class="nav-item" data-page="profile">
-            <span>👤</span>
-            <span class="nav-label">प्रोफाइल</span>
+        <div class="nav-item" data-page="settings">
+            <span>⚙️</span>
+            <span class="nav-label">सेटिंग्स</span>
         </div>
     </div>
 
@@ -621,22 +587,11 @@
 <div id="toastMessage" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none;"></div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, query, orderBy, limit, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { collection, getDocs, query, orderBy, limit, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { auth, db } from './js/firebase.js';
     
-    const firebaseConfig = {
-        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
-        authDomain: "ok-mart-khata.firebaseapp.com",
-        projectId: "ok-mart-khata",
-        storageBucket: "ok-mart-khata.firebasestorage.app",
-        messagingSenderId: "334851811921",
-        appId: "1:334851811921:web:804863c35baa17dd61a670"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+
     
     let allCustomers = [];
     let allLedger = [];
@@ -769,7 +724,7 @@
                     <div class="customer-item" data-id="${c.id}">
                         <div class="customer-info">
                             <div class="customer-name">${escapeHtml(c.name)}</div>
-                            <div class="customer-phone">📞 ${c.phone}</div>
+                            <div class="customer-phone">📞 ${escapeHtml(c.phone)}</div>
                         </div>
                         <div class="customer-due">
                             <div class="due-amount">₹${c.totalDue.toLocaleString()}</div>
@@ -818,9 +773,12 @@
         return customer ? customer.name : 'ग्राहक';
     }
     
+    // Escape user-entered text before innerHTML (also escapes quotes for attribute contexts)
     function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/[&<>"']/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+        });
     }
     
     // Navigation
@@ -834,7 +792,6 @@
         'bulk-reminder': 'bulk-reminder.html',
         'loyalty': 'loyalty-points.html',
         'settings': 'settings.html',
-        'profile': 'customer-view.html'
     };
     
     function navigateTo(page) {
@@ -898,7 +855,6 @@
         'bulk-reminder.html': 'bulk-reminder',
         'loyalty-points.html': 'loyalty',
         'settings.html': 'settings',
-        'customer-view.html': 'profile'
     };
     const activeKey = pageToKey[currentPage] || 'dashboard';
     document.querySelectorAll('.sidebar-item, .nav-item').forEach(item => {
@@ -908,6 +864,16 @@
             item.classList.remove('active');
         }
     });
+</script>
+<script>
+// Service worker registration (2026-11-13): offline cache for the khata PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js').catch(function(e) {
+            console.warn('Service worker registration failed:', e);
+        });
+    });
+}
 </script>
 </body>
 </html>

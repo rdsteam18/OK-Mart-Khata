@@ -4,41 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>रिपोर्ट्स - OK Mart Khata</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/khata.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
 
-        :root {
-            --primary: #FF5722;
-            --primary-dark: #E64A19;
-            --success: #4CAF50;
-            --danger: #F44336;
-            --warning: #FFC107;
-            --info: #2196F3;
-            --dark: #1a1a1a;
-            --light: #ffffff;
-            --gray: #757575;
-            --light-gray: #f5f5f5;
-            --border: #e0e0e0;
-            
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--light-gray);
@@ -352,6 +322,12 @@
     </style>
 </head>
 <body>
+<!-- Shared brand bar — OK Mart Khata (admin) -->
+<div class="ok-brandbar">
+    <img src="assets/images/okmart-logo.png" alt="OK Mart" class="brand-logo" onerror="this.onerror=null;this.src='https://blogger.googleusercontent.com/img/a/AVvXsEjfBhFUQu97TtoyBqkTmnXHAX0wwrVBZTDnD5NXtYp0ZLrcZsEwqzFAnrAVyGNd0lA7V_fptO0i2d0OjZROR4_44XeVBUCynuddGzAZohimGJkrrZjw1ZWoqOh0aJdUPDROPqOW0Ir5cIL5q0e4mPC5Q-sFAPUDE1xZAKYk6IrrLjZgFZgHAr8FfZSR=rw'">
+    <div><div class="brand-name">OK Mart Khata</div><div class="brand-sub">उधारी खाता &bull; Admin</div></div>
+</div>
+
 
 <!-- Bottom Navigation -->
 <div class="mobile-bottom-nav">
@@ -371,7 +347,7 @@
         <span>📊</span>
         <span class="nav-label">रिपोर्ट</span>
     </div>
-    <div class="nav-item" data-page="profile" id="logoutBtn">
+    <div class="nav-item" data-page="logout" id="logoutBtn">
         <span>🚪</span>
         <span class="nav-label">लॉगआउट</span>
     </div>
@@ -467,22 +443,11 @@
 
 <script type="module">
     // Firebase Imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { auth, db } from './js/firebase.js';
     
-    const firebaseConfig = {
-        apiKey: "AIzaSyAWL9DQhuyah1ntZgUwqFHegWcm_uvKyus",
-        authDomain: "ok-mart-khata.firebaseapp.com",
-        projectId: "ok-mart-khata",
-        storageBucket: "ok-mart-khata.firebasestorage.app",
-        messagingSenderId: "334851811921",
-        appId: "1:334851811921:web:804863c35baa17dd61a670"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+
     
     let allCustomers = [];
     let allTransactions = [];
@@ -610,7 +575,7 @@
                 <div class="customer-row" onclick="window.location.href='customer-detail.html?id=${c.id}'">
                     <div>
                         <div class="customer-name">${escapeHtml(c.name)}</div>
-                        <div class="customer-phone">📞 ${c.phone}</div>
+                        <div class="customer-phone">📞 ${escapeHtml(c.phone)}</div>
                     </div>
                     <div class="customer-amount">₹${c.totalDue.toLocaleString()}</div>
                 </div>
@@ -641,7 +606,7 @@
                 <div class="customer-row" onclick="window.location.href='customer-detail.html?id=${c.id}'">
                     <div>
                         <div class="customer-name">${medal} ${escapeHtml(c.name)}</div>
-                        <div class="customer-phone">📞 ${c.phone}</div>
+                        <div class="customer-phone">📞 ${escapeHtml(c.phone)}</div>
                     </div>
                     <div class="customer-amount">₹${c.totalAdded.toLocaleString()}</div>
                 </div>
@@ -746,11 +711,11 @@
                 <style>
                     body { font-family: Arial, sans-serif; padding: 20px; }
                     .header { text-align: center; margin-bottom: 30px; }
-                    .title { font-size: 24px; font-weight: bold; color: #FF5722; }
+                    .title { font-size: 24px; font-weight: bold; color: #006d37; }
                     .date-range { margin: 10px 0; color: gray; }
                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background: #FF5722; color: white; }
+                    th { background: #006d37; color: white; }
                     .total { font-weight: bold; background: #f5f5f5; }
                     @media print {
                         body { padding: 0; }
@@ -785,7 +750,7 @@
             html += `
                 <tr>
                     <td>${t.dateStr}</td>
-                    <td>${customerMap.get(t.customerId) || 'N/A'}</td>
+                    <td>${escapeHtml(customerMap.get(t.customerId)) || 'N/A'}</td>
                     <td>${t.type === 'credit' ? 'क्रेडिट' : 'पेमेंट'}</td>
                     <td>₹${t.amount.toLocaleString()}</td>
                 </tr>
@@ -809,7 +774,7 @@
             </table>
             
             <div class="no-print" style="text-align: center; margin-top: 20px;">
-                <button onclick="window.print()" style="padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
+                <button onclick="window.print()" style="padding: 10px 20px; background: #006d37; color: white; border: none; border-radius: 8px;">🖨️ प्रिंट करें</button>
             </div>
             </body>
             </html>
@@ -820,13 +785,11 @@
     }
     
     // Escape HTML
+    // Escape user-entered text before innerHTML (also escapes quotes for attribute contexts)
     function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/[&<>"']/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
         });
     }
     
@@ -898,6 +861,16 @@
         localStorage.setItem('darkMode', isDark);
         darkBtn.innerText = isDark ? '☀️' : '🌙';
     });
+</script>
+<script>
+// Service worker registration (2026-11-13): offline cache for the khata PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js').catch(function(e) {
+            console.warn('Service worker registration failed:', e);
+        });
+    });
+}
 </script>
 </body>
 </html>
