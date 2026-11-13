@@ -2,7 +2,7 @@
   "name": "OK Mart Khata",
   "short_name": "OK Khata",
   "description": "OK Mart Customer Khata System",
-  "start_url": "/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "theme_color": "#006d37",
   "background_color": "#006d37",
